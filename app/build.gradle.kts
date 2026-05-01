@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.greatmachine.artviewer"
+    namespace = "com.deviantart.artviewer"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.greatmachine.artviewer"
+        applicationId = "com.deviantart.artviewer"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.greatmachine.artviewer
+package com.deviantart.artviewer
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
