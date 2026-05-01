@@ -14,4 +14,5 @@ object AppColors {
     val AltBackgroundColor = Color(0xFFF7F7F5)
     val GreenSuccessColor = Color(0xFF00C853)
     val RedErrorColor = Color(0xFFD32F2F)
+    val White = Color.White
 }
