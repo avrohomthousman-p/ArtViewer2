@@ -1,21 +1,27 @@
 package com.deviantart.artviewer.ui.activities
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.toArgb
-import com.deviantart.artviewer.ui.screens.DisplayArtScreen
 import com.deviantart.artviewer.ui.themes.AppColors
 
-
 /**
- * Activity where the user is shown the media contents of a specific folder.
+ * Base activity for all other activities to extend
  */
-class DisplayArtActivity : BaseActivity() {
+open class BaseActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        setEdgeToEdge()
+    }
+
+
+    /**
+     * Sets the colors of the system navigation bar and status bar.
+     */
+    private fun setEdgeToEdge(){
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 scrim = AppColors.StatusBarColor.toArgb(),
@@ -26,9 +32,5 @@ class DisplayArtActivity : BaseActivity() {
                 darkScrim = AppColors.NavBarColor.toArgb()
             )
         )
-
-        setContent {
-            DisplayArtScreen()
-        }
     }
 }
