@@ -6,9 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.deviantart.artviewer.data.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 /**
@@ -25,7 +28,11 @@ enum class LoginState {
 /**
  * View model for the login screen
  */
-class LoginViewModel : ViewModel() {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val authRepo: AuthRepository
+) : ViewModel() {
+
     var loginState by mutableStateOf(LoginState.LoggedOut)
         private set
 
@@ -35,7 +42,7 @@ class LoginViewModel : ViewModel() {
             loginState = LoginState.LoginInProgress
 
             try {
-                delay(5000) // TODO: need real implementation
+                delay(3000) // TODO: need real implementation
 
                 loginState = LoginState.LoginSuccess
             }

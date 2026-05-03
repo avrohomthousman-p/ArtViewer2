@@ -7,11 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.toArgb
 import com.deviantart.artviewer.ui.screens.DisplayArtScreen
 import com.deviantart.artviewer.ui.themes.AppColors
+import dagger.hilt.android.AndroidEntryPoint
 
 
 /**
  * Activity where the user is shown the media contents of a specific folder.
  */
+@AndroidEntryPoint
 class DisplayArtActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

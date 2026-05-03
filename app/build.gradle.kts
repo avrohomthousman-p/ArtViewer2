@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     id("org.jetbrains.kotlin.plugin.compose")
+    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -43,6 +45,8 @@ android {
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.activity.compose)

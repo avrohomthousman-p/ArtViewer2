@@ -5,13 +5,17 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
+import javax.inject.Singleton
+
 
 private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
+
 
 /**
  * Data store that manages the auth related data we need to save in persistent
  * storage, like refresh tokens.
  */
+@Singleton
 class AuthenticationDataStore(private val context: Context) {
     private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
     private val REFESH_TOKEN_EXPIRATION_DATE_KEY = stringPreferencesKey("refresh_token_expiration_date")
