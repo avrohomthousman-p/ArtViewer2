@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.toArgb
 import com.deviantart.artviewer.ui.screens.LoginScreen
+import com.deviantart.artviewer.ui.screens.LoginViewModel
 import com.deviantart.artviewer.ui.themes.AppColors
 
 
@@ -30,7 +31,7 @@ class LoginActivity : ComponentActivity() {
         )
 
         setContent {
-            LoginScreen()
+            LoginScreen(LoginViewModel())
         }
     }
 }

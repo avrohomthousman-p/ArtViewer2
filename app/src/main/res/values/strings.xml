@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">Art Viewer</string>
+
+    <!-- Login Activity -->
+    <string name="login_btn_text">Login to DeviantArt</string>
+    <string name="banner_text_reauthenticate">We need you to log in. Please click the button below.</string>
+    <string name="banner_text_refreshing_access">Please wait while we log you in…</string>
+    <string name="banner_text_refresh_failed">Something went wrong. Please try to log in again.</string>
+
+    <string name="welcome_message">Welcome Back!</string>
+
+    <string name="login_pending_text">Authorizing…</string>
+    <string name="failed_login_text">❌ Could not log in ❌</string>
+    <string name="successful_login_text">✅ You have logged in! ✅</string>
 </resources>
