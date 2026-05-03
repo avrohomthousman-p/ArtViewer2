@@ -1,5 +1,6 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -23,6 +25,7 @@ import com.deviantart.artviewer.ui.components.StandardButton
 import com.deviantart.artviewer.ui.components.TOOLBAR_HEIGHT
 import com.deviantart.artviewer.ui.components.Toolbar
 import com.deviantart.artviewer.ui.themes.AppColors
+import com.deviantart.artviewer.util.NavDestination
 
 
 /**
@@ -30,6 +33,25 @@ import com.deviantart.artviewer.ui.themes.AppColors
  */
 @Composable
 fun LoginScreen(viewModel: LoginViewModel) {
+    LaunchedEffect(Unit) {
+        viewModel.navigation.collect { destination ->
+            when (destination) {
+                NavDestination.ToWebLogin -> {
+                    //TODO
+                }
+
+                NavDestination.ToMainActivity -> {
+                    //TODO
+                    //val intent = Intent(this, TargetActivity::class.java)
+                    //startActivity(intent)
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+
     LoginScreenContent(
         loginState = viewModel.loginState,
         performLogin = { viewModel.performLogin() }

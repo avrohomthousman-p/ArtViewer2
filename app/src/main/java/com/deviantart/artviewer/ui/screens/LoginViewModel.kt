@@ -6,10 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigationevent.NavigationEvent
 import com.deviantart.artviewer.data.repository.AuthRepository
+import com.deviantart.artviewer.util.MiscUtils
+import com.deviantart.artviewer.util.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,10 +38,55 @@ class LoginViewModel @Inject constructor(
     private val authRepo: AuthRepository
 ) : ViewModel() {
 
+    private val _navigation = MutableSharedFlow<NavDestination>()
+    val navigation = _navigation.asSharedFlow()
+
+
     var loginState by mutableStateOf(LoginState.LoggedOut)
         private set
 
 
+    init {
+        viewModelScope.launch(Dispatchers.IO){
+            if (authRepo.shouldRequireLogin()) {
+                loginState = LoginState.LoggedOut //Shows login button
+            }
+            else {
+                performRefresh()
+            }
+        }
+    }
+
+
+
+    /**
+     * Refreshes the access token and navigates to the main activity.
+     */
+    private suspend fun performRefresh(){
+        loginState = LoginState.LoginInProgress
+
+        try {
+            MiscUtils.runWithMinimumDuration {
+                authRepo.refreshAccessToken()
+            }
+
+            loginState = LoginState.LoginSuccess
+        }
+        catch (e: Exception) {
+            loginState = LoginState.LoginFailure
+            Log.e("LoginError", e.message ?: "Login failure")
+            return
+        }
+
+        delay(2500)
+        _navigation.emit(NavDestination.ToMainActivity)
+    }
+
+
+
+    /**
+     * Initiates a login by triggering navigation to DeviantArt's oauth2 webpage.
+     */
     fun performLogin() {
         viewModelScope.launch(Dispatchers.IO) {
             loginState = LoginState.LoginInProgress
@@ -49,7 +99,10 @@ class LoginViewModel @Inject constructor(
             catch (e: Exception){
                 Log.e("Login", e.message ?: "login failure")
                 loginState = LoginState.LoginFailure
+                return@launch
             }
+
+            _navigation.emit(NavDestination.ToWebLogin)
         }
     }
 }
