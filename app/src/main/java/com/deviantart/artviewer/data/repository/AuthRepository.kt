@@ -5,7 +5,6 @@ import com.deviantart.artviewer.data.local.datastore.AuthenticationDataStore
 import com.deviantart.artviewer.data.remote.LoginApi
 import com.deviantart.artviewer.util.PkceUtil
 import java.time.Instant
-import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.net.toUri
@@ -47,16 +46,16 @@ class AuthRepository @Inject constructor(
 
         dataStore.savePkceCodeVerifier(codeVerifier)
 
-        val authUrl = "https://www.deviantart.com/oauth2/authorize" +
-                "?response_type=code" +
-                "&client_id=" + CLIENT_ID +
-                "&redirect_uri=artviewer://oauth2redirect" +
-                "&scope=browse" +
-                "&code_challenge=${codeChallenge}" +
-                "&code_challenge_method=S256";
-
-
-        return authUrl.toUri()
+        val baseUrl = "https://www.deviantart.com/oauth2/authorize"
+        return baseUrl.toUri()
+            .buildUpon()
+            .appendQueryParameter("response_type", "code")
+            .appendQueryParameter("client_id", CLIENT_ID)
+            .appendQueryParameter("redirect_uri", "artviewer://oauth2redirect")
+            .appendQueryParameter("scope", "browse")
+            .appendQueryParameter("code_challenge", codeChallenge)
+            .appendQueryParameter("code_challenge_method", "S256")
+            .build()
     }
 
 
