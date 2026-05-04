@@ -1,6 +1,5 @@
 package com.deviantart.artviewer.ui.screens
 
-import android.app.Activity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -31,19 +30,20 @@ import com.deviantart.artviewer.util.NavDestination
 
 
 /**
- * Screen for the login activity
+ * Screen for the login activity.
+ *
  */
 @Composable
 fun LoginScreen(viewModel: LoginViewModel) {
     val context = LocalContext.current
 
+    // Navigation
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { destination ->
             when (destination) {
                 is NavDestination.ToWebLogin -> {
                     val intent = CustomTabsIntent.Builder().build()
                     intent.launchUrl(context, destination.url)
-                    (context as? Activity)?.finish()
                 }
 
                 NavDestination.ToMainActivity -> {

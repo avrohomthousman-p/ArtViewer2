@@ -14,22 +14,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault.Light.NoActionBar">
+
         <activity
             android:name=".ui.activities.LoginActivity"
             android:exported="true">
+
+            <!-- Launcher entry -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.activities.RedirectActivity"
-            android:exported="true">
 
+            <!-- OAuth redirect handler -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
@@ -38,10 +36,12 @@
                     android:host="oauth2redirect" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.activities.DisplayArtActivity"
             android:exported="false">
         </activity>
+
     </application>
 
 </manifest>

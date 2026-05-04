@@ -59,6 +59,15 @@ class AuthRepository @Inject constructor(
     }
 
 
+    /**
+     * Completes the login by exchanging the authentication token provided by DeviantArt
+     * for an access token that can be used to fetch DeviantArt media.
+     */
+    suspend fun exchangeAuthCodeForAccessToken(authCode: String){
+        //TODO
+    }
+
+
     suspend fun refreshAccessToken() {
         //TODO
     }

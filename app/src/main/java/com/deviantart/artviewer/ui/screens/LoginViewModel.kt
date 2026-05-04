@@ -45,14 +45,41 @@ class LoginViewModel @Inject constructor(
         private set
 
 
-    init {
+    fun setInitialState(authCode: String? = null){
         viewModelScope.launch(Dispatchers.IO){
-            if (authRepo.shouldRequireLogin()) {
+            if(!authCode.isNullOrEmpty()){
+                completeLogin(authCode)
+            }
+            else if (authRepo.shouldRequireLogin()) {
                 loginState = LoginState.LoggedOut //Shows login button
             }
             else {
                 performRefresh()
             }
+        }
+    }
+
+
+    /**
+     * Completes the login by having the auth repository exchange the authCode
+     * for an access token.
+     */
+    private suspend fun completeLogin(authCode: String){
+        loginState = LoginState.LoginInProgress
+
+        try {
+            MiscUtils.runWithMinimumDuration(2500) {
+                authRepo.exchangeAuthCodeForAccessToken(authCode)
+            }
+
+            loginState = LoginState.LoginSuccess
+            delay(2500)
+            //TODO: trigger navigation
+        }
+        catch (e: Exception){
+            loginState = LoginState.LoginFailure
+            Log.e("LoginError", e.message ?: "Login failure")
+            return
         }
     }
 
