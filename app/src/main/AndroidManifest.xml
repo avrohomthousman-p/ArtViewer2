@@ -24,6 +24,21 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.activities.RedirectActivity"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="artviewer"
+                    android:host="oauth2redirect" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".ui.activities.DisplayArtActivity"
             android:exported="false">
         </activity>

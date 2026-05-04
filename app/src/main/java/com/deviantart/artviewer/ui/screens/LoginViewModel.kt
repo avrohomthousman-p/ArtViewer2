@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigationevent.NavigationEvent
 import com.deviantart.artviewer.data.repository.AuthRepository
 import com.deviantart.artviewer.util.MiscUtils
 import com.deviantart.artviewer.util.NavDestination
@@ -87,22 +86,10 @@ class LoginViewModel @Inject constructor(
     /**
      * Initiates a login by triggering navigation to DeviantArt's oauth2 webpage.
      */
-    fun performLogin() {
+    fun triggerLoginStart() {
         viewModelScope.launch(Dispatchers.IO) {
-            loginState = LoginState.LoginInProgress
-
-            try {
-                delay(3000) // TODO: need real implementation
-
-                loginState = LoginState.LoginSuccess
-            }
-            catch (e: Exception){
-                Log.e("Login", e.message ?: "login failure")
-                loginState = LoginState.LoginFailure
-                return@launch
-            }
-
-            _navigation.emit(NavDestination.ToWebLogin)
+            val uri = authRepo.buildAuthorizationUrl()
+            _navigation.emit(NavDestination.ToWebLogin(uri))
         }
     }
 }
