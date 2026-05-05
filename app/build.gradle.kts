@@ -58,6 +58,8 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.browser)
+    implementation(libs.converter.moshi)
+    implementation(libs.moshi.kotlin)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
