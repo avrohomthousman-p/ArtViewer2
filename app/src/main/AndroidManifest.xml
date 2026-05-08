@@ -42,6 +42,11 @@
             android:exported="false">
         </activity>
 
+
+        <activity
+            android:name=".ui.activities.MainActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>

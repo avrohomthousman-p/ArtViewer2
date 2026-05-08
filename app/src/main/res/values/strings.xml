@@ -12,4 +12,10 @@
     <string name="login_pending_text">Authorizing…</string>
     <string name="failed_login_text">❌ Could not log in ❌</string>
     <string name="successful_login_text">✅ You have logged in! ✅</string>
+
+
+    <!-- Main activity -->
+    <string name="main_activity_title">My Folders</string>
+    <string name="load_failed_error">Something went wrong. We could not load your folders</string>
+    <string name="loading_message">Loading your folders…</string>
 </resources>

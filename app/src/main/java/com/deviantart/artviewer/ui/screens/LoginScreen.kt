@@ -1,5 +1,6 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.deviantart.artviewer.R
+import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.StandardButton
 import com.deviantart.artviewer.ui.components.TOOLBAR_HEIGHT
 import com.deviantart.artviewer.ui.components.Toolbar
@@ -31,7 +33,6 @@ import com.deviantart.artviewer.util.NavDestination
 
 /**
  * Screen for the login activity.
- *
  */
 @Composable
 fun LoginScreen(viewModel: LoginViewModel) {
@@ -47,9 +48,8 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 }
 
                 NavDestination.ToMainActivity -> {
-                    //TODO
-                    //val intent = Intent(this, TargetActivity::class.java)
-                    //startActivity(intent)
+                    val intent = Intent(context, MainActivity::class.java)
+                    context.startActivity(intent)
                 }
 
                 else -> {}
