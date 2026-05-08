@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.deviantart.artviewer.data.repository.AuthRepository
+import com.deviantart.artviewer.util.ApiResponse
 import com.deviantart.artviewer.util.MiscUtils
 import com.deviantart.artviewer.util.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,19 +68,19 @@ class LoginViewModel @Inject constructor(
     private suspend fun completeLogin(authCode: String){
         loginState = LoginState.LoginInProgress
 
-        try {
-            MiscUtils.runWithMinimumDuration(2500) {
-                authRepo.exchangeAuthCodeForAccessToken(authCode)
-            }
+        val response = MiscUtils.runWithMinimumDuration(2500) {
+            authRepo.exchangeAuthCodeForAccessToken(authCode)
+        }
 
+        if (response is ApiResponse.Error) {
+            loginState = LoginState.LoginFailure
+            Log.e("LoginError", response.message)
+            return
+        }
+        else {
             loginState = LoginState.LoginSuccess
             delay(2500)
-            //TODO: trigger navigation
-        }
-        catch (e: Exception){
-            loginState = LoginState.LoginFailure
-            Log.e("LoginError", e.message ?: "Login failure")
-            return
+            _navigation.emit(NavDestination.ToMainActivity)
         }
     }
 
