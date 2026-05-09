@@ -1,5 +1,6 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -16,14 +17,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
+import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.components.FolderDisplay
 import com.deviantart.artviewer.ui.components.Toolbar
+import com.deviantart.artviewer.util.NavDestination
+import com.deviantart.artviewer.util.ToolbarButtonData
 import com.deviantart.artviewer.util.UiState
 
 
@@ -36,15 +40,42 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
         viewModel.loadFolders()
     }
 
-    val state = viewModel.uiState.collectAsState()
 
-    //TODO: view model stuff here
-    MainActivityScreenContent(state.value)
+    // Navigation
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        viewModel.navigation.collect { destination ->
+            when (destination) {
+                is NavDestination.ToLoginActivity -> {
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context.startActivity(intent)
+                    //TODO: finish
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+
+    val state = viewModel.uiState.collectAsState()
+    val toolbarButtons = listOf(
+        ToolbarButtonData(
+            icon = R.drawable.ic_logout,
+            contentDescription = stringResource(R.string.logout_btn_content_desc),
+            onClick = { viewModel.logout() }
+        )
+        //TODO: add more icons here
+    )
+    MainActivityScreenContent(state.value, toolbarButtons)
 }
 
 
 @Composable
-private fun MainActivityScreenContent(state: UiState<List<Folder>>){
+private fun MainActivityScreenContent(
+    state: UiState<List<Folder>>,
+    toolbarButtons: List<ToolbarButtonData>
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,7 +85,7 @@ private fun MainActivityScreenContent(state: UiState<List<Folder>>){
         Toolbar(
             includeBackButton = false,
             title = stringResource(R.string.main_activity_title),
-            otherButtons = emptyList() //TODO: add items here
+            otherButtons = toolbarButtons
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -120,24 +151,33 @@ private fun FoldersDisplay(folders: List<Folder>) {
 
 
 
+val toolbarButtonsForPreviews = listOf(
+    ToolbarButtonData(
+        icon = R.drawable.ic_logout,
+        contentDescription = "",
+        onClick = { }
+    )
+)
+
+
 @Preview(showBackground = true)
 @Composable
 fun LoadingFoldersPreview() {
-    MainActivityScreenContent(state = UiState.Loading)
+    MainActivityScreenContent(state = UiState.Loading, toolbarButtons = toolbarButtonsForPreviews)
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun FailedToLoadFoldersPreview() {
-    MainActivityScreenContent(state = UiState.Error())
+    MainActivityScreenContent(state = UiState.Error(), toolbarButtons = toolbarButtonsForPreviews)
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun NoFoldersPreview() {
-    MainActivityScreenContent(state = UiState.Success(emptyList()))
+    MainActivityScreenContent(state = UiState.Success(emptyList()), toolbarButtons = toolbarButtonsForPreviews)
 }
 
 //TODO: preview with a folder

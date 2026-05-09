@@ -139,7 +139,18 @@ class AuthRepository @Inject constructor(
     }
 
 
+    /**
+     * Log out of DeviantArt. This will clear your access token and refresh token
+     * so you should navigate to the login screen after calling this.
+     */
     suspend fun logout() {
-        //TODO
+        val refreshToken = dataStore.loadRefreshToken()
+        if (!refreshToken.isNullOrEmpty()){
+            loginApi.logout(inAppOnly = true, token = refreshToken)
+        }
+
+        this.accessToken = null
+        dataStore.clearRefreshToken()
+        dataStore.clearRefreshTokenExpiration()
     }
 }

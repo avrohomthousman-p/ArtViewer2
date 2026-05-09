@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Art Viewer</string>
 
+    <!-- Content Descriptions -->
+    <string name="logout_btn_content_desc">Logout button</string>
+
     <!-- Login Activity -->
     <string name="login_btn_text">Login to DeviantArt</string>
     <string name="banner_text_reauthenticate">We need you to log in. Please click the button below.</string>

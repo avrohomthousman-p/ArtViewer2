@@ -26,5 +26,16 @@ interface LoginApi {
     ): Response<TokenResponse>
 
 
+    /**
+     * Logout of DeviantArt
+     */
+    @FormUrlEncoded
+    @POST("oauth2/revoke")
+    suspend fun logout(
+        @Field("revoke_refresh_only") inAppOnly: Boolean,
+        @Field("token") token: String
+    )
+
+
     //TODO: create logout functions
 }
