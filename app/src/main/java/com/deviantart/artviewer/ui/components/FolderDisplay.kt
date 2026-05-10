@@ -171,30 +171,48 @@ private fun ActionButtons(
     val gapBetweenButtons = 18.dp
 
     if (showEditBtn) {
+        val interactionSource = remember { MutableInteractionSource() }
+
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_edit),
             contentDescription = null,
-            modifier = Modifier.clickable { /* TODO */ },
+            modifier = Modifier.clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),
+                onClick = { /* TODO */ }
+            ),
             tint = AppColors.GreenSuccessColor
         )
         Spacer(modifier = Modifier.width(gapBetweenButtons))
     }
 
     if (showDeleteBtn) {
+        val interactionSource = remember { MutableInteractionSource() }
+
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_delete),
             contentDescription = null,
-            modifier = Modifier.clickable { /* TODO */ },
+            modifier = Modifier.clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),
+                onClick = { /* TODO */ }
+            ),
             tint = AppColors.RedErrorColor
         )
         Spacer(modifier = Modifier.width(gapBetweenButtons))
     }
 
     if (showSaveBtn) {
+        val interactionSource = remember { MutableInteractionSource() }
+
         Icon(
             imageVector = ImageVector.vectorResource(R.drawable.ic_save),
             contentDescription = null,
-            modifier = Modifier.clickable { /* TODO */ },
+            modifier = Modifier.clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),
+                onClick = { /* TODO */ }
+            ),
             tint = AppColors.GreenSuccessColor
         )
         Spacer(modifier = Modifier.width(gapBetweenButtons))
