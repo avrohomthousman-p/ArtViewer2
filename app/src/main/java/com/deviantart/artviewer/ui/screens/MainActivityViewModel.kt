@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 
@@ -46,6 +47,33 @@ class MainActivityViewModel @Inject constructor(
             }
         }
     }
+
+
+
+    fun updateFolder(folder: Folder, index: Int){
+        val currentState = _uiState.value
+        if (currentState !is UiState.Success){
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                db.updateOrCreateFolder(folder)
+
+                val folderList = currentState.data.toMutableList()
+                folderList[index] = folder
+
+                withContext(Dispatchers.Main){
+                    _uiState.value = UiState.Success(folderList)
+                }
+            }
+            catch (e: Exception){
+                Log.e("db", e.message ?: "Room DB failure")
+                //TODO: make toast
+            }
+        }
+    }
+
 
 
     fun logout() {

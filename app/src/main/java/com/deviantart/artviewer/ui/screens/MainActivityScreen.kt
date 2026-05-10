@@ -16,6 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.activities.LoginActivity
+import com.deviantart.artviewer.ui.components.EditFolderDialog
 import com.deviantart.artviewer.ui.components.FolderDisplay
 import com.deviantart.artviewer.ui.components.NewFolderPrompt
 import com.deviantart.artviewer.ui.components.Toolbar
@@ -62,7 +67,14 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
     }
 
 
+
     val state = viewModel.uiState.collectAsState()
+    var folderBeingEdited by remember { mutableStateOf<Int?>(null) }
+    var folderBeingDeleted by remember { mutableStateOf<Int?>(null) }
+
+
+
+    // Toolbar buttons
     val toolbarButtons = listOf(
         ToolbarButtonData(
             icon = R.drawable.ic_logout,
@@ -71,14 +83,43 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
         )
         //TODO: add more icons here
     )
-    MainActivityScreenContent(state.value, toolbarButtons)
+
+
+
+    MainActivityScreenContent(
+        state = state.value,
+        toolbarButtons = toolbarButtons,
+        onClickFolderEdit = { folderIndex -> folderBeingEdited = folderIndex },
+        onClickFolderDelete = { folderIndex -> folderBeingDeleted = folderIndex }
+    )
+
+
+    folderBeingEdited?.let { index ->
+        val folders = (state.value as? UiState.Success)?.data ?: return@let
+
+        EditFolderDialog(
+            folder = folders[index],
+            onDismiss = { folderBeingEdited = null },
+            onSave = { folder ->
+                if (folder != null) {
+                    viewModel.updateFolder(folder, index)
+                }
+
+                folderBeingEdited = null
+            }
+        )
+    }
+
+    //TODO: make a delete dialog
 }
 
 
 @Composable
 private fun MainActivityScreenContent(
     state: UiState<List<Folder>>,
-    toolbarButtons: List<ToolbarButtonData>
+    toolbarButtons: List<ToolbarButtonData>,
+    onClickFolderEdit: (Int) -> Unit,
+    onClickFolderDelete: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -98,7 +139,7 @@ private fun MainActivityScreenContent(
         when(state) {
             is UiState.Error -> ErrorDisplay()
             UiState.Loading -> LoadingDisplay()
-            is UiState.Success<List<Folder>> -> FoldersDisplay(state.data)
+            is UiState.Success<List<Folder>> -> FoldersDisplay(state.data, onClickFolderEdit, onClickFolderDelete)
         }
     }
 }
@@ -128,8 +169,13 @@ private fun ErrorDisplay(){
 }
 
 
+
 @Composable
-private fun FoldersDisplay(folders: List<Folder>) {
+private fun FoldersDisplay(
+    folders: List<Folder>,
+    onClickFolderEdit: (Int) -> Unit,
+    onClickFolderDelete: (Int) -> Unit
+) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
@@ -137,14 +183,14 @@ private fun FoldersDisplay(folders: List<Folder>) {
             .background(AppColors.White)
             .verticalScroll(scrollState)
     ) {
-        folders.forEach { folder ->
+        folders.forEachIndexed { index, folder ->
 
             FolderDisplay(
                 imageUrl = folder.thumbnailUrl,
                 folderName = folder.displayName,
-                showEditBtn = true,
-                showDeleteBtn = true,
-                showSaveBtn = false
+                onClickEditBtn = { onClickFolderEdit(index) },
+                onClickDeleteBtn = { onClickFolderDelete(index) },
+                onClickSaveBtn = null
             )
             Spacer(modifier = Modifier.height(30.dp))
         }
@@ -169,21 +215,36 @@ val toolbarButtonsForPreviews = listOf(
 @Preview(showBackground = true)
 @Composable
 fun LoadingFoldersPreview() {
-    MainActivityScreenContent(state = UiState.Loading, toolbarButtons = toolbarButtonsForPreviews)
+    MainActivityScreenContent(
+        state = UiState.Loading,
+        toolbarButtons = toolbarButtonsForPreviews,
+        onClickFolderEdit = { },
+        onClickFolderDelete = { },
+    )
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun FailedToLoadFoldersPreview() {
-    MainActivityScreenContent(state = UiState.Error(), toolbarButtons = toolbarButtonsForPreviews)
+    MainActivityScreenContent(
+        state = UiState.Error(),
+        toolbarButtons = toolbarButtonsForPreviews,
+        onClickFolderEdit = { },
+        onClickFolderDelete = { }
+    )
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun NoFoldersPreview() {
-    MainActivityScreenContent(state = UiState.Success(emptyList()), toolbarButtons = toolbarButtonsForPreviews)
+    MainActivityScreenContent(
+        state = UiState.Success(emptyList()),
+        toolbarButtons = toolbarButtonsForPreviews,
+        onClickFolderEdit = { },
+        onClickFolderDelete = { }
+    )
 }
 
 //TODO: preview with a folder

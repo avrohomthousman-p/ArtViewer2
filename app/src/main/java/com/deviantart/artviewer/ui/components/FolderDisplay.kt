@@ -1,6 +1,5 @@
 package com.deviantart.artviewer.ui.components
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -22,10 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,17 +33,18 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.ui.themes.AppColors
 
 
-
 /**
- * Displays a single folder
+ * Displays a folder entry along with action buttons for Edit, Delete, and Save.
+ * Each action button is shown only when the caller supplies a non-null handler
+ * for that action.
  */
 @Composable
 fun FolderDisplay(
     imageUrl: String? = null,
     folderName: String = "",
-    showEditBtn: Boolean = true,
-    showDeleteBtn: Boolean = true,
-    showSaveBtn: Boolean = false
+    onClickEditBtn: (() -> Unit)? = null,
+    onClickDeleteBtn: (() -> Unit)? = null,
+    onClickSaveBtn: (() -> Unit)? = null
 ){
     FolderContainer(
         onClick = { /* TODO */ },
@@ -84,9 +81,9 @@ fun FolderDisplay(
 
 
                 ActionButtons(
-                    showEditBtn = showEditBtn,
-                    showDeleteBtn = showDeleteBtn,
-                    showSaveBtn = showSaveBtn
+                    onClickEditBtn = onClickEditBtn,
+                    onClickDeleteBtn = onClickDeleteBtn,
+                    onClickSaveBtn = onClickSaveBtn
                 )
             }
         }
@@ -163,14 +160,13 @@ private fun FolderContainer(onClick: () -> Unit, content: @Composable () -> Unit
  */
 @Composable
 private fun ActionButtons(
-    showEditBtn: Boolean,
-    showDeleteBtn: Boolean,
-    showSaveBtn: Boolean
+    onClickEditBtn: (() -> Unit)?,
+    onClickDeleteBtn: (() -> Unit)?,
+    onClickSaveBtn: (() -> Unit)?
 ){
-    //TODO: add click animation
     val gapBetweenButtons = 18.dp
 
-    if (showEditBtn) {
+    if (onClickEditBtn != null) {
         val interactionSource = remember { MutableInteractionSource() }
 
         Icon(
@@ -179,14 +175,14 @@ private fun ActionButtons(
             modifier = Modifier.clickable(
                 interactionSource = interactionSource,
                 indication = ripple(),
-                onClick = { /* TODO */ }
+                onClick = { onClickEditBtn() }
             ),
             tint = AppColors.GreenSuccessColor
         )
         Spacer(modifier = Modifier.width(gapBetweenButtons))
     }
 
-    if (showDeleteBtn) {
+    if (onClickDeleteBtn != null) {
         val interactionSource = remember { MutableInteractionSource() }
 
         Icon(
@@ -195,14 +191,14 @@ private fun ActionButtons(
             modifier = Modifier.clickable(
                 interactionSource = interactionSource,
                 indication = ripple(),
-                onClick = { /* TODO */ }
+                onClick = { onClickDeleteBtn() }
             ),
             tint = AppColors.RedErrorColor
         )
         Spacer(modifier = Modifier.width(gapBetweenButtons))
     }
 
-    if (showSaveBtn) {
+    if (onClickSaveBtn != null) {
         val interactionSource = remember { MutableInteractionSource() }
 
         Icon(
@@ -211,7 +207,7 @@ private fun ActionButtons(
             modifier = Modifier.clickable(
                 interactionSource = interactionSource,
                 indication = ripple(),
-                onClick = { /* TODO */ }
+                onClick = { onClickSaveBtn() }
             ),
             tint = AppColors.GreenSuccessColor
         )
@@ -227,8 +223,8 @@ fun FolderDisplayPreview(){
     FolderDisplay(
         folderName = "Sample Art",
         imageUrl = null,
-        showEditBtn = true,
-        showDeleteBtn = true,
-        showSaveBtn = true
+        onClickEditBtn = { },
+        onClickDeleteBtn = { },
+        onClickSaveBtn = { }
     )
 }
