@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.activities.LoginActivity
+import com.deviantart.artviewer.ui.components.DeleteFolderDialog
 import com.deviantart.artviewer.ui.components.EditFolderDialog
 import com.deviantart.artviewer.ui.components.FolderDisplay
 import com.deviantart.artviewer.ui.components.NewFolderPrompt
@@ -121,7 +122,16 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
         )
     }
 
-    //TODO: make a delete dialog
+
+    folderBeingDeleted?.let { index ->
+        DeleteFolderDialog(
+            onDismiss = { folderBeingDeleted = null },
+            onSave = {
+                viewModel.deleteFolder(index)
+                folderBeingDeleted = null
+            }
+        )
+    }
 }
 
 

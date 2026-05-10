@@ -78,6 +78,38 @@ class MainActivityViewModel @Inject constructor(
     }
 
 
+    /**
+     * Deletes a folder from the DB.
+     *
+     * @param folderIndex - The position of the folder within the UiState folder list
+     */
+    fun deleteFolder(folderIndex: Int){
+        val currentState = _uiState.value
+        if (currentState !is UiState.Success){
+            return
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val folder = currentState.data[folderIndex]
+
+                db.deleteFolder(folder)
+
+                val folderList = currentState.data.toMutableList()
+                folderList.removeAt(folderIndex)
+
+                withContext(Dispatchers.Main){
+                    _uiState.value = UiState.Success(folderList)
+                }
+            }
+            catch (e: Exception){
+                Log.e("db", e.message ?: "Room DB failure")
+                _toastMessage.emit("Unable to save your changes")
+            }
+        }
+    }
+
+
 
     fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
