@@ -86,7 +86,7 @@ class AuthRepository @Inject constructor(
      * Completes the login by exchanging the authentication token provided by DeviantArt
      * for an access token that can be used to fetch DeviantArt media.
      */
-    suspend fun exchangeAuthCodeForAccessToken(authCode: String) : ApiResponse<String> { //FIXME: Do I want to use a Respone object
+    suspend fun exchangeAuthCodeForAccessToken(authCode: String) : ApiResponse<String> {
         val codeVerifier = dataStore.loadPkceCodeVerifier()
         if (codeVerifier.isNullOrEmpty()){
             return ApiResponse.Error("PKCE code verifier is missing")
@@ -144,8 +144,50 @@ class AuthRepository @Inject constructor(
 
 
 
-    suspend fun refreshAccessToken() {
-        //TODO
+    /**
+     * Instead of a full login, use the existing refresh token to load a new access token.
+     */
+    suspend fun refreshAccessToken(): ApiResponse<String> {
+        if (!isRefreshPossible()) {
+            return ApiResponse.Error("Cannot refresh access token. Please login again.")
+        }
+
+
+
+        val refreshToken = dataStore.loadRefreshToken()!!
+        val response = loginApi.refreshAccessToken(
+            grantType = "refresh_token",
+            clientId = CLIENT_ID,
+            refreshToken = refreshToken,
+        )
+
+
+
+        val responseData = response.body()
+        val dataIsValid = (
+                responseData != null &&
+                responseData.status == "success" &&
+                !responseData.accessToken.isNullOrEmpty()
+        )
+
+
+        if (response.isSuccessful && dataIsValid){
+            this.accessToken = responseData.accessToken
+
+            val newRefreshToken = responseData.refreshToken
+            if (newRefreshToken != null){
+                saveNewRefreshToken(newRefreshToken)
+            }
+
+            return ApiResponse.Success(this.accessToken!!)
+        }
+        else {
+            dataStore.clearRefreshToken()
+            dataStore.clearRefreshTokenExpiration()
+            return ApiResponse.Error(
+                message = "Could not refresh access token. Please login again."
+            )
+        }
     }
 
 

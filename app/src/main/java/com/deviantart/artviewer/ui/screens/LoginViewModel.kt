@@ -92,21 +92,27 @@ class LoginViewModel @Inject constructor(
     private suspend fun performRefresh(){
         loginState = LoginState.LoginInProgress
 
-        try {
+
+        val response =
             MiscUtils.runWithMinimumDuration {
                 authRepo.refreshAccessToken()
             }
 
-            loginState = LoginState.LoginSuccess
-        }
-        catch (e: Exception) {
-            loginState = LoginState.LoginFailure
-            Log.e("LoginError", e.message ?: "Login failure")
-            return
-        }
 
-        delay(2500)
-        _navigation.emit(NavDestination.ToMainActivity)
+        when(response) {
+            is ApiResponse.Error -> {
+                Log.e("LoginError", response.message)
+                loginState = LoginState.LoginFailure
+                delay(2500)
+                loginState = LoginState.LoggedOut
+                return
+            }
+            is ApiResponse.Success<*> -> {
+                loginState = LoginState.LoginSuccess
+                delay(2500)
+                _navigation.emit(NavDestination.ToMainActivity)
+            }
+        }
     }
 
 

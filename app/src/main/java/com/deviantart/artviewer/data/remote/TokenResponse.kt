@@ -5,7 +5,8 @@ import kotlinx.serialization.SerialName
 
 
 /**
- * Data class for fetching an access token from the DeviantArt API.
+ * Data class for fetching an access token or refreshing an access token
+ * from the DeviantArt API.
  */
 @Serializable
 data class TokenResponse(

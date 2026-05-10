@@ -37,5 +37,11 @@ interface LoginApi {
     )
 
 
-    //TODO: create logout functions
+    @FormUrlEncoded
+    @POST("oauth2/token")
+    suspend fun refreshAccessToken(
+        @Field("grant_type") grantType: String = "refresh_token",
+        @Field("client_id") clientId: String,
+        @Field("refresh_token") refreshToken: String
+    ): Response<TokenResponse>
 }
