@@ -54,17 +54,21 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(client: OkHttpClient): Retrofit =
-        Retrofit.Builder()
+    fun provideRetrofit(client: OkHttpClient): Retrofit {
+        val json = Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+        }
+
+        return Retrofit.Builder()
             .baseUrl("https://www.deviantart.com/")
             .client(client)
             .addConverterFactory(
-                Json {
-                    ignoreUnknownKeys = true
-                    isLenient = true
-                }.asConverterFactory("application/json".toMediaType())
+                json.asConverterFactory("application/json".toMediaType())
             )
             .build()
+    }
+
 
 
 

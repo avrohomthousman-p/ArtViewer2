@@ -112,7 +112,7 @@ fun NewFolderPrompt(){
                     tint = AppColors.Black
                 )
 
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(14.dp))
 
                 Text(
                     text = stringResource(R.string.add_new_folder_prompt),

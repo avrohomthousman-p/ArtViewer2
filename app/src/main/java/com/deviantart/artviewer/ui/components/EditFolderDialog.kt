@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -98,7 +97,7 @@ fun EditFolderDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (folderNameDraft.length < 4){
+                    if (folderNameDraft.trim().length < 4){
                         showErrorOnFolderName = true
                         return@TextButton
                     }
@@ -114,7 +113,7 @@ fun EditFolderDialog(
                             remoteId = folder.remoteId,
                             ownerUsername = folder.ownerUsername,
                             storedIn = folder.storedIn,
-                            displayName = folderNameDraft,
+                            displayName = folderNameDraft.trim(),
                             shouldRandomize = shouldRandomize,
                             thumbnailUrl = folder.thumbnailUrl,
                             totalImages = folder.totalImages

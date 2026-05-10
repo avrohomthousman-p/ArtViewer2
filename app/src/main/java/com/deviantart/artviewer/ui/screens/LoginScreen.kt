@@ -1,5 +1,6 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.app.Activity
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
@@ -51,6 +52,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 NavDestination.ToMainActivity -> {
                     val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)
+                    (context as? Activity)?.finish()
                 }
 
                 else -> {}

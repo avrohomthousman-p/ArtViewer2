@@ -32,6 +32,9 @@ class MainActivityViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<UiState<List<Folder>>>(UiState.Loading)
     val uiState: StateFlow<UiState<List<Folder>>> = _uiState
 
+    private val _toastMessage = MutableSharedFlow<String>()
+    val toastMessage = _toastMessage
+
 
     /**
      * Loads all saved folders from the DB so they can be displayed.
@@ -69,7 +72,7 @@ class MainActivityViewModel @Inject constructor(
             }
             catch (e: Exception){
                 Log.e("db", e.message ?: "Room DB failure")
-                //TODO: make toast
+                _toastMessage.emit("Unable to save your changes")
             }
         }
     }

@@ -1,6 +1,8 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -45,24 +47,33 @@ import com.deviantart.artviewer.util.UiState
  */
 @Composable
 fun MainActivityScreen(viewModel: MainActivityViewModel) {
+    val context = LocalContext.current
+
+
     LaunchedEffect(Unit) {
         viewModel.loadFolders()
     }
 
 
     // Navigation
-    val context = LocalContext.current
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { destination ->
             when (destination) {
                 is NavDestination.ToLoginActivity -> {
                     val intent = Intent(context, LoginActivity::class.java)
                     context.startActivity(intent)
-                    //TODO: finish
+                    (context as? Activity)?.finish()
                 }
 
                 else -> {}
             }
+        }
+    }
+
+
+    LaunchedEffect(Unit) {
+        viewModel.toastMessage.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
     }
 
