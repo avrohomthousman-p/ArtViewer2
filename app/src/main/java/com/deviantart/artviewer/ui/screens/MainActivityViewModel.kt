@@ -1,13 +1,15 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.deviantart.artviewer.data.local.room.Folder
+import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.repository.AuthRepository
 import com.deviantart.artviewer.util.NavDestination
 import com.deviantart.artviewer.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,13 +17,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class Folder {} //TODO: Temporary class until the DB is set up
-
 
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val authRepo: AuthRepository
+    private val authRepo: AuthRepository,
+    private val db: FolderDao
 ) : ViewModel() {
 
     private val _navigation = MutableSharedFlow<NavDestination>()
@@ -36,10 +37,13 @@ class MainActivityViewModel @Inject constructor(
      */
     fun loadFolders(){
         viewModelScope.launch(Dispatchers.IO) {
-            //TODO: need actual implementation
-
-            delay(5000)
-            _uiState.value = UiState.Success(emptyList())
+            try {
+                val folders = db.getAllFolders()
+                _uiState.value = UiState.Success(folders)
+            } catch (e: Exception) {
+                Log.e("db", e.message ?: "Room DB failure")
+                _uiState.value = UiState.Error(e.message, e)
+            }
         }
     }
 

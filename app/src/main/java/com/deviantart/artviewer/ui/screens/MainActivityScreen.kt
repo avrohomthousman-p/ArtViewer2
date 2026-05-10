@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
+import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.components.FolderDisplay
 import com.deviantart.artviewer.ui.components.Toolbar
@@ -133,17 +134,16 @@ private fun FoldersDisplay(folders: List<Folder>) {
             .verticalScroll(scrollState)
     ) {
         folders.forEach { folder ->
-            //TODO: need real live data here
+
             FolderDisplay(
-                imageUrl = null,
-                folderName = "",
+                imageUrl = folder.thumbnailUrl,
+                folderName = folder.displayName,
                 showEditBtn = true,
                 showDeleteBtn = true,
                 showSaveBtn = false
             )
             Spacer(modifier = Modifier.height(30.dp))
         }
-
 
         //TODO: need a "add new folder" item
     }
