@@ -34,8 +34,8 @@ import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.components.DeleteFolderDialog
 import com.deviantart.artviewer.ui.components.EditFolderDialog
-import com.deviantart.artviewer.ui.components.FolderDisplay
 import com.deviantart.artviewer.ui.components.NewFolderPrompt
+import com.deviantart.artviewer.ui.components.SingleFolderDisplay
 import com.deviantart.artviewer.ui.components.Toolbar
 import com.deviantart.artviewer.ui.themes.AppColors
 import com.deviantart.artviewer.util.NavDestination
@@ -160,7 +160,7 @@ private fun MainActivityScreenContent(
         when(state) {
             is UiState.Error -> ErrorDisplay()
             UiState.Loading -> LoadingDisplay()
-            is UiState.Success<List<Folder>> -> FoldersDisplay(state.data, onClickFolderEdit, onClickFolderDelete)
+            is UiState.Success<List<Folder>> -> FoldersListDisplay(state.data, onClickFolderEdit, onClickFolderDelete)
         }
     }
 }
@@ -192,7 +192,7 @@ private fun ErrorDisplay(){
 
 
 @Composable
-private fun FoldersDisplay(
+private fun FoldersListDisplay(
     folders: List<Folder>,
     onClickFolderEdit: (Int) -> Unit,
     onClickFolderDelete: (Int) -> Unit
@@ -206,7 +206,7 @@ private fun FoldersDisplay(
     ) {
         folders.forEachIndexed { index, folder ->
 
-            FolderDisplay(
+            SingleFolderDisplay(
                 imageUrl = folder.thumbnailUrl,
                 folderName = folder.displayName,
                 onClickEditBtn = { onClickFolderEdit(index) },

@@ -39,7 +39,7 @@ import com.deviantart.artviewer.ui.themes.AppColors
  * for that action.
  */
 @Composable
-fun FolderDisplay(
+fun SingleFolderDisplay(
     imageUrl: String? = null,
     folderName: String = "",
     onClickEditBtn: (() -> Unit)? = null,
@@ -220,7 +220,7 @@ private fun ActionButtons(
 @Composable
 @Preview
 fun FolderDisplayPreview(){
-    FolderDisplay(
+    SingleFolderDisplay(
         folderName = "Sample Art",
         imageUrl = null,
         onClickEditBtn = { },
