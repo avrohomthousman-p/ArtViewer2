@@ -2,6 +2,7 @@ package com.deviantart.artviewer.ui.screens
 
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -95,6 +96,7 @@ private fun LoginScreenContent(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
+            .background(AppColors.White)
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
         val (toolbar, title, statusContent) = createRefs()

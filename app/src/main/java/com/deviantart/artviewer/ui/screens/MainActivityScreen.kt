@@ -1,6 +1,7 @@
 package com.deviantart.artviewer.ui.screens
 
 import android.content.Intent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -27,6 +28,7 @@ import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.components.FolderDisplay
 import com.deviantart.artviewer.ui.components.Toolbar
+import com.deviantart.artviewer.ui.themes.AppColors
 import com.deviantart.artviewer.util.NavDestination
 import com.deviantart.artviewer.util.ToolbarButtonData
 import com.deviantart.artviewer.util.UiState
@@ -131,6 +133,7 @@ private fun FoldersDisplay(folders: List<Folder>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(AppColors.White)
             .verticalScroll(scrollState)
     ) {
         folders.forEach { folder ->

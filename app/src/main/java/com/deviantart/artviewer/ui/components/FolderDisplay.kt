@@ -44,7 +44,7 @@ fun FolderDisplay(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp)
+            .height(90.dp)
             .padding(horizontal = 20.dp)
             .background(
                 color = AppColors.AltBackgroundColor,
@@ -62,7 +62,7 @@ fun FolderDisplay(
                 AsyncImage(
                     model = imageUrl,
                     contentDescription = null,
-                    modifier = Modifier.size(imageSize)
+                    modifier = Modifier.size(imageSize).padding(end = 4.dp)
                 )
             }
             else {
