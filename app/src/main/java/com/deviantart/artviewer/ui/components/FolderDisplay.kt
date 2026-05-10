@@ -3,6 +3,8 @@ package com.deviantart.artviewer.ui.components
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,11 +17,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.ui.themes.AppColors
+
 
 
 /**
@@ -41,6 +49,93 @@ fun FolderDisplay(
     showDeleteBtn: Boolean = true,
     showSaveBtn: Boolean = false
 ){
+    FolderContainer(
+        onClick = { /* TODO */ },
+        content = {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                val imageSize = 64.dp
+                if (!imageUrl.isNullOrEmpty()){
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(imageSize)
+                            .padding(end = 4.dp)
+                    )
+                }
+                else {
+                    Spacer(modifier = Modifier.width(imageSize))
+                }
+
+
+                if (folderName.isNotBlank()){
+                    Text(
+                        text = folderName,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+
+                ActionButtons(
+                    showEditBtn = showEditBtn,
+                    showDeleteBtn = showDeleteBtn,
+                    showSaveBtn = showSaveBtn
+                )
+            }
+        }
+    )
+}
+
+
+
+/**
+ * Displays a box that looks like a folder, but instead of showing folder information,
+ * it can be clicked to add a new folder.
+ */
+@Composable
+fun NewFolderPrompt(){
+    FolderContainer(
+        onClick = { /* TODO */ },
+        content = {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_add),
+                    contentDescription = null,
+                    tint = AppColors.Black
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Text(
+                    text = stringResource(R.string.add_new_folder_prompt),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    )
+}
+
+
+
+/**
+ * Clickable area that can be used to display a folder.
+ */
+@Composable
+private fun FolderContainer(onClick: () -> Unit, content: @Composable () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,45 +145,17 @@ fun FolderDisplay(
                 color = AppColors.AltBackgroundColor,
                 shape = RoundedCornerShape(12.dp)
             )
-        //TODO: make this clickable
+            .clickable(
+                interactionSource = interactionSource,
+                indication = ripple(),
+                onClick = { onClick() }
+            ),
+        contentAlignment = Alignment.Center
     ){
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            val imageSize = 64.dp
-            if (!imageUrl.isNullOrEmpty()){
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = null,
-                    modifier = Modifier.size(imageSize).padding(end = 4.dp)
-                )
-            }
-            else {
-                Spacer(modifier = Modifier.width(imageSize))
-            }
-
-
-            if (folderName.isNotBlank()){
-                Text(
-                    text = folderName,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-
-            ActionButtons(
-                showEditBtn = showEditBtn,
-                showDeleteBtn = showDeleteBtn,
-                showSaveBtn = showSaveBtn
-            )
-        }
+        content()
     }
 }
+
 
 
 /**

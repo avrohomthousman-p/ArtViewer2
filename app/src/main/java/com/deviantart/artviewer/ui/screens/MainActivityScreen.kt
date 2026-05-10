@@ -27,6 +27,7 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.components.FolderDisplay
+import com.deviantart.artviewer.ui.components.NewFolderPrompt
 import com.deviantart.artviewer.ui.components.Toolbar
 import com.deviantart.artviewer.ui.themes.AppColors
 import com.deviantart.artviewer.util.NavDestination
@@ -148,7 +149,9 @@ private fun FoldersDisplay(folders: List<Folder>) {
             Spacer(modifier = Modifier.height(30.dp))
         }
 
-        //TODO: need a "add new folder" item
+
+        NewFolderPrompt()
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
 
