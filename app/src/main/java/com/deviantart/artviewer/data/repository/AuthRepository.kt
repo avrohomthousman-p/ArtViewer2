@@ -32,18 +32,31 @@ class AuthRepository @Inject constructor(
         private set
 
 
+
     /**
      * Checks if the user can be automatically logged in using the refresh token,
      * or if they need to manually log in.
      */
     suspend fun shouldRequireLogin() : Boolean {
+        return !isRefreshPossible()
+    }
+
+
+
+    private suspend fun isRefreshPossible(): Boolean {
+        val refreshToken = dataStore.loadRefreshToken()
+        if (refreshToken.isNullOrEmpty()) {
+            return false
+        }
+
         val refreshTokenExpiration = dataStore.loadRefreshTokenExpiration()
             ?.let { Instant.parse(it) }
 
         val now = Instant.now()
 
-        return refreshTokenExpiration == null || now.isAfter(refreshTokenExpiration)
+        return refreshTokenExpiration != null && now.isBefore(refreshTokenExpiration)
     }
+
 
 
     /**
@@ -66,6 +79,7 @@ class AuthRepository @Inject constructor(
             .appendQueryParameter("code_challenge_method", "S256")
             .build()
     }
+
 
 
     /**
@@ -102,6 +116,7 @@ class AuthRepository @Inject constructor(
     }
 
 
+
     /**
      * Error checking and save data from the response after exchanging the auth token for the
      * accessCode.
@@ -115,15 +130,9 @@ class AuthRepository @Inject constructor(
         }
 
 
-        if (!tokenData.refreshToken.isNullOrEmpty()){
-            dataStore.saveRefreshToken(tokenData.refreshToken)
-
-            val expirationDate = ZonedDateTime.now(ZoneOffset.UTC)
-                .plusMonths(3)
-                .toInstant()
-                .toString()
-
-            dataStore.saveRefreshTokenExpiration(expirationDate)
+        val newRefreshToken = tokenData.refreshToken
+        if (!newRefreshToken.isNullOrEmpty()){
+            saveNewRefreshToken(newRefreshToken)
         }
 
 
@@ -134,9 +143,34 @@ class AuthRepository @Inject constructor(
     }
 
 
+
     suspend fun refreshAccessToken() {
         //TODO
     }
+
+
+
+    /**
+     * Overwrites the existing refresh token with the new one, and updates the expiration date to
+     * 3 months from now.
+     *
+     * You cannot use this function to clear the refresh token by setting it to null. If you want
+     * that, you need to call the clearRefreshToken and clearRefreshTokenExpirationDate functions
+     * on the data store.
+     */
+    private suspend fun saveNewRefreshToken(newRefreshToken: String) {
+        if (newRefreshToken.isNotBlank()) {
+            dataStore.saveRefreshToken(newRefreshToken)
+
+            val expirationDate = ZonedDateTime.now(ZoneOffset.UTC)
+                .plusMonths(3)
+                .toInstant()
+                .toString()
+
+            dataStore.saveRefreshTokenExpiration(expirationDate)
+        }
+    }
+
 
 
     /**
