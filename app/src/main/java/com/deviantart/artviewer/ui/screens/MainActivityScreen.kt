@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.local.room.Folder
+import com.deviantart.artviewer.ui.activities.DisplayArtActivity
 import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.components.DeleteFolderDialog
 import com.deviantart.artviewer.ui.components.EditFolderDialog
@@ -103,6 +104,11 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
     MainActivityScreenContent(
         state = state.value,
         toolbarButtons = toolbarButtons,
+        onClickFolder = { folder ->
+            val intent = Intent(context, DisplayArtActivity::class.java)
+            intent.putExtra(DisplayArtActivity.FOLDER_ID_KEY, folder.localId)
+            context.startActivity(intent)
+        },
         onClickFolderEdit = { folderIndex -> folderBeingEdited = folderIndex },
         onClickFolderDelete = { folderIndex -> folderBeingDeleted = folderIndex }
     )
@@ -141,6 +147,7 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
 private fun MainActivityScreenContent(
     state: UiState<List<Folder>>,
     toolbarButtons: List<ToolbarButtonData>,
+    onClickFolder: (Folder) -> Unit,
     onClickFolderEdit: (Int) -> Unit,
     onClickFolderDelete: (Int) -> Unit
 ) {
@@ -162,7 +169,13 @@ private fun MainActivityScreenContent(
         when(state) {
             is UiState.Error -> ErrorDisplay()
             UiState.Loading -> LoadingDisplay()
-            is UiState.Success<List<Folder>> -> FoldersListDisplay(state.data, onClickFolderEdit, onClickFolderDelete)
+            is UiState.Success<List<Folder>> ->
+                FoldersListDisplay(
+                    folders = state.data,
+                    onClickFolder = onClickFolder,
+                    onClickFolderEdit = onClickFolderEdit,
+                    onClickFolderDelete = onClickFolderDelete
+                )
         }
     }
 }
@@ -196,6 +209,7 @@ private fun ErrorDisplay(){
 @Composable
 private fun FoldersListDisplay(
     folders: List<Folder>,
+    onClickFolder: (Folder) -> Unit,
     onClickFolderEdit: (Int) -> Unit,
     onClickFolderDelete: (Int) -> Unit
 ) {
@@ -211,6 +225,7 @@ private fun FoldersListDisplay(
             SingleFolderDisplay(
                 imageUrl = folder.thumbnailUrl,
                 folderName = folder.displayName,
+                onClickFolder = { onClickFolder(folder) },
                 onClickEditBtn = { onClickFolderEdit(index) },
                 onClickDeleteBtn = { onClickFolderDelete(index) },
                 onClickSaveBtn = null
@@ -254,6 +269,7 @@ fun LoadingFoldersPreview() {
     MainActivityScreenContent(
         state = UiState.Loading,
         toolbarButtons = toolbarButtonsForPreviews,
+        onClickFolder = { },
         onClickFolderEdit = { },
         onClickFolderDelete = { },
     )
@@ -266,6 +282,7 @@ fun FailedToLoadFoldersPreview() {
     MainActivityScreenContent(
         state = UiState.Error(),
         toolbarButtons = toolbarButtonsForPreviews,
+        onClickFolder = { },
         onClickFolderEdit = { },
         onClickFolderDelete = { }
     )
@@ -278,6 +295,7 @@ fun NoFoldersPreview() {
     MainActivityScreenContent(
         state = UiState.Success(emptyList()),
         toolbarButtons = toolbarButtonsForPreviews,
+        onClickFolder = { },
         onClickFolderEdit = { },
         onClickFolderDelete = { }
     )

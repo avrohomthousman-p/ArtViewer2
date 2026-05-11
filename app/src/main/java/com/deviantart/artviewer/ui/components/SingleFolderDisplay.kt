@@ -42,12 +42,13 @@ import com.deviantart.artviewer.ui.themes.AppColors
 fun SingleFolderDisplay(
     imageUrl: String? = null,
     folderName: String = "",
+    onClickFolder: () -> Unit = { },
     onClickEditBtn: (() -> Unit)? = null,
     onClickDeleteBtn: (() -> Unit)? = null,
     onClickSaveBtn: (() -> Unit)? = null
 ){
     FolderContainer(
-        onClick = { /* TODO */ },
+        onClick = { onClickFolder() },
         content = {
             Row(
                 modifier = Modifier.fillMaxSize(),

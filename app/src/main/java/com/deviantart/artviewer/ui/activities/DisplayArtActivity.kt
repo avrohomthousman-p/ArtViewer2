@@ -1,13 +1,13 @@
 package com.deviantart.artviewer.ui.activities
 
 import android.os.Bundle
-import androidx.activity.SystemBarStyle
+import android.widget.Toast
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.ui.graphics.toArgb
+import androidx.lifecycle.lifecycleScope
 import com.deviantart.artviewer.ui.screens.DisplayArtScreen
-import com.deviantart.artviewer.ui.themes.AppColors
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 /**
@@ -15,22 +15,43 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class DisplayArtActivity : BaseActivity() {
+    companion object {
+        const val FOLDER_ID_KEY = "folderID"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(
-                scrim = AppColors.StatusBarColor.toArgb(),
-                darkScrim = AppColors.StatusBarColor.toArgb()
-            ),
-            navigationBarStyle = SystemBarStyle.light(
-                scrim = AppColors.NavBarColor.toArgb(),
-                darkScrim = AppColors.NavBarColor.toArgb()
-            )
-        )
+
+        val folderId = intent?.getIntExtra(FOLDER_ID_KEY, -1)
+        if (folderId == null || folderId == -1){
+            this.handleFolderNotFound()
+            return
+        }
+
+
+        //TODO: have view model fetch the folder contents
 
         setContent {
             DisplayArtScreen()
+        }
+    }
+
+
+
+    /**
+     * Shows an error toast and goes back to the previous activity.
+     */
+    private fun handleFolderNotFound(){
+        Toast.makeText(
+            this,
+            "Something went wrong. We could not load your folder.",
+            Toast.LENGTH_LONG
+        ).show()
+
+        lifecycleScope.launch {
+            delay(3500)
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 }

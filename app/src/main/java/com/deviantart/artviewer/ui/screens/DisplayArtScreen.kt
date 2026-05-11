@@ -27,7 +27,8 @@ import com.deviantart.artviewer.ui.components.Toolbar
 @Composable
 fun DisplayArtScreen() {
     Column(
-        modifier = Modifier.fillMaxSize().padding(WindowInsets.systemBars.asPaddingValues())
+        modifier = Modifier.fillMaxSize()
+            .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
         Toolbar(includeBackButton = true, title = "testrun")
 
@@ -57,7 +58,7 @@ fun DisplayArtScreen() {
 fun VideoPlayer(url: String, play: Boolean) {
     val context = LocalContext.current
 
-    // Create and remember ExoPlayer
+
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
             val mediaItem = MediaItem.fromUri(url)
