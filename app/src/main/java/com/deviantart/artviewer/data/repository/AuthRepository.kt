@@ -22,14 +22,11 @@ import java.time.ZonedDateTime
 @Singleton
 class AuthRepository @Inject constructor(
     private val loginApi: LoginApi,
-    private val dataStore: AuthenticationDataStore
+    private val dataStore: AuthenticationDataStore,
+    private val tokenManager: TokenManager
 ) {
 
     private val CLIENT_ID = "48967"
-
-
-    var accessToken: String? = null
-        private set
 
 
 
@@ -136,7 +133,7 @@ class AuthRepository @Inject constructor(
         }
 
 
-        this.accessToken = tokenData.accessToken
+        tokenManager.saveAccessToken(tokenData.accessToken)
         dataStore.clearPkceCodeVerifier()
 
         return ApiResponse.Success<String>(tokenData.accessToken)
@@ -172,14 +169,14 @@ class AuthRepository @Inject constructor(
 
 
         if (response.isSuccessful && dataIsValid){
-            this.accessToken = responseData.accessToken
+            tokenManager.saveAccessToken(responseData.accessToken)
 
             val newRefreshToken = responseData.refreshToken
             if (newRefreshToken != null){
                 saveNewRefreshToken(newRefreshToken)
             }
 
-            return ApiResponse.Success(this.accessToken!!)
+            return ApiResponse.Success(responseData.accessToken)
         }
         else {
             dataStore.clearRefreshToken()
@@ -225,7 +222,7 @@ class AuthRepository @Inject constructor(
             loginApi.logout(inAppOnly = true, token = refreshToken)
         }
 
-        this.accessToken = null
+        tokenManager.clearAccessToken()
         dataStore.clearRefreshToken()
         dataStore.clearRefreshTokenExpiration()
     }

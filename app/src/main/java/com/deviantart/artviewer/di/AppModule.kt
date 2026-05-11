@@ -9,6 +9,7 @@ import com.deviantart.artviewer.data.local.datastore.AuthenticationDataStore
 import com.deviantart.artviewer.data.local.room.AppDatabase
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.remote.LoginApi
+import com.deviantart.artviewer.data.repository.TokenManager
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -43,11 +44,30 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient =
+    fun provideTokenManager(): TokenManager {
+        return TokenManager()
+    }
+
+
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(tokenManager: TokenManager): OkHttpClient =
         OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
+            .addInterceptor { chain ->
+                val newRequest = chain.request().newBuilder()
+                    .apply {
+                        if (!tokenManager.isTokenExpired()) {
+                            val accessToken = tokenManager.getAccessToken()
+                            header("Authorization", "Bearer $accessToken")
+                        }
+                    }
+                    .build()
+                chain.proceed(newRequest)
+            }
             .build()
 
 
@@ -68,7 +88,6 @@ object AppModule {
             )
             .build()
     }
-
 
 
 
