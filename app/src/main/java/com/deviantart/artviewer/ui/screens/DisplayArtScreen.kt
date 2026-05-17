@@ -32,7 +32,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.decode.GifDecoder
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.ui.activities.MainActivity
@@ -212,6 +214,8 @@ private fun VideoPlayer(title: String, url: String, play: Boolean) {
 
 @Composable
 private fun ImageDisplay(title: String, url: String){
+    val imageLoader = rememberGifImageLoader()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -229,8 +233,21 @@ private fun ImageDisplay(title: String, url: String){
 
         AsyncImage(
             model = url,
+            imageLoader = imageLoader,
             contentDescription = null,
             modifier = Modifier.fillMaxSize()
         )
     }
+}
+
+
+
+@Composable
+fun rememberGifImageLoader(): ImageLoader {
+    val context = LocalContext.current
+    return ImageLoader.Builder(context)
+        .components {
+            add(GifDecoder.Factory())
+        }
+        .build()
 }
