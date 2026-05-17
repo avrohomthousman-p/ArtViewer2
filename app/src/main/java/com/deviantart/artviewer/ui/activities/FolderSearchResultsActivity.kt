@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.ui.screens.FolderSearchResultsScreen
+import com.deviantart.artviewer.ui.screens.FolderSearchResultsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -23,6 +25,8 @@ class FolderSearchResultsActivity : BaseActivity() {
         const val LOCATION_KEY = "folderName"
     }
 
+
+    private val viewModel: FolderSearchResultsViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?){
@@ -59,6 +63,7 @@ class FolderSearchResultsActivity : BaseActivity() {
 
         setContent {
             FolderSearchResultsScreen(
+                viewModel = viewModel,
                 ownerUsername = ownerUsername,
                 location = locationAsEnum
             )

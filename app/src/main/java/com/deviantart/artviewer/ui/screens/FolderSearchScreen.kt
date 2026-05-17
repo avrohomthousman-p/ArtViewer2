@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.ui.activities.FolderSearchResultsActivity
-import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.FolderTypePicker
 import com.deviantart.artviewer.ui.components.LabeledCheckbox
 import com.deviantart.artviewer.ui.components.StandardButton
@@ -155,7 +154,7 @@ fun FolderSearchScreenContent() {
                 }
                 else {
                     val intent = Intent(context, FolderSearchResultsActivity::class.java)
-                    intent.putExtra(FolderSearchResultsActivity.USERNAME_KEY, usernameInput)
+                    intent.putExtra(FolderSearchResultsActivity.USERNAME_KEY, usernameInput.trim())
                     intent.putExtra(FolderSearchResultsActivity.LOCATION_KEY, radioSelection.toString())
                     context.startActivity(intent)
                 }

@@ -101,8 +101,6 @@ class AuthRepository @Inject constructor(
 
         if (!response.isSuccessful){
             val error = response.errorBody()?.string() ?: "Could not authenticate"
-            val raw = response.errorBody()?.string()
-            Log.e("TOKEN_ERROR", raw ?: "no error body")
             Log.e("API failure", error)
             return ApiResponse.Error(error)
         }

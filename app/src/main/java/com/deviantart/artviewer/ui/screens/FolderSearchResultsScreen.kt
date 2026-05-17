@@ -7,12 +7,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
-import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
+import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.TitleWithBullets
 import com.deviantart.artviewer.ui.components.Toolbar
@@ -32,16 +33,27 @@ import com.deviantart.artviewer.ui.util.UiState
 
 
 @Composable
-fun FolderSearchResultsScreen(ownerUsername: String, location: StorageLocation) {
-    //TODO: get state from viewModel
-    FolderSearchResultsScreenContent(UiState.Error(), ownerUsername, location)
+fun FolderSearchResultsScreen(
+    viewModel: FolderSearchResultsViewModel,
+    ownerUsername: String,
+    location: StorageLocation
+) {
+    val state = viewModel.uiState.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        viewModel.loadFolders(ownerUsername, location)
+    }
+
+
+    FolderSearchResultsScreenContent(state.value, ownerUsername, location)
 }
 
 
 
 @Composable
 fun FolderSearchResultsScreenContent(
-    state: UiState<List<DeviantArtMediaItem>>,
+    state: UiState<List<DeviantArtFolder>>,
     ownerUsername: String,
     location: StorageLocation
 ){
@@ -59,13 +71,16 @@ fun FolderSearchResultsScreenContent(
         when(state) {
             is UiState.Error -> DisplayError(ownerUsername, location)
             UiState.Loading -> DisplayLoadingMessage()
-            is UiState.Success<*> -> TODO()
+            is UiState.Success<List<DeviantArtFolder>> -> DisplayFoldersList(state.data)
         }
     }
 }
 
 
 
+/**
+ * Toolbar just for the FolderSearchResults screen.
+ */
 @Composable
 private fun SearchResultsScreenToolbar(toolbarTitle: String){
     val context = LocalContext.current
@@ -97,14 +112,12 @@ private fun DisplayError(ownerUsername: String, location: StorageLocation){
     }
 
 
-
     Text(
         text = stringResource(R.string.no_deviantart_folders_found),
         fontSize = 30.sp,
         textAlign = TextAlign.Center
     )
     Spacer(modifier = Modifier.height(30.dp))
-
 
 
     TitleWithBullets(
@@ -131,6 +144,14 @@ private fun DisplayLoadingMessage(){
 
 
 @Composable
-private fun DisplayFoldersList(folders: List<DeviantArtMediaItem>){
-    //TODO
+private fun DisplayFoldersList(folders: List<DeviantArtFolder>){
+    Text(
+        text = stringResource(R.string.pick_your_folders_prompt),
+        fontSize = 26.sp
+    )
+
+
+    folders.forEach { it ->
+        Text(it.folderName) //TODO: need to show actual folder
+    }
 }
