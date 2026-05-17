@@ -2,6 +2,7 @@ package com.deviantart.artviewer.util
 
 import android.util.Log
 import com.deviantart.artviewer.data.local.room.Folder
+import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.data.remote.MediaApi
 
 
@@ -65,18 +66,33 @@ data class ArtQuery(
 
 
         //Collect results
-        //TODO: ignore items with tier_access != null
-        //TODO: ignore items with no media
         if (folder.shouldRandomize) {
             itemsToKeep.forEach { index ->
-                responseData[index].let { accumulator.addItem(it) }
+                responseData[index]
+                    .takeIf { isValidMedia(it) }
+                    ?.let { accumulator.addItem(it) }
             }
         } else {
             itemsToKeep.forEach { index ->
-                responseData[index].let { art ->
-                    accumulator.addItem(art, index + offset)
-                }
+                responseData[index]
+                    .takeIf { isValidMedia(it) }
+                    ?.let { art ->
+                        accumulator.addItem(art, index + offset)
+                    }
             }
         }
+    }
+
+
+
+    private fun isValidMedia(mediaItem: DeviantArtMediaItem): Boolean {
+        val isBlocked = mediaItem.tierAccess != null
+
+        val hasVideo = !mediaItem.getVideoUrl().isNullOrEmpty()
+        val hasImage = !mediaItem.getImageUrl().isNullOrEmpty()
+
+        val hasExactlyOneMedia = hasVideo xor hasImage
+
+        return !isBlocked && hasExactlyOneMedia
     }
 }

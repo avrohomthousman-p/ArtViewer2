@@ -35,26 +35,8 @@ class ArtRepository @Inject constructor(
      */
     suspend fun fetchFolderContents(localId: Int): List<DeviantArtMediaItem> {
         val folder = db.getFolder(localId)
-
-
-        // Plan the queries
-        val needAllMedia = folder.totalImages <= MAX_ITEMS_SHOWN
-        val queries =
-            if (folder.shouldRandomize && !needAllMedia)
-                planNonConsecutiveQueries(folder)
-            else
-                planConsecutiveQueries(folder)
-
-
-
-        val accumulator = MediaAccumulator(
-            mode =
-                if (folder.shouldRandomize)
-                    MediaAccumulator.Mode.RANDOMIZED
-                else
-                    MediaAccumulator.Mode.SORTED
-        )
-
+        val queries = planQueriesForFolder(folder)
+        val accumulator = buildAccumulator(folder)
 
         // Run all queries in parallel
         coroutineScope {
@@ -63,8 +45,34 @@ class ArtRepository @Inject constructor(
             }
         }
 
-
         return accumulator.getResults()
+    }
+
+
+
+    /**
+     * Builds a list of all the queries we need to get the right art.
+     */
+    private fun planQueriesForFolder(folder: Folder): List<ArtQuery> {
+        val needAllMedia = folder.totalImages <= MAX_ITEMS_SHOWN
+
+        return if (folder.shouldRandomize && !needAllMedia) {
+            planNonConsecutiveQueries(folder)
+        } else {
+            planConsecutiveQueries(folder)
+        }
+    }
+
+
+
+    private fun buildAccumulator(folder: Folder): MediaAccumulator {
+        return MediaAccumulator(
+            mode =
+                if (folder.shouldRandomize)
+                    MediaAccumulator.Mode.RANDOMIZED
+                else
+                    MediaAccumulator.Mode.SORTED
+        )
     }
 
 
@@ -102,16 +110,16 @@ class ArtRepository @Inject constructor(
      * it can fit without going over the [MAX_ITEMS_PER_QUERY]
      */
     private fun planNonConsecutiveQueries(folder: Folder): List<ArtQuery> {
-        val itemsNeeded = chooseItemsToFetch(folder).sorted()
+        val remoteIndexesToFetch = chooseItemsToFetch(folder).sorted()
         val queries = mutableListOf<ArtQuery>()
 
-        var i = 0 //Where we are up to in itemsNeeded
+        var i = 0 //Where we are up to in remoteIndexesToFetch
 
-        while (i < itemsNeeded.size) {
-            val offset = itemsNeeded[i]
-            val (lastIndexInQuery, itemsKept) = collectItemsForQuery(itemsNeeded, i, offset)
+        while (i < remoteIndexesToFetch.size) {
+            val offset = remoteIndexesToFetch[i]
+            val (lastIndexInQuery, itemsKept) = collectItemsForQuery(remoteIndexesToFetch, i, offset)
 
-            val lastRemoteIndex = itemsNeeded[lastIndexInQuery]
+            val lastRemoteIndex = remoteIndexesToFetch[lastIndexInQuery]
             val limit = lastRemoteIndex - offset + 1
 
 
@@ -137,15 +145,15 @@ class ArtRepository @Inject constructor(
      * captured in the same query (because they are not too far away and they items we
      * need).
      *
-     * @param itemsNeeded - A list of all the items we want from the API (remote indexes)
-     * @param startIndex - The position (within itemsNeeded) of the first item to be
+     * @param remoteIndexesToFetch - A list of all the items we want from the API (remote indexes)
+     * @param startIndex - The position (within remoteIndexesToFetch) of the first item to be
      *          included in the query.
      *
      * @param offset - The starting index of the first item included in this query on
      *          the API itself (remote index).
      */
     private fun collectItemsForQuery(
-        itemsNeeded: List<Int>,
+        remoteIndexesToFetch: List<Int>,
         startIndex: Int,
         offset: Int
     ): Pair<Int, List<Int>> {
@@ -154,14 +162,24 @@ class ArtRepository @Inject constructor(
 
         itemsKept.add(0)
 
-        while (i + 1 < itemsNeeded.size && itemsNeeded[i + 1] < offset + MAX_ITEMS_PER_QUERY) {
+        while (i + 1 < remoteIndexesToFetch.size && isWithinQueryWindow(remoteIndexesToFetch[i + 1], offset)) {
             i++
-            itemsKept.add(itemsNeeded[i] - offset)
+            itemsKept.add(remoteIndexesToFetch[i] - offset)
         }
 
         return i to itemsKept
     }
 
+
+
+    /**
+     * Checks if the specified remote index can be included in the query with the given
+     * offset. If including it would make the number of items in the query (query limit)
+     * greater then [MAX_ITEMS_PER_QUERY], then it cannot be included.
+     */
+    private fun isWithinQueryWindow(remoteIndex: Int, offset: Int): Boolean {
+        return remoteIndex < offset + MAX_ITEMS_PER_QUERY
+    }
 
 
 

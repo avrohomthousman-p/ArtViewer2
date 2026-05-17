@@ -1,5 +1,7 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,8 +35,11 @@ import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
+import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.Toolbar
+import com.deviantart.artviewer.util.ToolbarButtonData
 import com.deviantart.artviewer.util.UiState
+
 
 
 /**
@@ -42,13 +48,28 @@ import com.deviantart.artviewer.util.UiState
 @Composable
 fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
     val state = viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
 
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
-        Toolbar(includeBackButton = true, title = folderName)
+        Toolbar(
+            includeBackButton = true,
+            title = folderName,
+            otherButtons = listOf(
+                ToolbarButtonData(
+                    icon = R.drawable.ic_home,
+                    contentDescription = "Home button",
+                    onClick = {
+                        val intent = Intent(context, MainActivity::class.java)
+                        context.startActivity(intent)
+                        (context as? Activity)?.finish()
+                    }
+                )
+            )
+        )
 
 
         val exactState: UiState<List<DeviantArtMediaItem>> = state.value//needed to satisfy compiler type concerns
@@ -67,11 +88,11 @@ fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
 private fun LoadingDisplay(){
     Box(
         modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = stringResource(R.string.loading_art_message),
-            fontSize = 22.sp,
+            fontSize = 26.sp,
             textAlign = TextAlign.Center
         )
     }
@@ -96,7 +117,8 @@ private fun ErrorDisplay(errorMessage: String? = null){
     Box(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
         Text(
             text = actualMessage,
-            fontSize = 22.sp
+            fontSize = 22.sp,
+            fontWeight = FontWeight.SemiBold
         )
     }
 }
@@ -168,7 +190,8 @@ private fun VideoPlayer(title: String, url: String, play: Boolean) {
         Text(
             text = title,
             fontSize = 22.sp,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.SemiBold
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -198,7 +221,8 @@ private fun ImageDisplay(title: String, url: String){
         Text(
             text = title,
             fontSize = 22.sp,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.SemiBold
         )
 
         Spacer(modifier = Modifier.height(10.dp))
