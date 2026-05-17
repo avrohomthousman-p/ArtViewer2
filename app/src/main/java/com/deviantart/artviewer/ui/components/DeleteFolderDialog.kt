@@ -15,6 +15,10 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.ui.themes.AppColors
 
 
+
+/**
+ * Dialog popup to delete a folder from the database.
+ */
 @Composable
 fun DeleteFolderDialog(
     onDismiss: () -> Unit,

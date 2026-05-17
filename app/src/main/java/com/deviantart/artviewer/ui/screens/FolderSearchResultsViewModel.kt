@@ -30,6 +30,10 @@ class FolderSearchResultsViewModel @Inject constructor(
 
 
 
+    /**
+     * Load DeviantArt folders from the specified user so they can be displayed on
+     * the screen for the user to save.
+     */
     fun loadFolders(ownerUsername: String, location: StorageLocation){
         viewModelScope.launch(Dispatchers.IO) {
             val response = folderRepo.loadFolders(ownerUsername, location)
@@ -42,5 +46,21 @@ class FolderSearchResultsViewModel @Inject constructor(
                 _uiState.value = UiState.Success(response.data)
             }
         }
+    }
+
+
+
+    fun removeFolderFromList(index: Int){
+        if (_uiState.value !is UiState.Success<List<DeviantArtFolder>>){
+            throw IllegalStateException("Cannot remove folder from results if there are no results")
+        }
+
+
+        val currentList = (_uiState.value as UiState.Success<List<DeviantArtFolder>>).data.toMutableList()
+        currentList.removeAt(index)
+
+        _uiState.value = UiState.Success(
+            data = currentList.toList()
+        )
     }
 }

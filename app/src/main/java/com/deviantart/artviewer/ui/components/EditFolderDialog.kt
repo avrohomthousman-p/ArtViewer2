@@ -24,6 +24,7 @@ import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.themes.AppColors
 
 
+
 /**
  * Dialog popup for when the user clicks the edit button on a folder.
  *

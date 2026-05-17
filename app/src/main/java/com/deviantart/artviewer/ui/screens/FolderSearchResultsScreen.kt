@@ -48,7 +48,13 @@ fun FolderSearchResultsScreen(
     }
 
 
-    FolderSearchResultsScreenContent(state.value, ownerUsername, location)
+    FolderSearchResultsScreenContent(
+        state = state.value,
+        ownerUsername = ownerUsername,
+        location = location,
+        onClickDeleteBtn = { index -> viewModel.removeFolderFromList(index) },
+        onClickSaveBtn = { /* TODO */ }
+    )
 }
 
 
@@ -57,7 +63,9 @@ fun FolderSearchResultsScreen(
 fun FolderSearchResultsScreenContent(
     state: UiState<List<DeviantArtFolder>>,
     ownerUsername: String,
-    location: StorageLocation
+    location: StorageLocation,
+    onClickDeleteBtn: (Int) -> Unit,
+    onClickSaveBtn: (Int) -> Unit
 ){
     Column(
         modifier = Modifier
@@ -73,7 +81,12 @@ fun FolderSearchResultsScreenContent(
         when(state) {
             is UiState.Error -> DisplayError(ownerUsername, location)
             UiState.Loading -> DisplayLoadingMessage()
-            is UiState.Success<List<DeviantArtFolder>> -> DisplayFoldersList(state.data)
+            is UiState.Success<List<DeviantArtFolder>> ->
+                DisplayFoldersList(
+                    folders = state.data,
+                    onClickSaveBtn = onClickSaveBtn,
+                    onClickDeleteBtn = onClickDeleteBtn
+                )
         }
     }
 }
@@ -105,6 +118,9 @@ private fun SearchResultsScreenToolbar(toolbarTitle: String){
 
 
 
+/**
+ * Screen content for when the API fails
+ */
 @Composable
 private fun DisplayError(ownerUsername: String, location: StorageLocation){
     val oppositeLocation = when(location){
@@ -144,8 +160,15 @@ private fun DisplayLoadingMessage(){
 
 
 
+/**
+ * Display primary content of the screen.
+ */
 @Composable
-private fun DisplayFoldersList(folders: List<DeviantArtFolder>){
+private fun DisplayFoldersList(
+    folders: List<DeviantArtFolder>,
+    onClickDeleteBtn: (Int) -> Unit,
+    onClickSaveBtn: (Int) -> Unit
+) {
     Text(
         text = stringResource(R.string.pick_your_folders_prompt),
         fontSize = 26.sp
@@ -158,12 +181,12 @@ private fun DisplayFoldersList(folders: List<DeviantArtFolder>){
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
     ) {
-        folders.forEach {
+        folders.forEachIndexed { index, folderData ->
             SingleFolderDisplay(
-                imageUrl = it.getThumbnailUrl(),
-                folderName = it.folderName,
-                onClickDeleteBtn = { /* TODO */ },
-                onClickSaveBtn = { /* TODO */ }
+                imageUrl = folderData.getThumbnailUrl(),
+                folderName = folderData.folderName,
+                onClickDeleteBtn = { onClickDeleteBtn(index) },
+                onClickSaveBtn = { onClickSaveBtn(index) },
             )
             Spacer(modifier = Modifier.height(30.dp))
         }
