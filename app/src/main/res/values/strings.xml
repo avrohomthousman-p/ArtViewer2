@@ -9,6 +9,8 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="confirm">Confirm</string>
+    <string name="gallery">Gallery</string>
+    <string name="collection">Collection</string>
 
 
     <!-- Login Activity -->
@@ -46,5 +48,12 @@
     <!-- Display Art Activity -->
     <string name="loading_art_message">Loading your art…</string>
     <string name="default_error_msg">We are experiencing technical difficulties.</string>
+
+
+    <!-- Search Folders Activity -->
+    <string name="search_folders_toolbar_title">Search For Folders</string>
+    <string name="folder_search_prompt">Describe the folder you are looking for:</string>
+    <string name="username_field_prompt">Enter username of owner: </string>
+    <string name="full_gallery_label">Save the full Gallery/Collection</string>
 
 </resources>

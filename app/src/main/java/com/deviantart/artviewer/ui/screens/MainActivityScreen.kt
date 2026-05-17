@@ -35,6 +35,7 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.activities.DisplayArtActivity
 import com.deviantart.artviewer.ui.activities.LoginActivity
+import com.deviantart.artviewer.ui.activities.SearchFoldersActivity
 import com.deviantart.artviewer.ui.components.DeleteFolderDialog
 import com.deviantart.artviewer.ui.components.EditFolderDialog
 import com.deviantart.artviewer.ui.components.NewFolderPrompt
@@ -249,7 +250,13 @@ private fun FoldersListDisplay(
         }
 
 
-        NewFolderPrompt()
+        val context = LocalContext.current
+        NewFolderPrompt(
+            onClick = {
+                val intent = Intent(context, SearchFoldersActivity::class.java)
+                context.startActivity(intent)
+            }
+        )
         Spacer(modifier = Modifier.height(30.dp))
     }
 }

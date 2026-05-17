@@ -37,6 +37,13 @@
             </intent-filter>
         </activity>
 
+
+        <activity
+            android:name=".ui.activities.MainActivity"
+            android:exported="false">
+        </activity>
+
+
         <activity
             android:name=".ui.activities.DisplayArtActivity"
             android:exported="false">
@@ -44,7 +51,13 @@
 
 
         <activity
-            android:name=".ui.activities.MainActivity"
+            android:name=".ui.activities.SearchFoldersActivity"
+            android:exported="false">
+        </activity>
+
+
+        <activity
+            android:name=".ui.activities.FolderSearchResultsActivity"
             android:exported="false">
         </activity>
     </application>

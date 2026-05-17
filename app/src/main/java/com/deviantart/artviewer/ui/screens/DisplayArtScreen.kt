@@ -50,28 +50,13 @@ import com.deviantart.artviewer.util.UiState
 @Composable
 fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
     val state = viewModel.uiState.collectAsState()
-    val context = LocalContext.current
 
 
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
-        Toolbar(
-            includeBackButton = true,
-            title = folderName,
-            otherButtons = listOf(
-                ToolbarButtonData(
-                    icon = R.drawable.ic_home,
-                    contentDescription = "Home button",
-                    onClick = {
-                        val intent = Intent(context, MainActivity::class.java)
-                        context.startActivity(intent)
-                        (context as? Activity)?.finish()
-                    }
-                )
-            )
-        )
+        Toolbar(folderName)
 
 
         val exactState: UiState<List<DeviantArtMediaItem>> = state.value//needed to satisfy compiler type concerns
@@ -83,6 +68,31 @@ fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
     }
 }
 
+
+
+/**
+ * Version of the toolbar that is specifically set for the DisplayArtScreen.
+ */
+@Composable
+private fun Toolbar(folderName: String){
+    val context = LocalContext.current
+
+    Toolbar(
+        includeBackButton = true,
+        title = folderName,
+        otherButtons = listOf(
+            ToolbarButtonData(
+                icon = R.drawable.ic_home,
+                contentDescription = "Home button",
+                onClick = {
+                    val intent = Intent(context, MainActivity::class.java)
+                    context.startActivity(intent)
+                    (context as? Activity)?.finish()
+                }
+            )
+        )
+    )
+}
 
 
 
@@ -191,6 +201,7 @@ private fun VideoPlayer(title: String, url: String, play: Boolean) {
 
         Text(
             text = title,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold
@@ -224,6 +235,7 @@ private fun ImageDisplay(title: String, url: String){
 
         Text(
             text = title,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
             fontSize = 22.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold

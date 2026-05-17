@@ -98,9 +98,9 @@ fun SingleFolderDisplay(
  * it can be clicked to add a new folder.
  */
 @Composable
-fun NewFolderPrompt(){
+fun NewFolderPrompt(onClick: () -> Unit){
     FolderContainer(
-        onClick = { /* TODO */ },
+        onClick = { onClick() },
         content = {
             Row(
                 modifier = Modifier.fillMaxSize(),

@@ -1,6 +1,7 @@
 package com.deviantart.artviewer.ui.activities
 
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -40,6 +41,9 @@ class DisplayArtActivity : BaseActivity() {
 
 
         viewModel.loadFolderContent(folderId)
+
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContent {
             DisplayArtScreen(viewModel, folderName)
