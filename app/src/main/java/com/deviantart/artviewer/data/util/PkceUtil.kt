@@ -1,9 +1,8 @@
-package com.deviantart.artviewer.util
+package com.deviantart.artviewer.data.util
 
 import android.util.Base64
 import java.security.MessageDigest
 import java.security.SecureRandom
-
 
 /**
  * Class with PKCE tools for doing an oauth2.1 login.

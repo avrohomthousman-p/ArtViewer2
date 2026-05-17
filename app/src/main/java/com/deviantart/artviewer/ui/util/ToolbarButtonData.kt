@@ -1,4 +1,4 @@
-package com.deviantart.artviewer.util
+package com.deviantart.artviewer.ui.util
 
 
 /**

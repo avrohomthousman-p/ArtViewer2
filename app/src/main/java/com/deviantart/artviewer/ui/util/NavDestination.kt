@@ -1,8 +1,6 @@
-package com.deviantart.artviewer.util
+package com.deviantart.artviewer.ui.util
 
 import android.net.Uri
-
-
 
 /**
  * Enum that represents all the possible places that can be navigated to.

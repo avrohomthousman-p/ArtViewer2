@@ -1,9 +1,7 @@
-package com.deviantart.artviewer.util
+package com.deviantart.artviewer.data.util
 
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import java.util.Collections
-
-
 
 /**
  * Accumulates media items fetched from DeviantArt across multiple queries.

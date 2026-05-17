@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.Upsert
 
@@ -30,4 +31,18 @@ interface FolderDao {
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun folderDao(): FolderDao
+}
+
+
+
+/**
+ * Tools for converting StorageLocation instances to and from String so
+ * it can be stored in the DB.
+ */
+class Converters {
+    @TypeConverter
+    fun fromFolderType(value: StorageLocation): String = value.name
+
+    @TypeConverter
+    fun toFolderType(value: String): StorageLocation = StorageLocation.valueOf(value)
 }

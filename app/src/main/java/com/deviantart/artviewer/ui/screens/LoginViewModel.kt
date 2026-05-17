@@ -7,9 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.deviantart.artviewer.data.repository.AuthRepository
-import com.deviantart.artviewer.util.ApiResponse
-import com.deviantart.artviewer.util.MiscUtils
-import com.deviantart.artviewer.util.NavDestination
+import com.deviantart.artviewer.data.util.ApiResponse
+import com.deviantart.artviewer.ui.util.MiscUtils
+import com.deviantart.artviewer.ui.util.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

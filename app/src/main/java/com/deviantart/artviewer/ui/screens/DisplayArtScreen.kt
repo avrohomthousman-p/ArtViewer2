@@ -39,8 +39,8 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.Toolbar
-import com.deviantart.artviewer.util.ToolbarButtonData
-import com.deviantart.artviewer.util.UiState
+import com.deviantart.artviewer.ui.util.ToolbarButtonData
+import com.deviantart.artviewer.ui.util.UiState
 
 
 

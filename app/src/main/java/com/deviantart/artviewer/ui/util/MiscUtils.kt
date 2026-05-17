@@ -1,10 +1,9 @@
-package com.deviantart.artviewer.util
+package com.deviantart.artviewer.ui.util
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-
 
 /**
  * Class to store all miscellaneous utils that are not big enough to warrant

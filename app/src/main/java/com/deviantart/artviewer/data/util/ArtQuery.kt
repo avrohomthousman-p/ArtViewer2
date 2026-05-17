@@ -1,11 +1,9 @@
-package com.deviantart.artviewer.util
+package com.deviantart.artviewer.data.util
 
 import android.util.Log
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.data.remote.MediaApi
-
-
 
 /**
  * Stores information about an API query we will execute.
@@ -35,7 +33,7 @@ data class ArtQuery(
      *  - Performs basic error handling on the response.
      *  - Extracts only the items specified in [itemsToKeep].
      *  - Adds them to [accumulator], optionally preserving global ordering
-     *    depending on [Folder.shouldRandomize].
+     *    depending on [com.deviantart.artviewer.data.local.room.Folder.shouldRandomize].
      *
      * @param mediaApi The API instance used to perform the request.
      * @param folder The folder whose media is being fetched.

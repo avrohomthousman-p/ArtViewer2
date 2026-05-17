@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.ui.themes.AppColors
-import com.deviantart.artviewer.util.ToolbarButtonData
+import com.deviantart.artviewer.ui.util.ToolbarButtonData
 
 
 const val TOOLBAR_HEIGHT = 70

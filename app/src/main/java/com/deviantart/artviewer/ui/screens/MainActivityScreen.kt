@@ -42,9 +42,9 @@ import com.deviantart.artviewer.ui.components.NewFolderPrompt
 import com.deviantart.artviewer.ui.components.SingleFolderDisplay
 import com.deviantart.artviewer.ui.components.Toolbar
 import com.deviantart.artviewer.ui.themes.AppColors
-import com.deviantart.artviewer.util.NavDestination
-import com.deviantart.artviewer.util.ToolbarButtonData
-import com.deviantart.artviewer.util.UiState
+import com.deviantart.artviewer.ui.util.NavDestination
+import com.deviantart.artviewer.ui.util.ToolbarButtonData
+import com.deviantart.artviewer.ui.util.UiState
 
 
 /**

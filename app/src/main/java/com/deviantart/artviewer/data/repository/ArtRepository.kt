@@ -4,8 +4,8 @@ import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.data.remote.MediaApi
-import com.deviantart.artviewer.util.ArtQuery
-import com.deviantart.artviewer.util.MediaAccumulator
+import com.deviantart.artviewer.data.util.ArtQuery
+import com.deviantart.artviewer.data.util.MediaAccumulator
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject

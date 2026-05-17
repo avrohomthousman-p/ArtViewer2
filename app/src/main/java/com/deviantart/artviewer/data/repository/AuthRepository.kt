@@ -4,13 +4,13 @@ import android.net.Uri
 import android.util.Log
 import com.deviantart.artviewer.data.local.datastore.AuthenticationDataStore
 import com.deviantart.artviewer.data.remote.LoginApi
-import com.deviantart.artviewer.util.PkceUtil
+import com.deviantart.artviewer.data.util.PkceUtil
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.net.toUri
 import com.deviantart.artviewer.data.remote.TokenResponse
-import com.deviantart.artviewer.util.ApiResponse
+import com.deviantart.artviewer.data.util.ApiResponse
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 

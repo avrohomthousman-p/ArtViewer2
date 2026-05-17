@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.repository.AuthRepository
-import com.deviantart.artviewer.util.NavDestination
-import com.deviantart.artviewer.util.UiState
+import com.deviantart.artviewer.ui.util.NavDestination
+import com.deviantart.artviewer.ui.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow

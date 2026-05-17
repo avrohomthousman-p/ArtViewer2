@@ -30,7 +30,7 @@ import com.deviantart.artviewer.ui.components.StandardButton
 import com.deviantart.artviewer.ui.components.TOOLBAR_HEIGHT
 import com.deviantart.artviewer.ui.components.Toolbar
 import com.deviantart.artviewer.ui.themes.AppColors
-import com.deviantart.artviewer.util.NavDestination
+import com.deviantart.artviewer.ui.util.NavDestination
 
 
 /**
