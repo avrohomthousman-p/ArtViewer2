@@ -21,11 +21,12 @@ import androidx.media3.ui.PlayerView
 import com.deviantart.artviewer.ui.components.Toolbar
 
 
+
 /**
  * Screen used for the DisplayArtActivity.
  */
 @Composable
-fun DisplayArtScreen() {
+fun DisplayArtScreen(viewModel: DisplayArtViewModel) {
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(WindowInsets.systemBars.asPaddingValues())
@@ -86,4 +87,11 @@ fun VideoPlayer(url: String, play: Boolean) {
         },
         modifier = Modifier.fillMaxSize()
     )
+}
+
+
+
+@Composable
+fun ImageDisplay(url: String, title: String){
+    //TODO
 }

@@ -27,15 +27,27 @@ data class DeviantArtMediaItem (
     val videos: List<DeviantArtVideo>? = null,
 
     @SerialName("content")
-    val content: DeviantArtImage? = null
-)
+    val image: DeviantArtImage? = null
+){
+
+    fun getVideoUrl(): String? {
+        return this.videos?.firstOrNull()?.url
+    }
+
+
+    fun getImageUrl(): String? {
+        return this.image?.url
+    }
+
+
+}
 
 
 
 @Serializable
 data class DeviantArtVideo(
     @SerialName("src")
-    val src: String
+    val url: String
 )
 
 
@@ -43,5 +55,5 @@ data class DeviantArtVideo(
 @Serializable
 data class DeviantArtImage(
     @SerialName("src")
-    val src: String
+    val url: String
 )

@@ -3,8 +3,10 @@ package com.deviantart.artviewer.ui.activities
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.deviantart.artviewer.ui.screens.DisplayArtScreen
+import com.deviantart.artviewer.ui.screens.DisplayArtViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -19,6 +21,10 @@ class DisplayArtActivity : BaseActivity() {
         const val FOLDER_ID_KEY = "folderID"
     }
 
+
+    private val viewModel: DisplayArtViewModel by viewModels()
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,11 +35,10 @@ class DisplayArtActivity : BaseActivity() {
             return
         }
 
-
-        //TODO: have view model fetch the folder contents
+        viewModel.loadFolderContent(folderId)
 
         setContent {
-            DisplayArtScreen()
+            DisplayArtScreen(viewModel)
         }
     }
 
