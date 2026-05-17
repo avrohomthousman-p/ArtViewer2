@@ -13,6 +13,7 @@
     <string name="collection">Collection</string>
     <string name="should_randomize_text">Show images in a RANDOM order</string>
     <string name="should_not_randomize_text">Show images in the CORRECT order</string>
+    <string name="home_icon_content_description">Home button</string>
 
 
     <!-- Login Activity -->
@@ -33,7 +34,7 @@
     <string name="load_failed_error">Something went wrong. We could not load your folders</string>
     <string name="loading_folders_message">Loading your folders…</string>
     <string name="add_new_folder_prompt">Add new folder</string>
-    <string name="no_folders">You have no saved folders</string>
+    <string name="no_db_folders_found">You have no saved folders</string>
 
 
     <!-- Dialog boxes -->
@@ -50,12 +51,23 @@
     <string name="default_error_msg">We are experiencing technical difficulties.</string>
 
 
-    <!-- Search Folders Activity -->
-    <string name="search_folders_toolbar_title">Search For Folders</string>
+    <!-- Folder Search Activity -->
+    <string name="folder_search_toolbar_title">Search For Folders</string>
     <string name="folder_search_prompt">Describe the folder you are looking for:</string>
     <string name="username_field_prompt">Enter username of owner: </string>
     <string name="full_gallery_label">Save the full Gallery/Collection</string>
     <string name="save_folder_button">SAVE AS SINGLE FOLDER</string>
     <string name="run_folder_search">SEE USER FOLDERS</string>
+
+
+
+    <!-- Folder Search Results Activity -->
+    <string name="search_results_toolbar_title">Save Folders</string>
+    <string name="loading_folders_text">Loading folders…</string>
+    <string name="no_deviantart_folders_found">No folders found</string>
+    <string name="suggested_solutions">Here are some things you can try:</string>
+    <string name="check_internet_solution">Check your internet connection.</string>
+    <string name="check_username_suggestion">Make sure you spelled the username correctly. You entered \"%s\".</string>
+    <string name="check_location_suggestion">You selected %s. Did you mean %s?</string>
 
 </resources>

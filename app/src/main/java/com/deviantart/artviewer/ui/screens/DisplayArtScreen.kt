@@ -83,7 +83,7 @@ private fun Toolbar(folderName: String){
         otherButtons = listOf(
             ToolbarButtonData(
                 icon = R.drawable.ic_home,
-                contentDescription = "Home button",
+                contentDescription = stringResource(R.string.home_icon_content_description),
                 onClick = {
                     val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)

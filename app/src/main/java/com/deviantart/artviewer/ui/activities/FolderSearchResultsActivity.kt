@@ -1,9 +1,16 @@
 package com.deviantart.artviewer.ui.activities
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
+import androidx.lifecycle.lifecycleScope
+import com.deviantart.artviewer.common.StorageLocation
+import com.deviantart.artviewer.ui.activities.DisplayArtActivity.Companion.FOLDER_ID_KEY
+import com.deviantart.artviewer.ui.activities.DisplayArtActivity.Companion.FOLDER_NAME_KEY
+import com.deviantart.artviewer.ui.screens.FolderSearchResultsScreen
 import dagger.hilt.android.AndroidEntryPoint
-
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 /**
@@ -11,13 +18,56 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class FolderSearchResultsActivity : BaseActivity() {
+    companion object {
+        const val USERNAME_KEY = "username"
+        const val LOCATION_KEY = "folderName"
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
 
 
+        val ownerUsername = intent?.getStringExtra(USERNAME_KEY)
+        val location = intent?.getStringExtra(LOCATION_KEY)
+
+        if (ownerUsername.isNullOrEmpty() || location.isNullOrEmpty()){
+            handleMissingIntentData()
+            return
+        }
+
+
+        lateinit var locationAsEnum: StorageLocation
+        try {
+            locationAsEnum = StorageLocation.valueOf(location)
+        }
+        catch (_: IllegalArgumentException){
+            handleMissingIntentData()
+            return
+        }
+
+
+
         setContent {
-            //TODO
+            FolderSearchResultsScreen(
+                ownerUsername = ownerUsername,
+                location = locationAsEnum
+            )
+        }
+    }
+
+
+
+    private fun handleMissingIntentData(){
+        Toast.makeText(
+            this,
+            "Something went wrong. We could not load any folders.",
+            Toast.LENGTH_LONG
+        ).show()
+
+        lifecycleScope.launch {
+            delay(2000)
+            finish()
         }
     }
 }

@@ -63,8 +63,8 @@ class DisplayArtActivity : BaseActivity() {
         ).show()
 
         lifecycleScope.launch {
-            delay(3500)
-            onBackPressedDispatcher.onBackPressed()
+            delay(2000)
+            finish()
         }
     }
 }

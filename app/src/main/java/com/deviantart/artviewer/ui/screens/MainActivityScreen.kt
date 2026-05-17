@@ -241,7 +241,7 @@ private fun FoldersListDisplay(
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.no_folders),
+                text = stringResource(R.string.no_db_folders_found),
                 fontSize = 26.sp,
                 textAlign = TextAlign.Center
             )

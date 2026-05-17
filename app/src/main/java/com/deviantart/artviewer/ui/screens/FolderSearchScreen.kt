@@ -1,5 +1,6 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
+import com.deviantart.artviewer.ui.activities.FolderSearchResultsActivity
+import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.FolderTypePicker
 import com.deviantart.artviewer.ui.components.LabeledCheckbox
 import com.deviantart.artviewer.ui.components.StandardButton
@@ -48,6 +52,7 @@ fun FolderSearchScreen() {
 
 @Composable
 fun FolderSearchScreenContent() {
+    val context = LocalContext.current
     var usernameInput by remember { mutableStateOf("") }
     var saveFullGallery by remember { mutableStateOf(false) }
     var radioSelection by remember { mutableStateOf(StorageLocation.GALLERY) }
@@ -63,7 +68,7 @@ fun FolderSearchScreenContent() {
     ) {
         Toolbar(
             includeBackButton = true,
-            title = stringResource(R.string.search_folders_toolbar_title),
+            title = stringResource(R.string.folder_search_toolbar_title),
             otherButtons = listOf()
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -131,11 +136,14 @@ fun FolderSearchScreenContent() {
             modifier = Modifier,
             text = stringResource(btnText),
             onClick = {
+                //TODO: error checking
                 if (saveFullGallery){
                     //TODO: save folder
                 }
                 else {
-                    //TODO: navigate to results activity
+                    val intent = Intent(context, FolderSearchResultsActivity::class.java)
+                    //TODO: add data to the intent
+                    context.startActivity(intent)
                 }
             }
         )
