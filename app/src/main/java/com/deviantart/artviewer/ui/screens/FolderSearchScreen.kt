@@ -21,8 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -31,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
-import com.deviantart.artviewer.ui.activities.SearchFoldersActivity
 import com.deviantart.artviewer.ui.components.FolderTypePicker
 import com.deviantart.artviewer.ui.components.LabeledCheckbox
 import com.deviantart.artviewer.ui.components.StandardButton
@@ -43,14 +40,14 @@ import com.deviantart.artviewer.ui.components.Toolbar
  * Screen for the SearchFoldersActivity
  */
 @Composable
-fun SearchFoldersScreen() {
-    SearchFoldersScreenContent()
+fun FolderSearchScreen() {
+    FolderSearchScreenContent()
 }
 
 
 
 @Composable
-fun SearchFoldersScreenContent() {
+fun FolderSearchScreenContent() {
     var usernameInput by remember { mutableStateOf("") }
     var saveFullGallery by remember { mutableStateOf(false) }
     var radioSelection by remember { mutableStateOf(StorageLocation.GALLERY) }
@@ -151,5 +148,5 @@ fun SearchFoldersScreenContent() {
 @Preview
 @Composable
 fun SearchFoldersActivityPreview(){
-    SearchFoldersScreenContent()
+    FolderSearchScreenContent()
 }

@@ -51,7 +51,7 @@
 
 
         <activity
-            android:name=".ui.activities.SearchFoldersActivity"
+            android:name=".ui.activities.FolderSearchActivity"
             android:exported="false">
         </activity>
 
