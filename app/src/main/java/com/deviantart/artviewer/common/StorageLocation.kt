@@ -1,6 +1,4 @@
-package com.deviantart.artviewer.data.local.room
-
-
+package com.deviantart.artviewer.common
 
 /**
  * Ways DeviantArt might store a folder.

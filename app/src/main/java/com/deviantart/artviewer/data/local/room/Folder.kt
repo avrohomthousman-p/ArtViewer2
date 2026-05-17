@@ -2,7 +2,7 @@ package com.deviantart.artviewer.data.local.room
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-
+import com.deviantart.artviewer.common.StorageLocation
 
 
 /**
