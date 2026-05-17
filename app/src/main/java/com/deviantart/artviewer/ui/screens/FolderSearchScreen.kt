@@ -54,6 +54,7 @@ fun FolderSearchScreen() {
 fun FolderSearchScreenContent() {
     val context = LocalContext.current
     var usernameInput by remember { mutableStateOf("") }
+    var isValidUsername by remember { mutableStateOf(true) }
     var saveFullGallery by remember { mutableStateOf(false) }
     var radioSelection by remember { mutableStateOf(StorageLocation.GALLERY) }
     var shouldRandomize by remember { mutableStateOf(true) }
@@ -86,7 +87,11 @@ fun FolderSearchScreenContent() {
 
         OutlinedTextField(
             value = usernameInput,
-            onValueChange = { usernameInput = it },
+            onValueChange = { newValue ->
+                usernameInput = newValue
+                isValidUsername = newValue.isNotBlank()
+            },
+            isError = !isValidUsername,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp),
@@ -105,11 +110,13 @@ fun FolderSearchScreenContent() {
         Spacer(modifier = Modifier.height(30.dp))
 
 
+
         FolderTypePicker(
             currentlySelected = radioSelection,
             onSelected = { radioSelection = it }
         )
         Spacer(modifier = Modifier.height(30.dp))
+
 
 
         if (saveFullGallery){
@@ -128,7 +135,9 @@ fun FolderSearchScreenContent() {
         }
 
 
+
         Spacer(modifier = Modifier.weight(1f))
+
 
 
         val btnText = if (saveFullGallery) R.string.save_folder_button else R.string.run_folder_search
@@ -136,13 +145,18 @@ fun FolderSearchScreenContent() {
             modifier = Modifier,
             text = stringResource(btnText),
             onClick = {
-                //TODO: error checking
+                if (usernameInput.isBlank()){
+                    isValidUsername = false
+                    return@StandardButton
+                }
+
                 if (saveFullGallery){
                     //TODO: save folder
                 }
                 else {
                     val intent = Intent(context, FolderSearchResultsActivity::class.java)
-                    //TODO: add data to the intent
+                    intent.putExtra(FolderSearchResultsActivity.USERNAME_KEY, usernameInput)
+                    intent.putExtra(FolderSearchResultsActivity.LOCATION_KEY, radioSelection.toString())
                     context.startActivity(intent)
                 }
             }

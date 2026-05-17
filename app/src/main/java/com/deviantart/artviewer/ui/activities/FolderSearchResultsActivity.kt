@@ -1,16 +1,16 @@
 package com.deviantart.artviewer.ui.activities
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import com.deviantart.artviewer.common.StorageLocation
-import com.deviantart.artviewer.ui.activities.DisplayArtActivity.Companion.FOLDER_ID_KEY
-import com.deviantart.artviewer.ui.activities.DisplayArtActivity.Companion.FOLDER_NAME_KEY
 import com.deviantart.artviewer.ui.screens.FolderSearchResultsScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 
 /**
@@ -24,6 +24,7 @@ class FolderSearchResultsActivity : BaseActivity() {
     }
 
 
+
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
 
@@ -32,6 +33,13 @@ class FolderSearchResultsActivity : BaseActivity() {
         val location = intent?.getStringExtra(LOCATION_KEY)
 
         if (ownerUsername.isNullOrEmpty() || location.isNullOrEmpty()){
+            if (ownerUsername.isNullOrEmpty()){
+                Log.e("Navigation", "No username received by FolderSearchResultsActivity")
+            }
+            if (location.isNullOrEmpty()){
+                Log.e("Navigation", "No location received by FolderSearchResultsActivity")
+            }
+
             handleMissingIntentData()
             return
         }
@@ -39,9 +47,10 @@ class FolderSearchResultsActivity : BaseActivity() {
 
         lateinit var locationAsEnum: StorageLocation
         try {
-            locationAsEnum = StorageLocation.valueOf(location)
+            locationAsEnum = StorageLocation.valueOf(location.uppercase())
         }
-        catch (_: IllegalArgumentException){
+        catch (e: IllegalArgumentException){
+            Log.e("Navigation", e.message, e)
             handleMissingIntentData()
             return
         }
