@@ -14,6 +14,9 @@ interface FolderDao {
     @Query("SELECT * FROM folders ORDER BY displayName")
     suspend fun getAllFolders(): List<Folder>
 
+    @Query("SELECT * FROM folders WHERE localId = :localId")
+    suspend fun getFolder(localId: Int) : Folder
+
     @Delete
     suspend fun deleteFolder(folder: Folder)
 

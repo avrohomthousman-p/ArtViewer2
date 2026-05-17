@@ -2,6 +2,7 @@ package com.deviantart.artviewer.di
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.room.RoomDatabase
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -9,6 +10,7 @@ import com.deviantart.artviewer.data.local.datastore.AuthenticationDataStore
 import com.deviantart.artviewer.data.local.room.AppDatabase
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.remote.LoginApi
+import com.deviantart.artviewer.data.remote.MediaApi
 import com.deviantart.artviewer.data.repository.TokenManager
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -30,6 +32,7 @@ import javax.inject.Singleton
 /**
  * Makes classes available to hilt so they can be injected when needed.
  */
+@Suppress("unused")
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -62,7 +65,10 @@ object AppModule {
                     .apply {
                         if (!tokenManager.isTokenExpired()) {
                             val accessToken = tokenManager.getAccessToken()
-                            header("Authorization", "Bearer $accessToken")
+                            this.header("Authorization", "Bearer $accessToken")
+                        }
+                        else {
+                            Log.e("OkHttp", "No access token found")
                         }
                     }
                     .build()
@@ -95,6 +101,13 @@ object AppModule {
     @Singleton
     fun provideLoginApi(retrofit: Retrofit): LoginApi =
         retrofit.create(LoginApi::class.java)
+
+
+
+    @Provides
+    @Singleton
+    fun provideMediaApi(retrofit: Retrofit): MediaApi =
+        retrofit.create(MediaApi::class.java)
 
 
 

@@ -34,7 +34,7 @@ class TokenManager {
 
     fun saveAccessToken(accessToken: String){
         this._accessToken = accessToken
-        this._expiresAt = Instant.now()
+        this._expiresAt = Instant.now().plusSeconds(3600)
     }
 
 
