@@ -9,6 +9,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.deviantart.artviewer.data.local.datastore.AuthenticationDataStore
 import com.deviantart.artviewer.data.local.room.AppDatabase
 import com.deviantart.artviewer.data.local.room.FolderDao
+import com.deviantart.artviewer.data.remote.FolderApi
 import com.deviantart.artviewer.data.remote.LoginApi
 import com.deviantart.artviewer.data.remote.MediaApi
 import com.deviantart.artviewer.data.repository.TokenManager
@@ -108,6 +109,13 @@ object AppModule {
     @Singleton
     fun provideMediaApi(retrofit: Retrofit): MediaApi =
         retrofit.create(MediaApi::class.java)
+
+
+
+    @Provides
+    @Singleton
+    fun provideFolderApi(retrofit: Retrofit): FolderApi =
+        retrofit.create(FolderApi::class.java)
 
 
 
