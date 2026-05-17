@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 class DisplayArtActivity : BaseActivity() {
     companion object {
         const val FOLDER_ID_KEY = "folderID"
+        const val FOLDER_NAME_KEY = "folderName"
     }
 
 
@@ -34,11 +35,14 @@ class DisplayArtActivity : BaseActivity() {
             this.handleFolderNotFound()
             return
         }
+        val folderName = intent?.getStringExtra(FOLDER_NAME_KEY) ?: "Art Display"
+
+
 
         viewModel.loadFolderContent(folderId)
 
         setContent {
-            DisplayArtScreen(viewModel)
+            DisplayArtScreen(viewModel, folderName)
         }
     }
 

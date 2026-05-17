@@ -107,6 +107,7 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
         onClickFolder = { folder ->
             val intent = Intent(context, DisplayArtActivity::class.java)
             intent.putExtra(DisplayArtActivity.FOLDER_ID_KEY, folder.localId)
+            intent.putExtra(DisplayArtActivity.FOLDER_NAME_KEY, folder.displayName)
             context.startActivity(intent)
         },
         onClickFolderEdit = { folderIndex -> folderBeingEdited = folderIndex },
@@ -187,10 +188,11 @@ private fun MainActivityScreenContent(
 @Composable
 private fun LoadingDisplay() {
     Text(
-        text = stringResource(R.string.loading_message),
+        text = stringResource(R.string.loading_folders_message),
         fontSize = 28.sp
     )
 }
+
 
 
 /**

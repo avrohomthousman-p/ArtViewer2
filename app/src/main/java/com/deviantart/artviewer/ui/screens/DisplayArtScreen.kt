@@ -1,54 +1,134 @@
 package com.deviantart.artviewer.ui.screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import coil.compose.AsyncImage
+import com.deviantart.artviewer.R
+import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.ui.components.Toolbar
-
+import com.deviantart.artviewer.util.UiState
 
 
 /**
  * Screen used for the DisplayArtActivity.
  */
 @Composable
-fun DisplayArtScreen(viewModel: DisplayArtViewModel) {
+fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
+    val state = viewModel.uiState.collectAsState()
+
+
     Column(
         modifier = Modifier.fillMaxSize()
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
-        Toolbar(includeBackButton = true, title = "testrun")
+        Toolbar(includeBackButton = true, title = folderName)
 
-        //TODO: replace with real data
-        val videoUrls = listOf(
-            "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/27c6bab5-855f-4fd0-a29c-4eb2b2d21405/dldn2oe-d80ed949-792a-4b3f-a082-e7bcac86a79e.VideoQualities.res_360p.f8d73f30e7ea4907b607f95d3830e816.mp4",
-            "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/e9112713-b9dc-4a88-b0c3-1dbe26f51849/dkxi7r4-b5a878ab-7924-48c6-a88d-e0fc587b6e41.VideoQualities.res_360p.2b68ed9dd84d47ca8b0e3211c4567b42.mp4",
-            "https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/103d5233-607d-4aba-bde5-daeb0df3c52b/djtaxhj-796af7d2-94c6-414d-bce8-a171bd4c16d7.VideoQualities.res_360p.d8d5688908b44b72ad06afad0e4471d9.mp4"
+
+        val exactState: UiState<List<DeviantArtMediaItem>> = state.value//needed to satisfy compiler type concerns
+        when(exactState){
+            UiState.Loading -> LoadingDisplay()
+            is UiState.Error -> ErrorDisplay(exactState.message)
+            is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(exactState.data)
+        }
+    }
+}
+
+
+
+
+@Composable
+private fun LoadingDisplay(){
+    Box(
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Text(
+            text = stringResource(R.string.loading_art_message),
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center
         )
+    }
+}
 
-        val pagerState = rememberPagerState(pageCount = { videoUrls.size })
 
-        VerticalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize()
-        ) { page ->
 
-            val isCurrentPage = pagerState.currentPage == page
-            VideoPlayer(url = videoUrls[page], play = isCurrentPage)
+/**
+ * Display for when the viewModel fails to fetch art.
+ *
+ * Uses a default error message if none is provided.
+ */
+@Composable
+private fun ErrorDisplay(errorMessage: String? = null){
+    val actualMessage =
+        if (!errorMessage.isNullOrEmpty())
+            errorMessage
+        else
+            stringResource(R.string.default_error_msg)
+
+
+    Box(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
+        Text(
+            text = actualMessage,
+            fontSize = 22.sp
+        )
+    }
+}
+
+
+
+/**
+ * Display each art item in a separate page so you can scroll between
+ * them, and they snap into place (like YouTube sorts or TikTok).
+ */
+@Composable
+private fun ArtDisplay(artList: List<DeviantArtMediaItem>) {
+    val pagerState = rememberPagerState(pageCount = { artList.size })
+
+    VerticalPager(
+        state = pagerState,
+        modifier = Modifier.fillMaxSize()
+    ) { page ->
+
+        val isCurrentPage = pagerState.currentPage == page
+        val artItem = artList[page]
+
+
+        val videoUrl = artItem.getVideoUrl()
+        val imageUrl = artItem.getImageUrl()
+
+
+        if (!videoUrl.isNullOrEmpty()){
+            VideoPlayer(title = artItem.title, url = videoUrl, play = isCurrentPage)
+        }
+        else if(!imageUrl.isNullOrEmpty()) {
+            ImageDisplay(title = artItem.title, url = imageUrl)
         }
     }
 }
@@ -56,7 +136,7 @@ fun DisplayArtScreen(viewModel: DisplayArtViewModel) {
 
 
 @Composable
-fun VideoPlayer(url: String, play: Boolean) {
+private fun VideoPlayer(title: String, url: String, play: Boolean) {
     val context = LocalContext.current
 
 
@@ -78,20 +158,55 @@ fun VideoPlayer(url: String, play: Boolean) {
         }
     }
 
-    AndroidView(
-        factory = {
-            PlayerView(context).apply {
-                player = exoPlayer
-                useController = true
-            }
-        },
-        modifier = Modifier.fillMaxSize()
-    )
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = title,
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        AndroidView(
+            factory = {
+                PlayerView(context).apply {
+                    player = exoPlayer
+                    useController = true
+                }
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }
 
 
 
 @Composable
-fun ImageDisplay(url: String, title: String){
-    //TODO
+private fun ImageDisplay(title: String, url: String){
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = title,
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }
