@@ -17,4 +17,16 @@ enum class StorageLocation {
             GALLERY -> "gallery"
         }
     }
+
+
+    /**
+     * Gets the string representation of thi enum as it should be displayed
+     * on the screen for the user to read.
+     */
+    fun asUiFriendlyLabel(): String {
+        return when(this) {
+            COLLECTION -> "Collection"
+            GALLERY -> "Gallery"
+        }
+    }
 }

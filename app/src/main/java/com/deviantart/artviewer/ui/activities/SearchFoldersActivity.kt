@@ -2,6 +2,7 @@ package com.deviantart.artviewer.ui.activities
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import com.deviantart.artviewer.ui.screens.SearchFoldersScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -18,7 +19,7 @@ class SearchFoldersActivity : BaseActivity() {
         //TODO: build a viewModel
 
         setContent {
-            //SearchFoldersScreen()
+            SearchFoldersScreen()
         }
     }
 }

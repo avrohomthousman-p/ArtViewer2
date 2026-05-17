@@ -5,16 +5,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.deviantart.artviewer.common.StorageLocation
 
 
 
-//TODO: use an enum instead of this
 /**
  * Composable for letting the user choose the kind of folder they are looking for:
  * collection or gallery.
@@ -24,14 +25,24 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun FolderTypePicker(
-    currentlySelected: String,
-    onSelected: (String) -> Unit
+    currentlySelected: StorageLocation,
+    onSelected: (StorageLocation) -> Unit
 ) {
-    Column {
+    Column(
+        modifier = Modifier.wrapContentSize(Alignment.CenterStart)
+    ) {
+
         SingleRadioButton(
-            optionName = TODO(),
-            isSelected = TODO(),
-            onSelected = TODO()
+            option = StorageLocation.GALLERY,
+            isSelected = currentlySelected == StorageLocation.GALLERY,
+            onSelected = onSelected
+        )
+
+
+        SingleRadioButton(
+            option = StorageLocation.COLLECTION,
+            isSelected = currentlySelected == StorageLocation.COLLECTION,
+            onSelected = onSelected
         )
     }
 }
@@ -40,23 +51,22 @@ fun FolderTypePicker(
 
 @Composable
 private fun SingleRadioButton(
-    optionName: String,
+    option: StorageLocation,
     isSelected: Boolean,
-    onSelected: (String) -> Unit
+    onSelected: (StorageLocation) -> Unit
 ){
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onSelected(optionName) }
-            .padding(vertical = 8.dp)
+            .clickable { onSelected(option) }
+            .padding(top = 6.dp, bottom = 6.dp, end = 16.dp)
     ) {
         RadioButton(
             selected = isSelected,
-            onClick = { onSelected(optionName) }
+            onClick = { onSelected(option) }
         )
         Text(
-            text = optionName,
+            text = option.asUiFriendlyLabel(),
             modifier = Modifier.padding(start = 8.dp)
         )
     }
