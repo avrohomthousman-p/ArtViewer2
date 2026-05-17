@@ -28,8 +28,13 @@ data class DeviantArtFolder(
     val totalImages: Int,
 
     @SerialName("thumb")
-    val thumbnail: ThumbnailContainer
-)
+    val thumbnail: ThumbnailContainer?
+) {
+
+    fun getThumbnailUrl(): String? {
+        return this.thumbnail?.thumbnailList?.firstOrNull()?.url
+    }
+}
 
 
 

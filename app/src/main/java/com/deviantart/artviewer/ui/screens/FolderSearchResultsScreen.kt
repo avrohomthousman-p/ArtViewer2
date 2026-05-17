@@ -1,6 +1,5 @@
 package com.deviantart.artviewer.ui.screens
 
-import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +26,7 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.ui.activities.MainActivity
+import com.deviantart.artviewer.ui.components.SingleFolderDisplay
 import com.deviantart.artviewer.ui.components.TitleWithBullets
 import com.deviantart.artviewer.ui.components.Toolbar
 import com.deviantart.artviewer.ui.util.ToolbarButtonData
@@ -95,7 +97,6 @@ private fun SearchResultsScreenToolbar(toolbarTitle: String){
                 onClick = {
                     val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)
-                    (context as? Activity)?.finish()
                 }
             )
         )
@@ -149,9 +150,22 @@ private fun DisplayFoldersList(folders: List<DeviantArtFolder>){
         text = stringResource(R.string.pick_your_folders_prompt),
         fontSize = 26.sp
     )
+    Spacer(modifier = Modifier.height(30.dp))
 
 
-    folders.forEach { it ->
-        Text(it.folderName) //TODO: need to show actual folder
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        folders.forEach {
+            SingleFolderDisplay(
+                imageUrl = it.getThumbnailUrl(),
+                folderName = it.folderName,
+                onClickDeleteBtn = { /* TODO */ },
+                onClickSaveBtn = { /* TODO */ }
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+        }
     }
 }

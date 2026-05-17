@@ -42,13 +42,13 @@ import com.deviantart.artviewer.ui.themes.AppColors
 fun SingleFolderDisplay(
     imageUrl: String? = null,
     folderName: String = "",
-    onClickFolder: () -> Unit = { },
+    onClickFolder: (() -> Unit)? = null,
     onClickEditBtn: (() -> Unit)? = null,
     onClickDeleteBtn: (() -> Unit)? = null,
     onClickSaveBtn: (() -> Unit)? = null
 ){
     FolderContainer(
-        onClick = { onClickFolder() },
+        onClick = onClickFolder,
         content = {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -131,7 +131,10 @@ fun NewFolderPrompt(onClick: () -> Unit){
  * Clickable area that can be used to display a folder.
  */
 @Composable
-private fun FolderContainer(onClick: () -> Unit, content: @Composable () -> Unit) {
+private fun FolderContainer(
+    onClick: (() -> Unit)?,
+    content: @Composable () -> Unit
+) {
     val interactionSource = remember { MutableInteractionSource() }
 
     Box(
@@ -143,10 +146,13 @@ private fun FolderContainer(onClick: () -> Unit, content: @Composable () -> Unit
                 color = AppColors.AltBackgroundColor,
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(),
-                onClick = { onClick() }
+            .then(
+                if (onClick == null) Modifier
+                else Modifier.clickable(
+                    interactionSource = interactionSource,
+                    indication = ripple(),
+                    onClick = { onClick() }
+                )
             ),
         contentAlignment = Alignment.Center
     ){
