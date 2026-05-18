@@ -204,7 +204,8 @@ private fun LoadingDisplay() {
 private fun ErrorDisplay(){
     Text(
         text = stringResource(R.string.load_failed_error),
-        fontSize = 28.sp
+        fontSize = 28.sp,
+        textAlign = TextAlign.Center
     )
 }
 

@@ -13,7 +13,7 @@ import com.deviantart.artviewer.common.StorageLocation
 @Entity(tableName = "folders")
 data class Folder (
     @PrimaryKey(autoGenerate = true)
-    val localId: Int,
+    val localId: Int? = null,
 
     //DeviantArt folder ID or null if it's the full collection/gallery
     val remoteId: String?,

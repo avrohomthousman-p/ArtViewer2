@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
+import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.FolderInteraction
@@ -54,15 +55,15 @@ fun FolderSearchResultsScreen(
         ownerUsername = ownerUsername,
         location = location,
         onSwipeFolder = { index -> viewModel.removeFolderFromDisplayList(index) },
-        onClickSaveBtn = { /* TODO */ }
+        onClickSaveBtn = { /* TODO: open a popup */ }
     )
 }
 
 
 
 @Composable
-fun FolderSearchResultsScreenContent(
-    state: UiState<List<DeviantArtFolder>>,
+private fun FolderSearchResultsScreenContent(
+    state: UiState<List<Folder>>,
     ownerUsername: String,
     location: StorageLocation,
     onSwipeFolder: (Int) -> Unit,
@@ -82,7 +83,7 @@ fun FolderSearchResultsScreenContent(
         when(state) {
             is UiState.Error -> DisplayError(ownerUsername, location)
             UiState.Loading -> DisplayLoadingMessage()
-            is UiState.Success<List<DeviantArtFolder>> ->
+            is UiState.Success<List<Folder>> ->
                 DisplayFoldersList(
                     folders = state.data,
                     onClickSaveBtn = onClickSaveBtn,
@@ -166,7 +167,7 @@ private fun DisplayLoadingMessage(){
  */
 @Composable
 private fun DisplayFoldersList(
-    folders: List<DeviantArtFolder>,
+    folders: List<Folder>,
     onSwipeFolder: (Int) -> Unit,
     onClickSaveBtn: (Int) -> Unit
 ) {
@@ -182,11 +183,11 @@ private fun DisplayFoldersList(
     ) {
         items(
             count = folders.size,
-            key = { index -> folders[index].folderId },
+            key = { index -> folders[index].remoteId ?: "ALL_$index" },
             contentType = { DeviantArtFolder }
         ){ index ->
 
-            val folderData = folders[index]
+            val folder = folders[index]
 
 
             Box(
@@ -194,8 +195,8 @@ private fun DisplayFoldersList(
                 contentAlignment = Alignment.Center
             ) {
                 SingleFolderDisplay(
-                    imageUrl = folderData.getThumbnailUrl(),
-                    folderName = folderData.folderName,
+                    imageUrl = folder.thumbnailUrl,
+                    folderName = folder.displayName,
                     folderInteraction = FolderInteraction.Swipeable,
                     onFolderInteraction = { onSwipeFolder(index) },
                     onClickSaveBtn = { onClickSaveBtn(index) },

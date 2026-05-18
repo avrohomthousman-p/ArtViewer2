@@ -2,10 +2,12 @@ package com.deviantart.artviewer.data.repository
 
 import android.util.Log
 import com.deviantart.artviewer.common.StorageLocation
+import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.data.remote.FolderApi
 import com.deviantart.artviewer.data.util.ApiResponse
+import com.deviantart.artviewer.data.util.toFolder
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,7 +26,7 @@ class FolderRepository @Inject constructor(
         ownerUsername: String,
         location: StorageLocation,
         offset: Int = 0
-    ): ApiResponse<List<DeviantArtFolder>> {
+    ): ApiResponse<List<Folder>> {
 
         val response = folderApi.fetchFolders(
             location = location.asUrlPath(),
@@ -42,6 +44,12 @@ class FolderRepository @Inject constructor(
         }
 
 
-        return ApiResponse.Success(response.body()!!.folderList)
+        val resultAsFolders = response.body()!!
+            .folderList.map { deviantArtFolder ->
+                deviantArtFolder.toFolder(ownerUsername, location)
+            }
+
+
+        return ApiResponse.Success(resultAsFolders)
     }
 }

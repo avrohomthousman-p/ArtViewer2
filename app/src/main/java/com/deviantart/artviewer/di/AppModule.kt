@@ -125,10 +125,10 @@ object AppModule {
         app: Application
     ): AppDatabase {
         return Room.databaseBuilder(
-            app,
-            AppDatabase::class.java,
-            "app.db"
-        ).addCallback(object : RoomDatabase.Callback() {
+                app,
+                AppDatabase::class.java,
+                "app.db"
+            ).addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
                     // TODO: insert default folders here

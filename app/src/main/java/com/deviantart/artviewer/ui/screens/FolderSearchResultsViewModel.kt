@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.deviantart.artviewer.common.StorageLocation
+import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.data.repository.FolderRepository
@@ -25,8 +26,8 @@ class FolderSearchResultsViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private val _uiState = MutableStateFlow<UiState<List<DeviantArtFolder>>>(UiState.Loading)
-    val uiState: StateFlow<UiState<List<DeviantArtFolder>>> = _uiState
+    private val _uiState = MutableStateFlow<UiState<List<Folder>>>(UiState.Loading)
+    val uiState: StateFlow<UiState<List<Folder>>> = _uiState
 
 
 
@@ -52,7 +53,7 @@ class FolderSearchResultsViewModel @Inject constructor(
 
     fun removeFolderFromDisplayList(index: Int){
         val state = _uiState.value
-        require(state is UiState.Success<List<DeviantArtFolder>>) {
+        require(state is UiState.Success<List<Folder>>) {
             "Cannot remove folder from results if there are no results"
         }
 
@@ -69,7 +70,7 @@ class FolderSearchResultsViewModel @Inject constructor(
 
     fun saveFolderToDB(index: Int){
         val state = _uiState.value
-        require(state is UiState.Success<List<DeviantArtFolder>>) {
+        require(state is UiState.Success<List<Folder>>) {
             "Cannot remove folder from results if there are no results"
         }
 
