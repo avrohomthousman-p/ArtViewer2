@@ -37,7 +37,7 @@ import com.deviantart.artviewer.ui.activities.DisplayArtActivity
 import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.activities.FolderSearchActivity
 import com.deviantart.artviewer.ui.components.DeleteFolderDialog
-import com.deviantart.artviewer.ui.components.EditFolderDialog
+import com.deviantart.artviewer.ui.components.EditOrCreateFolderDialog
 import com.deviantart.artviewer.ui.components.FolderInteraction
 import com.deviantart.artviewer.ui.components.NewFolderPrompt
 import com.deviantart.artviewer.ui.components.SingleFolderDisplay
@@ -120,7 +120,7 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
     folderBeingEdited?.let { index ->
         val folders = (state.value as? UiState.Success)?.data ?: return@let
 
-        EditFolderDialog(
+        EditOrCreateFolderDialog(
             folder = folders[index],
             onDismiss = { folderBeingEdited = null },
             onSave = { folder ->

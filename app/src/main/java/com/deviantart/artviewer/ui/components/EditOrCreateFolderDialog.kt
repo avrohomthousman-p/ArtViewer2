@@ -26,7 +26,9 @@ import com.deviantart.artviewer.ui.themes.AppColors
 
 
 /**
- * Dialog popup for when the user clicks the edit button on a folder.
+ * Dialog popup for when the user clicks the edit/save button on a folder. It gives the user
+ * the ability to modify the name of the folder (local display name only) and to change the
+ * randomization settings.
  *
  * @param folder - The folder the user wants to edit.
  * @param onDismiss - A function to be called when the close button is clicked. It should
@@ -36,19 +38,21 @@ import com.deviantart.artviewer.ui.themes.AppColors
  *          passed in.
  */
 @Composable
-fun EditFolderDialog(
+fun EditOrCreateFolderDialog(
     folder: Folder,
     onDismiss: () -> Unit,
     onSave: (Folder?) -> Unit
 ) {
+    val isCreate = folder.localId == null
     var folderNameDraft by remember { mutableStateOf(folder.displayName) }
     var shouldRandomize by remember { mutableStateOf(folder.shouldRandomize) }
     var showErrorOnFolderName by remember { mutableStateOf(false) }
 
 
+    val titleResource = if (isCreate) R.string.save_dialog_title else R.string.edit_dialog_title
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text(stringResource(R.string.edit_dialog_title)) },
+        title = { Text(stringResource(titleResource)) },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -103,12 +107,12 @@ fun EditFolderDialog(
                         return@TextButton
                     }
 
-                    val isDirty = (folder.displayName != folderNameDraft)
-                            || (folder.shouldRandomize != shouldRandomize)
+                    fun isDirty() =
+                        (folder.displayName != folderNameDraft) || (folder.shouldRandomize != shouldRandomize)
 
 
                     var updatedFolder: Folder? = null
-                    if (isDirty){
+                    if (isCreate || isDirty()){
                         updatedFolder = folder.copy(
                             localId = folder.localId,
                             remoteId = folder.remoteId,
