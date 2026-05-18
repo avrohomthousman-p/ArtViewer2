@@ -45,7 +45,7 @@ fun FolderSearchResultsScreen(
 
 
     LaunchedEffect(Unit) {
-        viewModel.loadFolders(ownerUsername, location)
+        viewModel.loadDeviantArtFolders(ownerUsername, location)
     }
 
 
@@ -53,7 +53,7 @@ fun FolderSearchResultsScreen(
         state = state.value,
         ownerUsername = ownerUsername,
         location = location,
-        onSwipeFolder = { index -> viewModel.removeFolderFromList(index) },
+        onSwipeFolder = { index -> viewModel.removeFolderFromDisplayList(index) },
         onClickSaveBtn = { /* TODO */ }
     )
 }

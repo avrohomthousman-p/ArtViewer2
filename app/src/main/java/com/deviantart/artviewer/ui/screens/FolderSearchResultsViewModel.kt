@@ -34,7 +34,7 @@ class FolderSearchResultsViewModel @Inject constructor(
      * Load DeviantArt folders from the specified user so they can be displayed on
      * the screen for the user to save.
      */
-    fun loadFolders(ownerUsername: String, location: StorageLocation){
+    fun loadDeviantArtFolders(ownerUsername: String, location: StorageLocation){
         viewModelScope.launch(Dispatchers.IO) {
             val response = folderRepo.loadFolders(ownerUsername, location)
 
@@ -50,17 +50,33 @@ class FolderSearchResultsViewModel @Inject constructor(
 
 
 
-    fun removeFolderFromList(index: Int){
-        if (_uiState.value !is UiState.Success<List<DeviantArtFolder>>){
-            throw IllegalStateException("Cannot remove folder from results if there are no results")
+    fun removeFolderFromDisplayList(index: Int){
+        val state = _uiState.value
+        require(state is UiState.Success<List<DeviantArtFolder>>) {
+            "Cannot remove folder from results if there are no results"
         }
 
 
-        val currentList = (_uiState.value as UiState.Success<List<DeviantArtFolder>>).data.toMutableList()
+        val currentList = state.data.toMutableList()
         currentList.removeAt(index)
 
         _uiState.value = UiState.Success(
             data = currentList.toList()
         )
+    }
+
+
+
+    fun saveFolderToDB(index: Int){
+        val state = _uiState.value
+        require(state is UiState.Success<List<DeviantArtFolder>>) {
+            "Cannot remove folder from results if there are no results"
+        }
+
+
+        val folderData = state.data[index]
+        //TODO: build a folder instance
+        //TODO: we need the custom name and the should randomize
+        //TODO: insert it into the DB
     }
 }
