@@ -14,7 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SwipeToDismissBoxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -33,6 +38,18 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.ui.themes.AppColors
 
 
+
+/**
+ * Decides the behavior of the folder - clickable or swipeable
+ */
+sealed class FolderInteraction {
+    data object Clickable : FolderInteraction()
+    data object Swipeable : FolderInteraction()
+}
+
+
+
+
 /**
  * Displays a folder entry along with action buttons for Edit, Delete, and Save.
  * Each action button is shown only when the caller supplies a non-null handler
@@ -42,13 +59,15 @@ import com.deviantart.artviewer.ui.themes.AppColors
 fun SingleFolderDisplay(
     imageUrl: String? = null,
     folderName: String = "",
-    onClickFolder: (() -> Unit)? = null,
+    folderInteraction: FolderInteraction,
+    onFolderInteraction: (() -> Unit),
     onClickEditBtn: (() -> Unit)? = null,
     onClickDeleteBtn: (() -> Unit)? = null,
     onClickSaveBtn: (() -> Unit)? = null
 ){
     FolderContainer(
-        onClick = onClickFolder,
+        folderInteraction = folderInteraction,
+        onFolderInteraction = onFolderInteraction,
         content = {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -100,7 +119,8 @@ fun SingleFolderDisplay(
 @Composable
 fun NewFolderPrompt(onClick: () -> Unit){
     FolderContainer(
-        onClick = { onClick() },
+        folderInteraction = FolderInteraction.Clickable,
+        onFolderInteraction = { onClick() },
         content = {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -127,37 +147,89 @@ fun NewFolderPrompt(onClick: () -> Unit){
 
 
 
+private val baseFolderModifier =
+    Modifier
+        .fillMaxWidth()
+        .height(90.dp)
+        .padding(horizontal = 20.dp)
+        .background(
+            color = AppColors.AltBackgroundColor,
+            shape = RoundedCornerShape(12.dp)
+        )
+
+
+
 /**
  * Clickable area that can be used to display a folder.
  */
 @Composable
 private fun FolderContainer(
-    onClick: (() -> Unit)?,
+    folderInteraction: FolderInteraction,
+    onFolderInteraction: (() -> Unit),
     content: @Composable () -> Unit
 ) {
+
+    when(folderInteraction){
+        FolderInteraction.Clickable -> TappableFolderContainer(onFolderInteraction, content)
+        FolderInteraction.Swipeable -> SwipeableFolderContainer(onFolderInteraction, content)
+    }
+}
+
+
+
+@Composable
+private fun TappableFolderContainer(
+    onTapFolder: (() -> Unit),
+    content: @Composable () -> Unit
+){
     val interactionSource = remember { MutableInteractionSource() }
 
+
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(90.dp)
-            .padding(horizontal = 20.dp)
-            .background(
-                color = AppColors.AltBackgroundColor,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .then(
-                if (onClick == null) Modifier
-                else Modifier.clickable(
-                    interactionSource = interactionSource,
-                    indication = ripple(),
-                    onClick = { onClick() }
-                )
-            ),
+        modifier =
+            baseFolderModifier
+                .then(
+                    Modifier.clickable(
+                        interactionSource = interactionSource,
+                        indication = ripple(),
+                        onClick = { onTapFolder() }
+                    )
+                ),
         contentAlignment = Alignment.Center
     ){
         content()
     }
+}
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeableFolderContainer(
+    onSwipe: (() -> Unit),
+    content: @Composable () -> Unit
+){
+    val state = rememberSwipeToDismissBoxState(
+        SwipeToDismissBoxValue.Settled,
+        SwipeToDismissBoxDefaults.positionalThreshold
+    )
+
+
+    SwipeToDismissBox(
+        state = state,
+        backgroundContent = { },
+        enableDismissFromStartToEnd = true,
+        enableDismissFromEndToStart = false,
+        content = {
+            Box(
+                modifier = baseFolderModifier,
+                contentAlignment = Alignment.Center
+            ) {
+                content()
+            }
+        },
+        onDismiss = { onSwipe() },
+    )
 }
 
 
@@ -230,8 +302,10 @@ fun FolderDisplayPreview(){
     SingleFolderDisplay(
         folderName = "Sample Art",
         imageUrl = null,
+        folderInteraction = FolderInteraction.Clickable,
+        onFolderInteraction = { },
         onClickEditBtn = { },
         onClickDeleteBtn = { },
-        onClickSaveBtn = { }
+        onClickSaveBtn = { },
     )
 }

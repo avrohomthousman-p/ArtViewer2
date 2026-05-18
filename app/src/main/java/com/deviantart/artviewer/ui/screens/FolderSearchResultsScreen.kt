@@ -1,6 +1,7 @@
 package com.deviantart.artviewer.ui.screens
 
 import android.content.Intent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -9,8 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,6 +26,7 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.ui.activities.MainActivity
+import com.deviantart.artviewer.ui.components.FolderInteraction
 import com.deviantart.artviewer.ui.components.SingleFolderDisplay
 import com.deviantart.artviewer.ui.components.TitleWithBullets
 import com.deviantart.artviewer.ui.components.Toolbar
@@ -52,7 +53,7 @@ fun FolderSearchResultsScreen(
         state = state.value,
         ownerUsername = ownerUsername,
         location = location,
-        onClickDeleteBtn = { index -> viewModel.removeFolderFromList(index) },
+        onSwipeFolder = { index -> viewModel.removeFolderFromList(index) },
         onClickSaveBtn = { /* TODO */ }
     )
 }
@@ -64,7 +65,7 @@ fun FolderSearchResultsScreenContent(
     state: UiState<List<DeviantArtFolder>>,
     ownerUsername: String,
     location: StorageLocation,
-    onClickDeleteBtn: (Int) -> Unit,
+    onSwipeFolder: (Int) -> Unit,
     onClickSaveBtn: (Int) -> Unit
 ){
     Column(
@@ -85,7 +86,7 @@ fun FolderSearchResultsScreenContent(
                 DisplayFoldersList(
                     folders = state.data,
                     onClickSaveBtn = onClickSaveBtn,
-                    onClickDeleteBtn = onClickDeleteBtn
+                    onSwipeFolder = onSwipeFolder
                 )
         }
     }
@@ -166,7 +167,7 @@ private fun DisplayLoadingMessage(){
 @Composable
 private fun DisplayFoldersList(
     folders: List<DeviantArtFolder>,
-    onClickDeleteBtn: (Int) -> Unit,
+    onSwipeFolder: (Int) -> Unit,
     onClickSaveBtn: (Int) -> Unit
 ) {
     Text(
@@ -176,18 +177,30 @@ private fun DisplayFoldersList(
     Spacer(modifier = Modifier.height(30.dp))
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+    LazyColumn(
+        modifier = Modifier.fillMaxSize()
     ) {
-        folders.forEachIndexed { index, folderData ->
-            SingleFolderDisplay(
-                imageUrl = folderData.getThumbnailUrl(),
-                folderName = folderData.folderName,
-                onClickDeleteBtn = { onClickDeleteBtn(index) },
-                onClickSaveBtn = { onClickSaveBtn(index) },
-            )
+        items(
+            count = folders.size,
+            key = { index -> folders[index].folderId },
+            contentType = { DeviantArtFolder }
+        ){ index ->
+
+            val folderData = folders[index]
+
+
+            Box(
+                modifier = Modifier.animateItem(),
+                contentAlignment = Alignment.Center
+            ) {
+                SingleFolderDisplay(
+                    imageUrl = folderData.getThumbnailUrl(),
+                    folderName = folderData.folderName,
+                    folderInteraction = FolderInteraction.Swipeable,
+                    onFolderInteraction = { onSwipeFolder(index) },
+                    onClickSaveBtn = { onClickSaveBtn(index) },
+                )
+            }
             Spacer(modifier = Modifier.height(30.dp))
         }
     }

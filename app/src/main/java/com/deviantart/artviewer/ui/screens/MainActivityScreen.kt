@@ -38,6 +38,7 @@ import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.activities.FolderSearchActivity
 import com.deviantart.artviewer.ui.components.DeleteFolderDialog
 import com.deviantart.artviewer.ui.components.EditFolderDialog
+import com.deviantart.artviewer.ui.components.FolderInteraction
 import com.deviantart.artviewer.ui.components.NewFolderPrompt
 import com.deviantart.artviewer.ui.components.SingleFolderDisplay
 import com.deviantart.artviewer.ui.components.Toolbar
@@ -228,7 +229,8 @@ private fun FoldersListDisplay(
             SingleFolderDisplay(
                 imageUrl = folder.thumbnailUrl,
                 folderName = folder.displayName,
-                onClickFolder = { onClickFolder(folder) },
+                folderInteraction = FolderInteraction.Clickable,
+                onFolderInteraction = { onClickFolder(folder) },
                 onClickEditBtn = { onClickFolderEdit(index) },
                 onClickDeleteBtn = { onClickFolderDelete(index) },
                 onClickSaveBtn = null
