@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
-import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.data.repository.FolderRepository
 import com.deviantart.artviewer.data.util.ApiResponse
 import com.deviantart.artviewer.ui.util.UiState
@@ -68,16 +67,17 @@ class FolderSearchResultsViewModel @Inject constructor(
 
 
 
-    fun saveFolderToDB(index: Int){
+    fun saveFolderToDB(folder: Folder, index: Int){
         val state = _uiState.value
         require(state is UiState.Success<List<Folder>>) {
             "Cannot remove folder from results if there are no results"
         }
 
 
-        val folderData = state.data[index]
-        //TODO: build a folder instance
-        //TODO: we need the custom name and the should randomize
-        //TODO: insert it into the DB
+        viewModelScope.launch(Dispatchers.IO) {
+            db.updateOrCreateFolder(folder) //TODO: test that the PK is being set correctly
+
+            removeFolderFromDisplayList(index)
+        }
     }
 }

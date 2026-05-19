@@ -15,6 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,6 +31,7 @@ import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.ui.activities.MainActivity
+import com.deviantart.artviewer.ui.components.EditOrCreateFolderDialog
 import com.deviantart.artviewer.ui.components.FolderInteraction
 import com.deviantart.artviewer.ui.components.SingleFolderDisplay
 import com.deviantart.artviewer.ui.components.TitleWithBullets
@@ -43,6 +48,7 @@ fun FolderSearchResultsScreen(
     location: StorageLocation
 ) {
     val state = viewModel.uiState.collectAsState()
+    var folderBeingSaved by remember { mutableStateOf<Int?>(null) }
 
 
     LaunchedEffect(Unit) {
@@ -55,8 +61,25 @@ fun FolderSearchResultsScreen(
         ownerUsername = ownerUsername,
         location = location,
         onSwipeFolder = { index -> viewModel.removeFolderFromDisplayList(index) },
-        onClickSaveBtn = { /* TODO: open a popup */ }
+        onClickSaveBtn = { index -> folderBeingSaved = index}
     )
+
+
+    folderBeingSaved?.let { index ->
+        val folders = (state.value as? UiState.Success)?.data ?: return@let
+
+        EditOrCreateFolderDialog(
+            folder = folders[index],
+            onDismiss = { folderBeingSaved = null },
+            onSave = { folder ->
+                if (folder != null){
+                    viewModel.saveFolderToDB(folder, index)
+                }
+
+                folderBeingSaved = null
+            }
+        )
+    }
 }
 
 
