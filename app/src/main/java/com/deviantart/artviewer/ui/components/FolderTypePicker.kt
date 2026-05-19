@@ -3,7 +3,6 @@ package com.deviantart.artviewer.ui.components
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.RadioButton
@@ -17,8 +16,8 @@ import com.deviantart.artviewer.common.StorageLocation
 
 
 /**
- * Composable for letting the user choose the kind of folder they are looking for:
- * collection or gallery.
+ * Composable for showing radio buttons to let the user choose the kind of folder they are
+ * looking for: collection or gallery.
  *
  * @param currentlySelected - The label of the radio button currently selected.
  * @param onSelected - A function to call when an item is selected.
