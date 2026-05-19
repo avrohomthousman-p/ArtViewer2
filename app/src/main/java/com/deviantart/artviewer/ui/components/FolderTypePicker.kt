@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.deviantart.artviewer.common.StorageLocation
 
@@ -69,4 +70,15 @@ private fun SingleRadioButton(
             modifier = Modifier.padding(start = 8.dp)
         )
     }
+}
+
+
+
+@Preview
+@Composable
+private fun FolderTypePickerPreview(){
+    FolderTypePicker(
+        currentlySelected = StorageLocation.GALLERY,
+        onSelected = { }
+    )
 }

@@ -24,6 +24,7 @@ interface FolderDao {
 
     @Upsert
     suspend fun updateOrCreateFolder(folder: Folder)
+    //TODO: need the create to overwrite if there exists a folder with the same ID and username
 }
 
 

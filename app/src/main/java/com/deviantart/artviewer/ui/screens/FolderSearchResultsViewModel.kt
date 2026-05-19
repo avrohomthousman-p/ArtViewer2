@@ -75,7 +75,7 @@ class FolderSearchResultsViewModel @Inject constructor(
 
 
         viewModelScope.launch(Dispatchers.IO) {
-            db.updateOrCreateFolder(folder) //TODO: test that the PK is being set correctly
+            db.updateOrCreateFolder(folder)
 
             removeFolderFromDisplayList(index)
         }

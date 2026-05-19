@@ -70,6 +70,7 @@
     <string name="check_internet_solution">Check your internet connection.</string>
     <string name="check_username_suggestion">Make sure you spelled the username correctly. You entered \"%s\".</string>
     <string name="check_location_suggestion">You selected %s. Did you mean %s?</string>
-    <string name="pick_your_folders_prompt">Save the folders you want.</string>
+    <string name="pick_your_folders_prompt">Save the folders you want</string>
+    <string name="no_folders_left_to_pick">No folders to save</string>
 
 </resources>

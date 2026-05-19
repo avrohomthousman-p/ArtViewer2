@@ -7,6 +7,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.ui.themes.AppColors
@@ -29,4 +30,16 @@ fun StandardButton(modifier: Modifier, text: String, onClick: () -> Unit) {
     ){
         Text(text = text, fontSize = 18.sp)
     }
+}
+
+
+
+@Preview
+@Composable
+private fun ButtonPreview(){
+    StandardButton(
+        modifier = Modifier,
+        text = "Sample Button",
+        onClick = { }
+    )
 }

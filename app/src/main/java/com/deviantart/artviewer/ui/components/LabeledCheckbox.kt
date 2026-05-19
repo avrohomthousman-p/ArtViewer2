@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 
@@ -38,4 +39,28 @@ fun LabeledCheckbox(
             modifier = Modifier.padding(start = 8.dp)
         )
     }
+}
+
+
+
+@Preview
+@Composable
+private fun CheckedCheckboxPreview(){
+    LabeledCheckbox(
+        label = "Check if you want to",
+        checked = true,
+        onCheckedChange = { }
+    )
+}
+
+
+
+@Preview
+@Composable
+private fun UncheckedCheckboxPreview(){
+    LabeledCheckbox(
+        label = "Check if you want to",
+        checked = false,
+        onCheckedChange = { }
+    )
 }

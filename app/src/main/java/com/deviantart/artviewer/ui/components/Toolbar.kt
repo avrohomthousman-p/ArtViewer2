@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
@@ -96,5 +97,51 @@ private fun ToolbarButton(
         contentDescription = data.contentDescription,
         modifier = Modifier.clickable { data.onClick() },
         tint = AppColors.White
+    )
+}
+
+
+
+@Preview
+@Composable
+private fun ToolbarPreview(){
+    Toolbar(
+        includeBackButton = true,
+        title = "Screen Name",
+        otherButtons = listOf(
+            ToolbarButtonData(
+                icon = R.drawable.ic_home,
+                contentDescription = "",
+                onClick = { }
+            ),
+            ToolbarButtonData(
+                icon = R.drawable.ic_logout,
+                contentDescription = "",
+                onClick = { }
+            )
+        )
+    )
+}
+
+
+
+@Preview
+@Composable
+private fun ToolbarWithLongNamePreview(){
+    Toolbar(
+        includeBackButton = true,
+        title = "Very Very Long Screen Name",
+        otherButtons = listOf(
+            ToolbarButtonData(
+                icon = R.drawable.ic_home,
+                contentDescription = "",
+                onClick = { }
+            ),
+            ToolbarButtonData(
+                icon = R.drawable.ic_logout,
+                contentDescription = "",
+                onClick = { }
+            )
+        )
     )
 }

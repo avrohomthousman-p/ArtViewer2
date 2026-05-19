@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
@@ -194,8 +195,10 @@ private fun DisplayFoldersList(
     onSwipeFolder: (Int) -> Unit,
     onClickSaveBtn: (Int) -> Unit
 ) {
+    val textResource = if (folders.isEmpty()) R.string.no_folders_left_to_pick else R.string.pick_your_folders_prompt
+
     Text(
-        text = stringResource(R.string.pick_your_folders_prompt),
+        text = stringResource(textResource),
         fontSize = 26.sp
     )
     Spacer(modifier = Modifier.height(30.dp))
@@ -219,7 +222,7 @@ private fun DisplayFoldersList(
             ) {
                 SingleFolderDisplay(
                     imageUrl = folder.thumbnailUrl,
-                    folderName = folder.displayName,
+                    folderName = folder.displayName,//TODO: tack on number of images
                     folderInteraction = FolderInteraction.Swipeable,
                     onFolderInteraction = { onSwipeFolder(index) },
                     onClickSaveBtn = { onClickSaveBtn(index) },
@@ -228,4 +231,83 @@ private fun DisplayFoldersList(
             Spacer(modifier = Modifier.height(30.dp))
         }
     }
+}
+
+
+
+@Preview
+@Composable
+private fun LoadingPreview(){
+    FolderSearchResultsScreenContent(
+        state = UiState.Loading,
+        ownerUsername = "someone",
+        location = StorageLocation.GALLERY,
+        onSwipeFolder = { },
+        onClickSaveBtn = { }
+    )
+}
+
+
+
+@Preview
+@Composable
+private fun LoadFailedPreview(){
+    FolderSearchResultsScreenContent(
+        state = UiState.Error(),
+        ownerUsername = "someone",
+        location = StorageLocation.GALLERY,
+        onSwipeFolder = { },
+        onClickSaveBtn = { }
+    )
+}
+
+
+
+@Preview
+@Composable
+private fun NoFoldersPreview(){
+    FolderSearchResultsScreenContent(
+        state = UiState.Success(emptyList()),
+        ownerUsername = "someone",
+        location = StorageLocation.GALLERY,
+        onSwipeFolder = { },
+        onClickSaveBtn = { }
+    )
+}
+
+
+
+@Preview
+@Composable
+private fun TwoFoldersPreview(){
+    FolderSearchResultsScreenContent(
+        state = UiState.Success(
+            listOf(
+                Folder(
+                    localId = 1,
+                    remoteId = "1",
+                    ownerUsername = "someone",
+                    storedIn = StorageLocation.GALLERY,
+                    displayName = "Sample Folder",
+                    shouldRandomize = true,
+                    thumbnailUrl = null,
+                    totalImages = 200
+                ),
+                Folder(
+                    localId = 2,
+                    remoteId = "2",
+                    ownerUsername = "someone else",
+                    storedIn = StorageLocation.GALLERY,
+                    displayName = "Sample Folder",
+                    shouldRandomize = true,
+                    thumbnailUrl = null,
+                    totalImages = 200
+                )
+            )
+        ),
+        ownerUsername = "someone",
+        location = StorageLocation.GALLERY,
+        onSwipeFolder = { },
+        onClickSaveBtn = { }
+    )
 }

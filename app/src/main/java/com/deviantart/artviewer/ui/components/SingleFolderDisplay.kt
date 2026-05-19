@@ -298,7 +298,7 @@ private fun ActionButtons(
 
 @Composable
 @Preview
-fun FolderDisplayPreview(){
+private fun FolderDisplayPreview(){
     SingleFolderDisplay(
         folderName = "Sample Art",
         imageUrl = null,

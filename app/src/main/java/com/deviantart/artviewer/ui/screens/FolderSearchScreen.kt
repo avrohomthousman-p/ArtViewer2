@@ -168,6 +168,6 @@ fun FolderSearchScreenContent() {
 
 @Preview
 @Composable
-fun SearchFoldersActivityPreview(){
+private fun SearchFoldersActivityPreview(){
     FolderSearchScreenContent()
 }

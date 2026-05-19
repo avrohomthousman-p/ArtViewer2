@@ -24,7 +24,6 @@ import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.themes.AppColors
 
 
-
 /**
  * Dialog popup for when the user clicks the edit/save button on a folder. It gives the user
  * the ability to modify the name of the folder (local display name only) and to change the

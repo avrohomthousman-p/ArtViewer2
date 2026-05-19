@@ -136,6 +136,7 @@ private fun LoginScreenContent(
 }
 
 
+
 @Composable
 private fun Toolbar(modifier: Modifier){
     Box(
@@ -191,9 +192,10 @@ private fun CenterContent(
 }
 
 
+
 @Preview(showBackground = true)
 @Composable
-fun LoggedOutPreview() {
+private fun LoggedOutPreview() {
     LoginScreenContent(
         loginState = LoginState.LoggedOut,
         performLogin = {}
@@ -202,7 +204,7 @@ fun LoggedOutPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun LoggingInPreview() {
+private fun LoggingInPreview() {
     LoginScreenContent(
         loginState = LoginState.LoginInProgress,
         performLogin = {}
@@ -211,7 +213,7 @@ fun LoggingInPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun LoginFailedPreview() {
+private fun LoginFailedPreview() {
     LoginScreenContent(
         loginState = LoginState.LoginFailure,
         performLogin = {}
@@ -220,7 +222,7 @@ fun LoginFailedPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun LoginSuccessPreview() {
+private fun LoginSuccessPreview() {
     LoginScreenContent(
         loginState = LoginState.LoginSuccess,
         performLogin = {}

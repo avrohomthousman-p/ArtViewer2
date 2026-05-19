@@ -32,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
+import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.ui.activities.DisplayArtActivity
 import com.deviantart.artviewer.ui.activities.LoginActivity
@@ -98,7 +99,6 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
             contentDescription = stringResource(R.string.logout_btn_content_desc),
             onClick = { viewModel.logout() }
         )
-        //TODO: add more icons here
     )
 
 
@@ -277,7 +277,7 @@ val toolbarButtonsForPreviews = listOf(
 
 @Preview(showBackground = true)
 @Composable
-fun LoadingFoldersPreview() {
+private fun LoadingFoldersPreview() {
     MainActivityScreenContent(
         state = UiState.Loading,
         toolbarButtons = toolbarButtonsForPreviews,
@@ -290,7 +290,7 @@ fun LoadingFoldersPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun FailedToLoadFoldersPreview() {
+private fun FailedToLoadFoldersPreview() {
     MainActivityScreenContent(
         state = UiState.Error(),
         toolbarButtons = toolbarButtonsForPreviews,
@@ -303,7 +303,7 @@ fun FailedToLoadFoldersPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun NoFoldersPreview() {
+private fun NoFoldersPreview() {
     MainActivityScreenContent(
         state = UiState.Success(emptyList()),
         toolbarButtons = toolbarButtonsForPreviews,
@@ -313,4 +313,35 @@ fun NoFoldersPreview() {
     )
 }
 
-//TODO: preview with a folder
+
+
+@Preview
+@Composable
+private fun PreviewWithFolders() {
+    MainActivityScreenContent(
+        state = UiState.Success(listOf(
+            Folder(
+                remoteId = "1",
+                ownerUsername = "someone",
+                storedIn = StorageLocation.COLLECTION,
+                displayName = "Test Folder A",
+                shouldRandomize = true,
+                thumbnailUrl = null,
+                totalImages = 200
+            ),
+            Folder(
+                remoteId = "2",
+                ownerUsername = "someone else",
+                storedIn = StorageLocation.COLLECTION,
+                displayName = "Test Folder B",
+                shouldRandomize = false,
+                thumbnailUrl = null,
+                totalImages = 200
+            )
+        )),
+        toolbarButtons = toolbarButtonsForPreviews,
+        onClickFolder = { },
+        onClickFolderEdit = { },
+        onClickFolderDelete = { }
+    )
+}
