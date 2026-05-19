@@ -2,6 +2,7 @@ package com.deviantart.artviewer.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,6 +36,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
@@ -162,7 +166,7 @@ private fun ArtDisplay(artList: List<DeviantArtMediaItem>) {
             VideoPlayer(title = artItem.title, url = videoUrl, play = isCurrentPage)
         }
         else if(!imageUrl.isNullOrEmpty()) {
-            ImageDisplay(title = artItem.title, url = imageUrl)
+            ImageDisplay(title = artItem.title, url = imageUrl, showSpinner = isCurrentPage)
         }
     }
 }
@@ -224,8 +228,12 @@ private fun VideoPlayer(title: String, url: String, play: Boolean) {
 
 
 @Composable
-private fun ImageDisplay(title: String, url: String){
+private fun ImageDisplay(title: String, url: String, showSpinner: Boolean){
     val imageLoader = rememberGifImageLoader()
+    val painter = rememberAsyncImagePainter(
+        model = url,
+        imageLoader = imageLoader
+    )
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -243,17 +251,29 @@ private fun ImageDisplay(title: String, url: String){
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        AsyncImage(
-            model = url,
-            imageLoader = imageLoader,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize()
-        )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painter,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            if (showSpinner && painter.state is AsyncImagePainter.State.Loading) {
+                CircularProgressIndicator()
+            }
+        }
     }
 }
 
 
 
+/**
+ * Image loader that supports GIF's. Pass this into the AsyncImage
+ * composable.
+ */
 @Composable
 fun rememberGifImageLoader(): ImageLoader {
     val context = LocalContext.current
