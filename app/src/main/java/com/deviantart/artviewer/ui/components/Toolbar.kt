@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.deviantart.artviewer.R
@@ -65,11 +66,13 @@ fun Toolbar(
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = title,
+                modifier = Modifier.weight(1f),
                 color = AppColors.White,
-                fontSize = 24.sp
+                fontSize = 24.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
 
-            Spacer(modifier = Modifier.weight(1f))
 
             otherButtons.forEach {
                 ToolbarButton(it)
