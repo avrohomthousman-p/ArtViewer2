@@ -230,6 +230,7 @@ private fun FoldersListDisplay(
             SingleFolderDisplay(
                 imageUrl = folder.thumbnailUrl,
                 folderName = folder.displayName,
+                imageCount = null,
                 folderInteraction = FolderInteraction.Clickable,
                 onFolderInteraction = { onClickFolder(folder) },
                 onClickEditBtn = { onClickFolderEdit(index) },

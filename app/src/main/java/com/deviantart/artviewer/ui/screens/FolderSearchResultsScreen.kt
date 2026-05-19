@@ -222,7 +222,8 @@ private fun DisplayFoldersList(
             ) {
                 SingleFolderDisplay(
                     imageUrl = folder.thumbnailUrl,
-                    folderName = folder.displayName,//TODO: tack on number of images
+                    folderName = folder.displayName,
+                    imageCount = folder.totalImages,
                     folderInteraction = FolderInteraction.Swipeable,
                     onFolderInteraction = { onSwipeFolder(index) },
                     onClickSaveBtn = { onClickSaveBtn(index) },

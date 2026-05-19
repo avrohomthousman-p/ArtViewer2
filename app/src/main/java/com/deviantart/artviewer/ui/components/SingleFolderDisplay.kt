@@ -29,8 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,11 +60,26 @@ sealed class FolderInteraction {
  * Displays a folder entry along with action buttons for Edit, Delete, and Save.
  * Each action button is shown only when the caller supplies a non-null handler
  * for that action.
+ *
+ * @param imageUrl - The url for the folder's thumbnail image, or null if it has none.
+ * @param folderName - The name of the folder to be displayed as a title.
+ * @param imageCount - The number of images in the folder, or null if you don't want that displayed.
+ * @param folderInteraction - The kind of special action that can be taken with this folder:
+ *              clickable or swipeable.
+ * @param onFolderInteraction - A function you want executed when the special folder interaction happens.
+ * @param onClickEditBtn - A function you want executed when the edit button is clicked, or null if
+ *              there should be no edit button.
+ * @param onClickDeleteBtn - A function you want executed when the delete button is clicked, or null
+ *              if there should be no edit button.
+ * @param onClickSaveBtn - A function you want executed when the save button is clicked, or null if
+ *              there should be no edit button.
+ *
  */
 @Composable
 fun SingleFolderDisplay(
-    imageUrl: String? = null,
-    folderName: String = "",
+    imageUrl: String?,
+    folderName: String,
+    imageCount: Int?,
     folderInteraction: FolderInteraction,
     onFolderInteraction: (() -> Unit),
     onClickEditBtn: (() -> Unit)? = null,
@@ -90,8 +110,9 @@ fun SingleFolderDisplay(
                 }
 
 
+
                 Text(
-                    text = folderName,
+                    text = buildFolderDisplayName(folderName, imageCount),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -108,6 +129,60 @@ fun SingleFolderDisplay(
             }
         }
     )
+}
+
+
+
+
+/**
+ * Builds the text to display on the folder, which follows one of these formats:
+ *
+ * if a non-null image count is provided:
+ *      folderName   ([imageCount] images)
+ *
+ * if imageCount is null:
+ *      folderName
+ */
+@Composable
+private fun buildFolderDisplayName(
+    folderName: String,
+    imageCount: Int?
+): AnnotatedString {
+
+    return buildAnnotatedString {
+
+        // Folder name
+        withStyle(
+            style = SpanStyle(
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        ) {
+            append(folderName)
+        }
+
+
+
+        // If no image count, stop here
+        if (imageCount == null) return@buildAnnotatedString
+
+
+
+        append("   ")
+
+
+
+        // Image count
+        withStyle(
+            style = SpanStyle(
+                fontSize = 12.sp,
+                color = AppColors.MutedTextColor,
+                baselineShift = BaselineShift(0.2f)
+            )
+        ) {
+            append("($imageCount images)")
+        }
+    }
 }
 
 
@@ -298,14 +373,30 @@ private fun ActionButtons(
 
 @Composable
 @Preview
-private fun FolderDisplayPreview(){
+private fun FolderNoImageCountPreview(){
     SingleFolderDisplay(
-        folderName = "Sample Art",
         imageUrl = null,
+        folderName = "Sample Art",
+        imageCount = null,
         folderInteraction = FolderInteraction.Clickable,
         onFolderInteraction = { },
         onClickEditBtn = { },
         onClickDeleteBtn = { },
         onClickSaveBtn = { },
+    )
+}
+
+
+
+@Composable
+@Preview
+private fun FolderWithImageCountPreview(){
+    SingleFolderDisplay(
+        imageUrl = null,
+        folderName = "Sample Art",
+        imageCount = 239,
+        folderInteraction = FolderInteraction.Clickable,
+        onFolderInteraction = { },
+        onClickSaveBtn = { }
     )
 }

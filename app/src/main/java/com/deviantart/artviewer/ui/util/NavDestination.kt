@@ -12,5 +12,4 @@ sealed class NavDestination {
     data object ToMainActivity : NavDestination()
     data class ToWebLogin(val url: Uri) : NavDestination()
     data object ToFolderSearch : NavDestination()
-    //TODO: the rest of the activities
 }
