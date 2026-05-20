@@ -134,7 +134,8 @@ private fun ErrorDisplay(errorMessage: String? = null){
         Text(
             text = actualMessage,
             fontSize = 22.sp,
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center
         )
     }
 }

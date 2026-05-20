@@ -1,6 +1,7 @@
 package com.deviantart.artviewer.ui.screens
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,14 +46,27 @@ import com.deviantart.artviewer.ui.components.Toolbar
  * Screen for the SearchFoldersActivity
  */
 @Composable
-fun FolderSearchScreen() {
-    FolderSearchScreenContent()
+fun FolderSearchScreen(viewModel: FolderSearchViewModel) {
+    val context = LocalContext.current
+    val resources = LocalResources.current
+    LaunchedEffect(Unit) {
+        viewModel.toastMessage.collect { messageId: Int ->
+            Toast.makeText(context, resources.getString(messageId), Toast.LENGTH_LONG).show()
+        }
+    }
+
+
+    FolderSearchScreenContent(
+        saveFullCollection = { username, location, shouldRandomize ->
+            viewModel.saveFullCollectionAsFolder(username, location, shouldRandomize)
+        }
+    )
 }
 
 
 
 @Composable
-fun FolderSearchScreenContent() {
+fun FolderSearchScreenContent(saveFullCollection: (String, StorageLocation, Boolean) -> Unit) {
     val context = LocalContext.current
     var usernameInput by remember { mutableStateOf("") }
     var isValidUsername by remember { mutableStateOf(true) }
@@ -150,7 +166,7 @@ fun FolderSearchScreenContent() {
                 }
 
                 if (saveFullGallery){
-                    //TODO: save folder
+                    saveFullCollection(usernameInput, radioSelection, shouldRandomize)
                 }
                 else {
                     val intent = Intent(context, FolderSearchResultsActivity::class.java)
@@ -169,5 +185,7 @@ fun FolderSearchScreenContent() {
 @Preview
 @Composable
 private fun SearchFoldersActivityPreview(){
-    FolderSearchScreenContent()
+    FolderSearchScreenContent(
+        saveFullCollection = { _, _, _ ->  }
+    )
 }

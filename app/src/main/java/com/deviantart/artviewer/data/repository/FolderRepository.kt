@@ -52,4 +52,59 @@ class FolderRepository @Inject constructor(
 
         return ApiResponse.Success(resultAsFolders)
     }
+
+
+
+    /**
+     * Creates a folder in the DB that represents the full collection/gallery
+     * of the specified user. This is similar to the collection/all or
+     * gallery/all endpoint of DeviantArt.
+     *
+     * Please note that due to technical limitations of the DeviantArt API,
+     * the total number of images might not be completely accurate.
+     */
+    suspend fun saveFullCollectionAsFolder(
+        ownerUsername: String,
+        location: StorageLocation,
+        shouldRandomize: Boolean
+    ): ApiResponse<Unit> {
+        val response = folderApi.fetchFolders(
+            location = location.asUrlPath(),
+            ownerUsername = ownerUsername,
+            calculateSize = true,
+            filterEmptyFolders = true,
+            offset = 0
+        )
+
+
+        if (!response.isSuccessful || response.body()?.folderList.isNullOrEmpty()){
+            val error = response.errorBody()?.string() ?: "Could not fetch folders"
+            Log.e("API failure", error)
+            return ApiResponse.Error(error)
+        }
+
+
+        val responseData = response.body()?.folderList ?: return ApiResponse.Error("Could not fetch folders")
+
+        val totalImages = responseData.sumOf { deviantArtFolder -> deviantArtFolder.totalImages }
+        val thumbnail = responseData.firstOrNull()?.getThumbnailUrl()
+        val displayName = "${ownerUsername}\'s ${location.asUiFriendlyLabel()}"
+
+
+        val folder = Folder(
+            localId = null,
+            remoteId = null,
+            ownerUsername = ownerUsername,
+            storedIn = location,
+            displayName = displayName,
+            shouldRandomize = shouldRandomize,
+            thumbnailUrl = thumbnail,
+            totalImages = totalImages
+        )
+
+
+        db.updateOrCreateFolder(folder)
+
+        return ApiResponse.Success(Unit)
+    }
 }

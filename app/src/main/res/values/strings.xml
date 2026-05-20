@@ -59,6 +59,8 @@
     <string name="full_gallery_label">Save the full Gallery/Collection</string>
     <string name="save_folder_button">SAVE AS SINGLE FOLDER</string>
     <string name="run_folder_search">SEE USER FOLDERS</string>
+    <string name="saved_full_collection_toast_message">Folder saved successfully</string>
+    <string name="saved_full_collection_failed_toast_message">We could not save your folder</string>
 
 
 
@@ -71,6 +73,6 @@
     <string name="check_username_suggestion">Make sure you spelled the username correctly. You entered \"%s\".</string>
     <string name="check_location_suggestion">You selected %s. Did you mean %s?</string>
     <string name="pick_your_folders_prompt">Save the folders you want</string>
-    <string name="no_folders_left_to_pick">No folders to save</string>
+    <string name="folder_search_results_empty_message">No folders to save</string>
 
 </resources>

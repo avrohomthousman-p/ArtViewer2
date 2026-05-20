@@ -195,7 +195,9 @@ private fun DisplayFoldersList(
     onSwipeFolder: (Int) -> Unit,
     onClickSaveBtn: (Int) -> Unit
 ) {
-    val textResource = if (folders.isEmpty()) R.string.no_folders_left_to_pick else R.string.pick_your_folders_prompt
+    val textResource =
+        if (folders.isEmpty()) R.string.folder_search_results_empty_message
+        else R.string.pick_your_folders_prompt
 
     Text(
         text = stringResource(textResource),
