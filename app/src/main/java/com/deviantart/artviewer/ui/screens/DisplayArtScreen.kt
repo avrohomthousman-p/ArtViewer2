@@ -35,7 +35,6 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import coil.ImageLoader
-import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
@@ -107,7 +106,7 @@ private fun LoadingDisplay(){
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = stringResource(R.string.loading_art_message),
+            text = stringResource(R.string.media_loading_message),
             fontSize = 26.sp,
             textAlign = TextAlign.Center
         )
@@ -127,7 +126,7 @@ private fun ErrorDisplay(errorMessage: String? = null){
         if (!errorMessage.isNullOrEmpty())
             errorMessage
         else
-            stringResource(R.string.default_error_msg)
+            stringResource(R.string.media_default_error_msg)
 
 
     Box(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {

@@ -48,7 +48,7 @@ fun EditOrCreateFolderDialog(
     var showErrorOnFolderName by remember { mutableStateOf(false) }
 
 
-    val titleResource = if (isCreate) R.string.save_dialog_title else R.string.edit_dialog_title
+    val titleResource = if (isCreate) R.string.dialog_save_folder_title else R.string.dialog_edit_folder_title
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = { Text(stringResource(titleResource)) },
@@ -88,7 +88,7 @@ fun EditOrCreateFolderDialog(
                 Column {
                     Text(
                         text = stringResource(
-                            R.string.folder_info_text,
+                            R.string.dialog_folder_info_text,
                             folder.ownerUsername,
                             folder.storedIn.toString().lowercase()
                         ),
@@ -153,13 +153,13 @@ private fun RenameFolderTextField(
     OutlinedTextField(
         value = textFieldValue,
         onValueChange = onValueChanged,
-        label = { Text(stringResource(R.string.folder_name)) },
+        label = { Text(stringResource(R.string.dialog_folder_name_input_label)) },
         singleLine = true,
         isError = isError,
         supportingText = {
             if (isError) {
                 Text(
-                    text = stringResource(R.string.folder_name_error),
+                    text = stringResource(R.string.dialog_folder_name_error),
                     fontSize = 12.sp,
                     color = AppColors.RedErrorColor
                 )

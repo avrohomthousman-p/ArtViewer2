@@ -162,7 +162,7 @@ private fun MainActivityScreenContent(
     ) {
         Toolbar(
             includeBackButton = false,
-            title = stringResource(R.string.main_activity_title),
+            title = stringResource(R.string.main_title),
             otherButtons = toolbarButtons
         )
 
@@ -190,7 +190,7 @@ private fun MainActivityScreenContent(
 @Composable
 private fun LoadingDisplay() {
     Text(
-        text = stringResource(R.string.loading_folders_message),
+        text = stringResource(R.string.main_loading_folders_message),
         fontSize = 28.sp
     )
 }
@@ -203,7 +203,7 @@ private fun LoadingDisplay() {
 @Composable
 private fun ErrorDisplay(){
     Text(
-        text = stringResource(R.string.load_failed_error),
+        text = stringResource(R.string.main_load_failed_error),
         fontSize = 28.sp,
         textAlign = TextAlign.Center
     )
@@ -245,7 +245,7 @@ private fun FoldersListDisplay(
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.no_db_folders_found),
+                text = stringResource(R.string.main_no_saved_folders_message),
                 fontSize = 26.sp,
                 textAlign = TextAlign.Center
             )

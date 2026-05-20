@@ -77,16 +77,16 @@ private fun LoginScreenContent(
     performLogin: () -> Unit
 ){
     val bannerText = when (loginState) {
-        LoginState.LoggedOut -> stringResource(R.string.banner_text_reauthenticate)
-        LoginState.LoginInProgress -> stringResource(R.string.banner_text_refreshing_access)
-        LoginState.LoginSuccess -> stringResource(R.string.welcome_message)
-        LoginState.LoginFailure -> stringResource(R.string.banner_text_refresh_failed)
+        LoginState.LoggedOut -> stringResource(R.string.login_banner_reauthenticate_message)
+        LoginState.LoginInProgress -> stringResource(R.string.login_banner_refreshing_message)
+        LoginState.LoginSuccess -> stringResource(R.string.login_welcome_message)
+        LoginState.LoginFailure -> stringResource(R.string.login_banner_refresh_failed_message)
     }
     val statusText = when (loginState) {
         LoginState.LoggedOut -> null
-        LoginState.LoginInProgress -> stringResource(R.string.login_pending_text)
-        LoginState.LoginSuccess -> stringResource(R.string.successful_login_text)
-        LoginState.LoginFailure -> stringResource(R.string.failed_login_text)
+        LoginState.LoginInProgress -> stringResource(R.string.login_pending_message)
+        LoginState.LoginSuccess -> stringResource(R.string.login_success_message)
+        LoginState.LoginFailure -> stringResource(R.string.login_failed_message)
     }
     val statusTextColor = when (loginState) {
         LoginState.LoginSuccess -> AppColors.GreenSuccessColor

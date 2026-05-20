@@ -110,7 +110,7 @@ fun FolderSearchScreenContent(saveFullCollection: (String, StorageLocation, Bool
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp),
-            label = { Text(stringResource(R.string.username_field_prompt)) },
+            label = { Text(stringResource(R.string.folder_search_username_prompt)) },
             singleLine = true
         )
         Spacer(modifier = Modifier.height(30.dp))
@@ -118,7 +118,7 @@ fun FolderSearchScreenContent(saveFullCollection: (String, StorageLocation, Bool
 
 
         LabeledCheckbox(
-            label = stringResource(R.string.full_gallery_label),
+            label = stringResource(R.string.folder_search_checkbox_label),
             checked = saveFullGallery,
             onCheckedChange = { saveFullGallery = it }
         )
@@ -155,7 +155,10 @@ fun FolderSearchScreenContent(saveFullCollection: (String, StorageLocation, Bool
 
 
 
-        val btnText = if (saveFullGallery) R.string.save_folder_button else R.string.run_folder_search
+        val btnText =
+            if (saveFullGallery) R.string.folder_search_save_full_gallery_button
+            else R.string.folder_search_run_search_button
+
         StandardButton(
             modifier = Modifier,
             text = stringResource(btnText),

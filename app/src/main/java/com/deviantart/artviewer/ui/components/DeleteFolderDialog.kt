@@ -33,14 +33,14 @@ fun DeleteFolderDialog(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.delete_folder_conformation),
+                    text = stringResource(R.string.dialog_delete_folder_conformation),
                     fontSize = 18.sp,
                     color = AppColors.RedErrorColor,
                     textAlign = TextAlign.Center
                 )
 
                 Text(
-                    text = stringResource(R.string.secondary_delete_warning),
+                    text = stringResource(R.string.dialog_delete_folder_warning),
                     fontSize = 14.sp,
                     color = AppColors.MutedTextColor
                 )

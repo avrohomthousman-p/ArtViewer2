@@ -100,7 +100,7 @@ private fun FolderSearchResultsScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        SearchResultsScreenToolbar(stringResource(R.string.search_results_toolbar_title))
+        SearchResultsScreenToolbar(stringResource(R.string.results_toolbar_title))
         Spacer(modifier = Modifier.height(30.dp))
 
 
@@ -156,7 +156,7 @@ private fun DisplayError(ownerUsername: String, location: StorageLocation){
 
 
     Text(
-        text = stringResource(R.string.no_deviantart_folders_found),
+        text = stringResource(R.string.results_no_folders_error),
         fontSize = 30.sp,
         textAlign = TextAlign.Center
     )
@@ -164,11 +164,11 @@ private fun DisplayError(ownerUsername: String, location: StorageLocation){
 
 
     TitleWithBullets(
-        title = stringResource(R.string.suggested_solutions),
+        title = stringResource(R.string.results_suggestions_header),
         bulletPoints = listOf(
-            stringResource(R.string.check_internet_solution),
-            stringResource(R.string.check_username_suggestion, ownerUsername),
-            stringResource(R.string.check_location_suggestion, location, oppositeLocation)
+            stringResource(R.string.results_suggestion_check_internet),
+            stringResource(R.string.results_suggestion_check_username, ownerUsername),
+            stringResource(R.string.results_suggestion_check_location, location, oppositeLocation)
         )
     )
 }
@@ -178,7 +178,7 @@ private fun DisplayError(ownerUsername: String, location: StorageLocation){
 @Composable
 private fun DisplayLoadingMessage(){
     Text(
-        text = stringResource(R.string.loading_folders_text),
+        text = stringResource(R.string.results_loading_message),
         fontSize = 30.sp,
         textAlign = TextAlign.Center
     )
@@ -196,8 +196,8 @@ private fun DisplayFoldersList(
     onClickSaveBtn: (Int) -> Unit
 ) {
     val textResource =
-        if (folders.isEmpty()) R.string.folder_search_results_empty_message
-        else R.string.pick_your_folders_prompt
+        if (folders.isEmpty()) R.string.results_folders_cleared_message
+        else R.string.results_pick_folders_prompt
 
     Text(
         text = stringResource(textResource),

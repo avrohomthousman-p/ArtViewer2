@@ -1,6 +1,5 @@
 package com.deviantart.artviewer.ui.screens
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.deviantart.artviewer.R
@@ -8,7 +7,6 @@ import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.repository.FolderRepository
 import com.deviantart.artviewer.data.util.ApiResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -42,10 +40,10 @@ class FolderSearchViewModel @Inject constructor(
 
 
             if(response is ApiResponse.Success){
-                _toastMessage.emit(R.string.saved_full_collection_toast_message)
+                _toastMessage.emit(R.string.folder_search_save_success_toast)
             }
             else {
-                _toastMessage.emit(R.string.saved_full_collection_failed_toast_message)
+                _toastMessage.emit(R.string.folder_search_save_failed_toast)
             }
         }
     }
