@@ -10,8 +10,9 @@ import com.deviantart.artviewer.ui.util.NavDestination
 import com.deviantart.artviewer.data.repository.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,8 +28,8 @@ class FolderSearchViewModel @Inject constructor(
     val toastMessage = _toastMessage
 
 
-    private val _navigation = MutableSharedFlow<NavDestination>()
-    val navigation = _navigation.asSharedFlow()
+    private val _navigation = Channel<NavDestination>(Channel.BUFFERED)
+    val navigation = _navigation.receiveAsFlow()
 
 
 
@@ -42,7 +43,7 @@ class FolderSearchViewModel @Inject constructor(
     fun checkIfAccessTokenExpired(): Boolean {
         if(tokenManager.isTokenExpired()){
             viewModelScope.launch(Dispatchers.IO) {
-                _navigation.emit(NavDestination.ToLoginActivity)
+                _navigation.send(NavDestination.ToLoginActivity)
             }
             return true
         }
@@ -69,7 +70,7 @@ class FolderSearchViewModel @Inject constructor(
 
 
             if(response is ApiResponse.Success){
-                _navigation.emit(NavDestination.ToMainActivity)
+                _navigation.send(NavDestination.ToMainActivity)
             }
             else {
                 _toastMessage.emit(R.string.folder_search_save_failed_toast)

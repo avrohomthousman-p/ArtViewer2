@@ -12,9 +12,9 @@ import com.deviantart.artviewer.ui.util.MiscUtils
 import com.deviantart.artviewer.ui.util.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,8 +38,8 @@ class LoginViewModel @Inject constructor(
     private val authRepo: AuthRepository
 ) : ViewModel() {
 
-    private val _navigation = MutableSharedFlow<NavDestination>()
-    val navigation = _navigation.asSharedFlow()
+    private val _navigation = Channel<NavDestination>(Channel.BUFFERED)
+    val navigation = _navigation.receiveAsFlow()
 
 
     var loginState by mutableStateOf(LoginState.LoggedOut)
@@ -80,7 +80,7 @@ class LoginViewModel @Inject constructor(
         else {
             loginState = LoginState.LoginSuccess
             delay(2500)
-            _navigation.emit(NavDestination.ToMainActivity)
+            _navigation.send(NavDestination.ToMainActivity)
         }
     }
 
@@ -110,7 +110,7 @@ class LoginViewModel @Inject constructor(
             is ApiResponse.Success<*> -> {
                 loginState = LoginState.LoginSuccess
                 delay(2500)
-                _navigation.emit(NavDestination.ToMainActivity)
+                _navigation.send(NavDestination.ToMainActivity)
             }
         }
     }
@@ -123,7 +123,7 @@ class LoginViewModel @Inject constructor(
     fun triggerLoginStart() {
         viewModelScope.launch(Dispatchers.IO) {
             val uri = authRepo.buildAuthorizationUrl()
-            _navigation.emit(NavDestination.ToWebLogin(uri))
+            _navigation.send(NavDestination.ToWebLogin(uri))
         }
     }
 }
