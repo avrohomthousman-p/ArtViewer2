@@ -3,11 +3,12 @@ package com.deviantart.artviewer.data.local.room
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import androidx.room.Upsert
 import com.deviantart.artviewer.common.StorageLocation
 
 
@@ -22,9 +23,8 @@ interface FolderDao {
     @Delete
     suspend fun deleteFolder(folder: Folder)
 
-    @Upsert
-    suspend fun updateOrCreateFolder(folder: Folder)
-    //TODO: need the create to overwrite if there exists a folder with the same ID and username
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrReplace(folder: Folder)
 }
 
 

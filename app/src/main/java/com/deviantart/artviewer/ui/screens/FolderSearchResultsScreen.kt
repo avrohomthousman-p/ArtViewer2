@@ -230,7 +230,7 @@ private fun DisplayFoldersList(
     ) {
         items(
             count = folders.size,
-            key = { index -> folders[index].remoteId ?: "ALL_$index" },
+            key = { index -> getFolderColumnKey(folders[index]) },
             contentType = { DeviantArtFolder }
         ){ index ->
 
@@ -252,6 +252,21 @@ private fun DisplayFoldersList(
             }
             Spacer(modifier = Modifier.height(30.dp))
         }
+    }
+}
+
+
+
+/**
+ * Generate a unique ID for a folder (that has no local ID) that can be used
+ * as a key in a lazy column.
+ */
+private fun getFolderColumnKey(folder: Folder): String {
+    return if (folder.remoteId == Folder.ID_IF_FULL_COLLECTION){
+        "${folder.remoteId}-${folder.ownerUsername}-${folder.storedIn.asUiFriendlyLabel()}"
+    }
+    else {
+        folder.remoteId
     }
 }
 

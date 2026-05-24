@@ -85,7 +85,7 @@ class MainActivityViewModel @Inject constructor(
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                db.updateOrCreateFolder(folder)
+                db.insertOrReplace(folder)
 
                 val folderList = currentState.data.toMutableList()
                 folderList[index] = folder

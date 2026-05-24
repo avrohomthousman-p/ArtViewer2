@@ -4,7 +4,6 @@ import android.util.Log
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
-import com.deviantart.artviewer.data.remote.DeviantArtFolder
 import com.deviantart.artviewer.data.remote.FolderApi
 import com.deviantart.artviewer.data.util.ApiResponse
 import com.deviantart.artviewer.data.util.toFolder
@@ -93,7 +92,7 @@ class FolderRepository @Inject constructor(
 
         val folder = Folder(
             localId = null,
-            remoteId = null,
+            remoteId = Folder.ID_IF_FULL_COLLECTION,
             ownerUsername = ownerUsername,
             storedIn = location,
             displayName = displayName,
@@ -103,7 +102,7 @@ class FolderRepository @Inject constructor(
         )
 
 
-        db.updateOrCreateFolder(folder)
+        db.insertOrReplace(folder)
 
         return ApiResponse.Success(Unit)
     }

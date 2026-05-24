@@ -90,7 +90,7 @@ class FolderSearchResultsViewModel @Inject constructor(
 
 
         viewModelScope.launch(Dispatchers.IO) {
-            db.updateOrCreateFolder(folder)
+            db.insertOrReplace(folder)
 
             removeFolderFromDisplayList(index)
         }

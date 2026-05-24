@@ -40,9 +40,13 @@ data class ArtQuery(
      * @param accumulator Collects all media items across multiple queries.
      */
     suspend fun runQuery(mediaApi: MediaApi, folder: Folder, accumulator: MediaAccumulator){
+        val remoteIdForUrl =
+            if (folder.remoteId == Folder.ID_IF_FULL_COLLECTION) "all"
+            else folder.remoteId
+
         val response = mediaApi.fetchMedia(
             location = folder.storedIn.asUrlPath(),
-            remoteId = folder.remoteId ?: "all",
+            remoteId = remoteIdForUrl,
             ownerUsername = folder.ownerUsername,
             offset = this.offset,
             limit = this.limit

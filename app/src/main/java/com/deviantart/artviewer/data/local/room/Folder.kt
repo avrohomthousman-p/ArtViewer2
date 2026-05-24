@@ -1,8 +1,10 @@
 package com.deviantart.artviewer.data.local.room
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.deviantart.artviewer.common.StorageLocation
+
 
 
 /**
@@ -10,13 +12,21 @@ import com.deviantart.artviewer.common.StorageLocation
  * This typically corresponds to a single folder on DeviantArt, but may also
  * represent an entire gallery or collection belonging to a DeviantArt user.
  */
-@Entity(tableName = "folders")
-data class Folder (
+@Entity(
+    tableName = "folders",
+    indices = [
+        Index(
+            value = ["remoteId", "ownerUsername", "storedIn"],
+            unique = true
+        )
+    ]
+)
+data class Folder constructor (
     @PrimaryKey(autoGenerate = true)
     val localId: Int? = null,
 
-    //DeviantArt folder ID or null if it's the full collection/gallery
-    val remoteId: String?,
+    //DeviantArt folder ID or [ID_IF_FULL_COLLECTION] if it's the full collection/gallery
+    val remoteId: String,
 
     val ownerUsername: String,
 
@@ -29,4 +39,8 @@ data class Folder (
     val thumbnailUrl: String?,
 
     val totalImages: Int
-)
+){
+    companion object {
+        const val ID_IF_FULL_COLLECTION = "__ALL__"
+    }
+}
