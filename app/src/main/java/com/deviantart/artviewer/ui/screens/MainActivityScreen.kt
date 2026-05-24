@@ -102,10 +102,14 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
         state = state.value,
         toolbarButtons = toolbarButtons,
         onClickFolder = { folder ->
-            val intent = Intent(context, DisplayArtActivity::class.java)
-            intent.putExtra(DisplayArtActivity.FOLDER_ID_KEY, folder.localId)
-            intent.putExtra(DisplayArtActivity.FOLDER_NAME_KEY, folder.displayName)
-            context.startActivity(intent)
+            folder.let {
+                if (viewModel.checkIfAccessTokenExpired())
+                    return@let
+                val intent = Intent(context, DisplayArtActivity::class.java)
+                intent.putExtra(DisplayArtActivity.FOLDER_ID_KEY, folder.localId)
+                intent.putExtra(DisplayArtActivity.FOLDER_NAME_KEY, folder.displayName)
+                context.startActivity(intent)
+            }
         },
         onClickFolderEdit = { folderIndex -> folderBeingEdited = folderIndex },
         onClickFolderDelete = { folderIndex -> folderBeingDeleted = folderIndex }

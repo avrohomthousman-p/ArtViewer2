@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.repository.AuthRepository
+import com.deviantart.artviewer.data.repository.TokenManager
 import com.deviantart.artviewer.ui.util.NavDestination
 import com.deviantart.artviewer.ui.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     private val authRepo: AuthRepository,
-    private val db: FolderDao
+    private val db: FolderDao,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
 
     private val _navigation = MutableSharedFlow<NavDestination>()
@@ -34,6 +36,7 @@ class MainActivityViewModel @Inject constructor(
 
     private val _toastMessage = MutableSharedFlow<String>()
     val toastMessage = _toastMessage
+
 
 
     /**
@@ -49,6 +52,26 @@ class MainActivityViewModel @Inject constructor(
                 _uiState.value = UiState.Error(e.message, e)
             }
         }
+    }
+
+
+
+    /**
+     * Checks if the access token has expired and if it has, triggers
+     * navigation back to the login screen.
+     *
+     * @return true if the access token has expired and a navigation is being triggered,
+     * and false otherwise.
+     */
+    fun checkIfAccessTokenExpired(): Boolean {
+        if(tokenManager.isTokenExpired()){
+            viewModelScope.launch(Dispatchers.IO) {
+                _navigation.emit(NavDestination.ToLoginActivity)
+            }
+            return true
+        }
+
+        return false
     }
 
 
@@ -76,6 +99,7 @@ class MainActivityViewModel @Inject constructor(
             }
         }
     }
+
 
 
     /**

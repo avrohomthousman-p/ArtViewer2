@@ -40,8 +40,10 @@ import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
+import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.Toolbar
+import com.deviantart.artviewer.ui.util.NavDestination
 import com.deviantart.artviewer.ui.util.ToolbarButtonData
 import com.deviantart.artviewer.ui.util.UiState
 
@@ -53,6 +55,22 @@ import com.deviantart.artviewer.ui.util.UiState
 @Composable
 fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
     val state = viewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+
+    LaunchedEffect(Unit){
+        viewModel.navigation.collect { destination ->
+            when(destination){
+                NavDestination.ToLoginActivity -> {
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context.startActivity(intent)
+                    (context as? Activity)?.finish()
+                }
+
+                else -> { }
+            }
+        }
+    }
 
 
     Column(

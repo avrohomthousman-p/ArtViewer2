@@ -1,5 +1,6 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -32,14 +33,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.ui.activities.FolderSearchResultsActivity
+import com.deviantart.artviewer.ui.activities.LoginActivity
+import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.FolderTypePicker
 import com.deviantart.artviewer.ui.components.LabeledCheckbox
 import com.deviantart.artviewer.ui.components.StandardButton
 import com.deviantart.artviewer.ui.components.Toolbar
-
+import com.deviantart.artviewer.ui.util.NavDestination
 
 
 /**
@@ -56,17 +62,56 @@ fun FolderSearchScreen(viewModel: FolderSearchViewModel) {
     }
 
 
+    LaunchedEffect(Unit){
+        viewModel.navigation.collect { destination ->
+            when(destination){
+                NavDestination.ToMainActivity -> {
+                    val intent = Intent(context, MainActivity::class.java)
+                    context.startActivity(intent)
+                }
+                NavDestination.ToLoginActivity -> {
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context.startActivity(intent)
+                    (context as? Activity)?.finish()
+                }
+
+                else -> { }
+            }
+        }
+    }
+
+
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    LaunchedEffect(Unit) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+            viewModel.checkIfAccessTokenExpired()
+        }
+    }
+
+
     FolderSearchScreenContent(
         saveFullCollection = { username, location, shouldRandomize ->
             viewModel.saveFullCollectionAsFolder(username, location, shouldRandomize)
-        }
+        },
+        checkIfLoginExpired = { viewModel.checkIfAccessTokenExpired() }
     )
 }
 
 
 
+/**
+ * Content of the FOlderSearchScreen.
+ *
+ * @param saveFullCollection - A function that saves the full gallery or collection as a folder, to
+ *          be called if the user makes that selection.
+ * @param checkIfLoginExpired - A function that checks if the user needs to log in again, and
+ *          triggers a navigation to the login screen in that case.
+ */
 @Composable
-fun FolderSearchScreenContent(saveFullCollection: (String, StorageLocation, Boolean) -> Unit) {
+fun FolderSearchScreenContent(
+    saveFullCollection: (String, StorageLocation, Boolean) -> Unit,
+    checkIfLoginExpired: () -> Boolean
+) {
     val context = LocalContext.current
     var usernameInput by remember { mutableStateOf("") }
     var isValidUsername by remember { mutableStateOf(true) }
@@ -163,10 +208,14 @@ fun FolderSearchScreenContent(saveFullCollection: (String, StorageLocation, Bool
             modifier = Modifier,
             text = stringResource(btnText),
             onClick = {
+                if(checkIfLoginExpired()){
+                    return@StandardButton
+                }
                 if (usernameInput.isBlank()){
                     isValidUsername = false
                     return@StandardButton
                 }
+
 
                 if (saveFullGallery){
                     saveFullCollection(usernameInput, radioSelection, shouldRandomize)
@@ -189,6 +238,7 @@ fun FolderSearchScreenContent(saveFullCollection: (String, StorageLocation, Bool
 @Composable
 private fun SearchFoldersActivityPreview(){
     FolderSearchScreenContent(
-        saveFullCollection = { _, _, _ ->  }
+        saveFullCollection = { _, _, _ -> },
+        checkIfLoginExpired = { true },
     )
 }

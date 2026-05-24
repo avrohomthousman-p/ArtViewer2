@@ -1,5 +1,6 @@
 package com.deviantart.artviewer.ui.screens
 
+import android.app.Activity
 import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,12 +32,14 @@ import com.deviantart.artviewer.R
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.remote.DeviantArtFolder
+import com.deviantart.artviewer.ui.activities.LoginActivity
 import com.deviantart.artviewer.ui.activities.MainActivity
 import com.deviantart.artviewer.ui.components.EditOrCreateFolderDialog
 import com.deviantart.artviewer.ui.components.FolderInteraction
 import com.deviantart.artviewer.ui.components.SingleFolderDisplay
 import com.deviantart.artviewer.ui.components.TitleWithBullets
 import com.deviantart.artviewer.ui.components.Toolbar
+import com.deviantart.artviewer.ui.util.NavDestination
 import com.deviantart.artviewer.ui.util.ToolbarButtonData
 import com.deviantart.artviewer.ui.util.UiState
 
@@ -49,11 +52,27 @@ fun FolderSearchResultsScreen(
     location: StorageLocation
 ) {
     val state = viewModel.uiState.collectAsState()
+    val context = LocalContext.current
     var folderBeingSaved by remember { mutableStateOf<Int?>(null) }
 
 
     LaunchedEffect(Unit) {
         viewModel.loadDeviantArtFolders(ownerUsername, location)
+    }
+
+
+    LaunchedEffect(Unit){
+        viewModel.navigation.collect { destination ->
+            when(destination){
+                NavDestination.ToLoginActivity -> {
+                    val intent = Intent(context, LoginActivity::class.java)
+                    context.startActivity(intent)
+                    (context as? Activity)?.finish()
+                }
+
+                else -> { }
+            }
+        }
     }
 
 

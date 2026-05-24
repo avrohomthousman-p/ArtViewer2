@@ -7,12 +7,16 @@ import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.repository.FolderRepository
+import com.deviantart.artviewer.data.repository.TokenManager
 import com.deviantart.artviewer.data.util.ApiResponse
+import com.deviantart.artviewer.ui.util.NavDestination
 import com.deviantart.artviewer.ui.util.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,12 +25,17 @@ import javax.inject.Inject
 @HiltViewModel
 class FolderSearchResultsViewModel @Inject constructor(
     private val folderRepo: FolderRepository,
-    private val db: FolderDao
+    private val db: FolderDao,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
 
 
     private val _uiState = MutableStateFlow<UiState<List<Folder>>>(UiState.Loading)
     val uiState: StateFlow<UiState<List<Folder>>> = _uiState
+
+
+    private val _navigation = Channel<NavDestination>(Channel.BUFFERED)
+    val navigation = _navigation.receiveAsFlow()
 
 
 
@@ -36,6 +45,12 @@ class FolderSearchResultsViewModel @Inject constructor(
      */
     fun loadDeviantArtFolders(ownerUsername: String, location: StorageLocation){
         viewModelScope.launch(Dispatchers.IO) {
+            if(tokenManager.isTokenExpired()){
+                _navigation.send(NavDestination.ToLoginActivity)
+                return@launch
+            }
+
+
             val response = folderRepo.loadFolders(ownerUsername, location)
 
             if (response is ApiResponse.Error){

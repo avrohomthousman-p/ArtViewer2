@@ -64,7 +64,6 @@
     <string name="folder_search_checkbox_label">Save the full Gallery/Collection</string>
     <string name="folder_search_save_full_gallery_button">SAVE AS SINGLE FOLDER</string>
     <string name="folder_search_run_search_button">SEE USER FOLDERS</string>
-    <string name="folder_search_save_success_toast">Folder saved successfully</string>
     <string name="folder_search_save_failed_toast">We could not save your folder</string>
 
 
