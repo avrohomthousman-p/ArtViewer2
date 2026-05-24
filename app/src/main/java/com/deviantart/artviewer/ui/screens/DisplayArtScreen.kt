@@ -147,7 +147,10 @@ private fun ErrorDisplay(errorMessage: String? = null){
             stringResource(R.string.media_default_error_msg)
 
 
-    Box(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
+    Box(
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        contentAlignment = Alignment.TopCenter
+    ) {
         Text(
             text = actualMessage,
             fontSize = 22.sp,
