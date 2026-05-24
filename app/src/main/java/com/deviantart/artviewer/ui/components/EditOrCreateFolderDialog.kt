@@ -95,6 +95,14 @@ fun EditOrCreateFolderDialog(
                         fontSize = 10.sp,
                         color = AppColors.MutedTextColor
                     )
+                    Text(
+                        text = stringResource(
+                            R.string.dialog_folder_image_count_text,
+                            folder.totalImages
+                        ),
+                        fontSize = 10.sp,
+                        color = AppColors.MutedTextColor
+                    )
                 }
             }
         },

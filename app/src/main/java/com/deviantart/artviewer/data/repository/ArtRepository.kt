@@ -7,7 +7,9 @@ import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.data.remote.MediaApi
 import com.deviantart.artviewer.data.util.ArtQuery
 import com.deviantart.artviewer.data.util.ArtQueryPlanner
+import com.deviantart.artviewer.data.util.AtomicNullableMin
 import com.deviantart.artviewer.data.util.MediaAccumulator
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,12 +38,15 @@ class ArtRepository @Inject constructor(
         val queries = ArtQueryPlanner.planQueriesForFolder(folder)
         val accumulator = buildAccumulator(folder)
 
+        val earliestInvalidIndex = AtomicNullableMin()
+
+
         // Run all queries in parallel
         coroutineScope {
             queries.forEach { query ->
-                launch {
+                launch(Dispatchers.IO) {
                     try {
-                        runQuery(query, folder, accumulator)
+                        runQuery(query, folder, accumulator, earliestInvalidIndex)
                     }
                     catch (e: Exception) {
                         Log.e("Query failure", e.message, e)
@@ -49,6 +54,9 @@ class ArtRepository @Inject constructor(
                 }
             }
         }
+
+
+        updateImageCountInDB(folder, earliestInvalidIndex.get())
 
         return accumulator.getResults()
     }
@@ -69,7 +77,9 @@ class ArtRepository @Inject constructor(
 
     /**
      * Executes a query against the DeviantArt API and stores the selected
-     * results in the provided accumulator.
+     * results in the provided accumulator. If the query ends up out of
+     * bounds, this function also updates the tracker for earliestInvalidIndex
+     * so the folder can be corrected later.
      *
      * The function:
      *  - Calls `MediaApi.fetchMedia` for the configured offset and limit.
@@ -81,8 +91,15 @@ class ArtRepository @Inject constructor(
      * @param mediaApi The API instance used to perform the request.
      * @param folder The folder whose media is being fetched.
      * @param accumulator Collects all media items across multiple queries.
+     * @param earliestInvalidIndex A threadsafe variable that is tracking the
+     *          earliest index that was out of bounds across all queries.
      */
-    private suspend fun runQuery(queryData: ArtQuery, folder: Folder, accumulator: MediaAccumulator){
+    private suspend fun runQuery(
+        queryData: ArtQuery,
+        folder: Folder,
+        accumulator: MediaAccumulator,
+        earliestInvalidIndex: AtomicNullableMin
+    ){
         val remoteIdForUrl =
             if (folder.remoteId == Folder.ID_IF_FULL_COLLECTION) "all"
             else folder.remoteId
@@ -110,40 +127,64 @@ class ArtRepository @Inject constructor(
 
 
 
-        gatherQueryResults(
+        val invalidIndex = gatherQueryResults(
             responseData = responseData,
             queryData = queryData,
             folder = folder,
             accumulator = accumulator
         )
+
+
+        earliestInvalidIndex.updateMin(invalidIndex)
     }
 
 
 
     /**
      * Extract the items we need from the query response and add them to the accumulator.
+     * If some of the indexes we are supposed to save are out of bounds (this happens if
+     * the DeviantArt folder is smaller than the totalImages we have saved on the DB) then
+     * this function returns the earliest invalid index so it can be used to adjust the
+     * folder's total images. If all indexes are in bounds, null is returned.
+     *
+     *
+     * @param responseData - The API response we got for this query.
+     * @param queryData - The information about the query and what parts of it we need to keep.
+     * @param folder - The folder these results belong to.
+     * @param accumulator - An object used to store the results we want to keep.
+     * @return the earliest index we needed that was out of bounds, or null if nothing was
+     *          out of bounds.
      */
     private fun gatherQueryResults(
         responseData: List<DeviantArtMediaItem>,
         queryData: ArtQuery,
         folder: Folder,
         accumulator: MediaAccumulator
-    ){
-        if (folder.shouldRandomize) {
-            queryData.itemsToKeep.forEach { index ->
-                responseData[index]
-                    .takeIf { isValidMedia(it) }
-                    ?.let { accumulator.addItem(it) }
+    ): Int? {
+
+        val addItem =
+            if (folder.shouldRandomize) {
+                { item: DeviantArtMediaItem, _: Int -> accumulator.addItem(item) }
             }
-        } else {
-            queryData.itemsToKeep.forEach { index ->
-                responseData[index]
-                    .takeIf { isValidMedia(it) }
-                    ?.let { art ->
-                        accumulator.addItem(art, index + queryData.offset)
-                    }
+            else {
+                { item: DeviantArtMediaItem, index: Int -> accumulator.addItem(item, index) }
             }
+
+
+
+        for (index in queryData.itemsToKeep) {
+            if (index >= responseData.size) {
+                return index + queryData.offset //earliest invalid index
+            }
+
+            val item = responseData[index]
+            if (!isValidMedia(item)) continue
+
+
+            addItem(item, index + queryData.offset)
         }
+
+        return null
     }
 
 
@@ -157,5 +198,15 @@ class ArtRepository @Inject constructor(
         val hasExactlyOneMedia = hasVideo xor hasImage
 
         return !isBlocked && hasExactlyOneMedia
+    }
+
+
+
+    private suspend fun updateImageCountInDB(folder: Folder, imageCount: Int?){
+        if (imageCount != null) {
+            coroutineScope {
+                db.insertOrReplace(folder.copy(totalImages = imageCount))
+            }
+        }
     }
 }
