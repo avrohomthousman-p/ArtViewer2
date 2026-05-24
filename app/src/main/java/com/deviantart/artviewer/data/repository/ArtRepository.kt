@@ -1,19 +1,17 @@
 package com.deviantart.artviewer.data.repository
 
+import android.util.Log
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.data.remote.MediaApi
 import com.deviantart.artviewer.data.util.ArtQuery
+import com.deviantart.artviewer.data.util.ArtQueryPlanner
 import com.deviantart.artviewer.data.util.MediaAccumulator
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
-
-
-private const val MAX_ITEMS_SHOWN = 250
-private const val MAX_ITEMS_PER_QUERY = 24
 
 
 
@@ -29,38 +27,30 @@ class ArtRepository @Inject constructor(
 
     /**
      * Fetches art from the folder with the specified ID according to these rules:
-     *      Maximum images is [MAX_ITEMS_SHOWN]
+     *      Maximum images fetched is [ArtQueryPlanner.MAX_ITEMS_SHOWN]
      *      The images will be either randomized or sorted (in the same order as the API stores them)
      *      Sort VS Randomize is determined by the folder.shouldRandomize field
      */
     suspend fun fetchFolderContents(localId: Int): List<DeviantArtMediaItem> {
         val folder = db.getFolder(localId)
-        val queries = planQueriesForFolder(folder)
+        val queries = ArtQueryPlanner.planQueriesForFolder(folder)
         val accumulator = buildAccumulator(folder)
 
         // Run all queries in parallel
         coroutineScope {
             queries.forEach { query ->
-                launch { query.runQuery(mediaApi, folder, accumulator) }
+                launch {
+                    try {
+                        runQuery(query, folder, accumulator)
+                    }
+                    catch (e: Exception) {
+                        Log.e("Query failure", e.message, e)
+                    }
+                }
             }
         }
 
         return accumulator.getResults()
-    }
-
-
-
-    /**
-     * Builds a list of all the queries we need to get the right art.
-     */
-    private fun planQueriesForFolder(folder: Folder): List<ArtQuery> {
-        val needAllMedia = folder.totalImages <= MAX_ITEMS_SHOWN
-
-        return if (folder.shouldRandomize && !needAllMedia) {
-            planNonConsecutiveQueries(folder)
-        } else {
-            planConsecutiveQueries(folder)
-        }
     }
 
 
@@ -78,117 +68,94 @@ class ArtRepository @Inject constructor(
 
 
     /**
-     * Generates a list of queries that will need to be done to get a series of media
-     * from DeviantArt IN ORDER.
-     */
-    private fun planConsecutiveQueries(folder: Folder): List<ArtQuery> {
-        val queries = mutableListOf<ArtQuery>()
-
-        val maxIndexAllowed = folder.totalImages.coerceAtMost(MAX_ITEMS_SHOWN)
-        var offset = 0
-        while(offset < maxIndexAllowed){
-
-            val limit = MAX_ITEMS_PER_QUERY.coerceAtMost(maxIndexAllowed - offset)
-            queries.add(
-                ArtQuery(
-                    offset = offset,
-                    limit = limit,
-                    itemsToKeep = (0 until limit).toList()
-                )
-            )
-            offset += MAX_ITEMS_PER_QUERY
-        }
-
-        return queries
-    }
-
-
-
-    /**
-     * Generates a list of queries that will need to be done to get a random set of media
-     * items from the DeviantArt folder. Each query will take as many required items as
-     * it can fit without going over the [MAX_ITEMS_PER_QUERY]
-     */
-    private fun planNonConsecutiveQueries(folder: Folder): List<ArtQuery> {
-        val remoteIndexesToFetch = chooseItemsToFetch(folder).sorted()
-        val queries = mutableListOf<ArtQuery>()
-
-        var i = 0 //Where we are up to in remoteIndexesToFetch
-
-        while (i < remoteIndexesToFetch.size) {
-            val offset = remoteIndexesToFetch[i]
-            val (lastIndexInQuery, itemsKept) = collectItemsForQuery(remoteIndexesToFetch, i, offset)
-
-            val lastRemoteIndex = remoteIndexesToFetch[lastIndexInQuery]
-            val limit = lastRemoteIndex - offset + 1
-
-
-            queries.add(
-                ArtQuery(
-                    offset = offset,
-                    limit = limit,
-                    itemsToKeep = itemsKept
-                )
-            )
-
-            // Move i to the first index after this query's range
-            i = lastIndexInQuery + 1
-        }
-
-        return queries
-    }
-
-
-
-    /**
-     * Given the first item in a query, gathers all subsequent items that could also be
-     * captured in the same query (because they are not too far away and they items we
-     * need).
+     * Executes a query against the DeviantArt API and stores the selected
+     * results in the provided accumulator.
      *
-     * @param remoteIndexesToFetch - A list of all the items we want from the API (remote indexes)
-     * @param startIndex - The position (within remoteIndexesToFetch) of the first item to be
-     *          included in the query.
+     * The function:
+     *  - Calls `MediaApi.fetchMedia` for the configured offset and limit.
+     *  - Performs basic error handling on the response.
+     *  - Extracts only the items specified in [ArtQuery.itemsToKeep].
+     *  - Adds them to [accumulator], optionally preserving global ordering
+     *    depending on [Folder.shouldRandomize].
      *
-     * @param offset - The starting index of the first item included in this query on
-     *          the API itself (remote index).
+     * @param mediaApi The API instance used to perform the request.
+     * @param folder The folder whose media is being fetched.
+     * @param accumulator Collects all media items across multiple queries.
      */
-    private fun collectItemsForQuery(
-        remoteIndexesToFetch: List<Int>,
-        startIndex: Int,
-        offset: Int
-    ): Pair<Int, List<Int>> {
-        val itemsKept = mutableListOf<Int>()
-        var i = startIndex
+    private suspend fun runQuery(queryData: ArtQuery, folder: Folder, accumulator: MediaAccumulator){
+        val remoteIdForUrl =
+            if (folder.remoteId == Folder.ID_IF_FULL_COLLECTION) "all"
+            else folder.remoteId
 
-        itemsKept.add(0)
+        val response = mediaApi.fetchMedia(
+            location = folder.storedIn.asUrlPath(),
+            remoteId = remoteIdForUrl,
+            ownerUsername = folder.ownerUsername,
+            offset = queryData.offset,
+            limit = queryData.limit
+        )
 
-        while (i + 1 < remoteIndexesToFetch.size && isWithinQueryWindow(remoteIndexesToFetch[i + 1], offset)) {
-            i++
-            itemsKept.add(remoteIndexesToFetch[i] - offset)
+
+        val responseData = response.body()?.media
+
+        //Error checking
+        if (!response.isSuccessful){
+            Log.e("Art Fetching Failure", response.message())
+            return
+        }
+        else if (responseData.isNullOrEmpty()){
+            Log.e("Art Fetching Failure", "Got no data in a query")
+            return
         }
 
-        return i to itemsKept
+
+
+        gatherQueryResults(
+            responseData = responseData,
+            queryData = queryData,
+            folder = folder,
+            accumulator = accumulator
+        )
     }
 
 
 
     /**
-     * Checks if the specified remote index can be included in the query with the given
-     * offset. If including it would make the number of items in the query (query limit)
-     * greater then [MAX_ITEMS_PER_QUERY], then it cannot be included.
+     * Extract the items we need from the query response and add them to the accumulator.
      */
-    private fun isWithinQueryWindow(remoteIndex: Int, offset: Int): Boolean {
-        return remoteIndex < offset + MAX_ITEMS_PER_QUERY
+    private fun gatherQueryResults(
+        responseData: List<DeviantArtMediaItem>,
+        queryData: ArtQuery,
+        folder: Folder,
+        accumulator: MediaAccumulator
+    ){
+        if (folder.shouldRandomize) {
+            queryData.itemsToKeep.forEach { index ->
+                responseData[index]
+                    .takeIf { isValidMedia(it) }
+                    ?.let { accumulator.addItem(it) }
+            }
+        } else {
+            queryData.itemsToKeep.forEach { index ->
+                responseData[index]
+                    .takeIf { isValidMedia(it) }
+                    ?.let { art ->
+                        accumulator.addItem(art, index + queryData.offset)
+                    }
+            }
+        }
     }
 
 
 
-    /**
-     * Decides which images within a folder will be fetched from DeviantArt and displayed.
-     */
-    private fun chooseItemsToFetch(folder: Folder): List<Int> {
-        return (0 until folder.totalImages)
-            .shuffled()
-            .take(MAX_ITEMS_SHOWN)
+    private fun isValidMedia(mediaItem: DeviantArtMediaItem): Boolean {
+        val isBlocked = mediaItem.tierAccess != null
+
+        val hasVideo = !mediaItem.getVideoUrl().isNullOrEmpty()
+        val hasImage = !mediaItem.getImageUrl().isNullOrEmpty()
+
+        val hasExactlyOneMedia = hasVideo xor hasImage
+
+        return !isBlocked && hasExactlyOneMedia
     }
 }
