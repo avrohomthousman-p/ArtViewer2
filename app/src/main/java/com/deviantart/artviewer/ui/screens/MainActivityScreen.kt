@@ -57,11 +57,6 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
     val context = LocalContext.current
 
 
-    LaunchedEffect(Unit) {
-        viewModel.loadFolders()
-    }
-
-
     // Navigation
     LaunchedEffect(Unit) {
         viewModel.navigation.collect { destination ->
