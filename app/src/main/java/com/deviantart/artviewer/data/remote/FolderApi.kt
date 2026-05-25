@@ -6,7 +6,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 
-
 /**
  * Endpoint for getting all folders from a specific user on DeviantArt.
  */

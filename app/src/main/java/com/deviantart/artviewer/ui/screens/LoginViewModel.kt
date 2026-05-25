@@ -7,11 +7,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.deviantart.artviewer.data.repository.AuthRepository
+import com.deviantart.artviewer.data.repository.DbSetupRepository
 import com.deviantart.artviewer.data.util.ApiResponse
 import com.deviantart.artviewer.ui.util.MiscUtils
 import com.deviantart.artviewer.ui.util.NavDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -35,8 +37,13 @@ enum class LoginState {
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepo: AuthRepository
+    private val authRepo: AuthRepository,
+    private val dbSetupRepo: DbSetupRepository
 ) : ViewModel() {
+
+
+    private lateinit var initializeDB: Job
+
 
     private val _navigation = Channel<NavDestination>(Channel.BUFFERED)
     val navigation = _navigation.receiveAsFlow()
@@ -44,6 +51,14 @@ class LoginViewModel @Inject constructor(
 
     var loginState by mutableStateOf(LoginState.LoggedOut)
         private set
+
+
+
+    fun initializeDB(){
+        this.initializeDB = viewModelScope.launch(Dispatchers.IO) {
+            dbSetupRepo.onFirstAppLaunch()
+        }
+    }
 
 
     fun setInitialState(authCode: String? = null){
@@ -79,7 +94,9 @@ class LoginViewModel @Inject constructor(
         }
         else {
             loginState = LoginState.LoginSuccess
-            delay(2500)
+            MiscUtils.runWithMinimumDuration(2500) {
+                this.initializeDB.join()
+            }
             _navigation.send(NavDestination.ToMainActivity)
         }
     }
@@ -109,7 +126,9 @@ class LoginViewModel @Inject constructor(
             }
             is ApiResponse.Success<*> -> {
                 loginState = LoginState.LoginSuccess
-                delay(2500)
+                MiscUtils.runWithMinimumDuration(2500) {
+                    this.initializeDB.join()
+                }
                 _navigation.send(NavDestination.ToMainActivity)
             }
         }

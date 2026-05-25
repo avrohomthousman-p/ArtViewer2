@@ -1,9 +1,14 @@
+import de.undercouch.gradle.tasks.download.Download
+import java.io.File
+
+
 plugins {
     alias(libs.plugins.android.application)
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp") version "2.0.21-1.0.25"
     id("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.21"
+    id("de.undercouch.download") version "5.7.0"
 }
 
 android {
@@ -44,6 +49,29 @@ android {
         compose = true
     }
 }
+
+
+tasks.register<Download>("fetchSampleDb") {
+    src("https://deviantart-app-tools.avrohomthousman.workers.dev/sampleDB")
+    dest(File(projectDir, "src/main/res/raw/sample_db.json"))
+    overwrite(true)
+
+
+    doLast {
+        if (!dest.exists() || dest.length() == 0L) {
+            println("WARNING: Failed to download sample DB. Using existing bundled file.")
+        } else {
+            println("Sample DB updated successfully.")
+        }
+    }
+}
+
+
+tasks.named("preBuild") {
+    dependsOn("fetchSampleDb")
+}
+
+
 
 dependencies {
     implementation(platform(libs.androidx.compose.bom))

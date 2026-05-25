@@ -30,6 +30,7 @@ class LoginActivity : BaseActivity() {
                 null
             }
 
+        viewModel.initializeDB()
         viewModel.setInitialState(authCode)
 
         setContent {

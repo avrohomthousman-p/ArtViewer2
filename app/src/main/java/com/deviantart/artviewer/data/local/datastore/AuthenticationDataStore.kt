@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Singleton
 
 
-private val Context.dataStore by preferencesDataStore(name = "auth_prefs")
+private val Context.authDataStore by preferencesDataStore(name = "auth_prefs")
 
 
 /**
@@ -24,60 +24,60 @@ class AuthenticationDataStore(private val context: Context) {
 
 
     suspend fun saveRefreshToken(value: String) {
-        context.dataStore.edit { prefs ->
+        context.authDataStore.edit { prefs ->
             prefs[REFRESH_TOKEN_KEY] = value
         }
     }
 
 
     suspend fun loadRefreshToken(): String? {
-        val prefs = context.dataStore.data.first()
+        val prefs = context.authDataStore.data.first()
         return prefs[REFRESH_TOKEN_KEY]
     }
 
 
     suspend fun clearRefreshToken() {
-        context.dataStore.edit { prefs ->
+        context.authDataStore.edit { prefs ->
             prefs.remove(REFRESH_TOKEN_KEY)
         }
     }
 
 
     suspend fun saveRefreshTokenExpiration(value: String) {
-        context.dataStore.edit { prefs ->
+        context.authDataStore.edit { prefs ->
             prefs[REFESH_TOKEN_EXPIRATION_DATE_KEY] = value
         }
     }
 
 
     suspend fun loadRefreshTokenExpiration(): String? {
-        val prefs = context.dataStore.data.first()
+        val prefs = context.authDataStore.data.first()
         return prefs[REFESH_TOKEN_EXPIRATION_DATE_KEY]
     }
 
 
     suspend fun clearRefreshTokenExpiration() {
-        context.dataStore.edit { prefs ->
+        context.authDataStore.edit { prefs ->
             prefs.remove(REFESH_TOKEN_EXPIRATION_DATE_KEY)
         }
     }
 
 
     suspend fun savePkceCodeVerifier(value: String) {
-        context.dataStore.edit { prefs ->
+        context.authDataStore.edit { prefs ->
             prefs[PKCE_CODE_VERIFIER_KEY] = value
         }
     }
 
 
     suspend fun loadPkceCodeVerifier(): String? {
-        val prefs = context.dataStore.data.first()
+        val prefs = context.authDataStore.data.first()
         return prefs[PKCE_CODE_VERIFIER_KEY]
     }
 
 
     suspend fun clearPkceCodeVerifier() {
-        context.dataStore.edit { prefs ->
+        context.authDataStore.edit { prefs ->
             prefs.remove(PKCE_CODE_VERIFIER_KEY)
         }
     }
