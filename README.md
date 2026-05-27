@@ -20,4 +20,9 @@ This app has you authenticate viathe DeviantArt Oauth2 login portal. Users will 
 
 
 # Screenshots
-TODO
+<img width="360" height="780" alt="Screenshot_20260527-072945_Art Viewer" src="https://github.com/user-attachments/assets/0f511227-d803-407f-a1c0-cee85cc890b4" />
+<img width="360" height="780" alt="Screenshot_20260527-072934_Art Viewer" src="https://github.com/user-attachments/assets/f88da3df-6697-4f84-9f85-bc20074e1561" />
+<img width="360" height="780" alt="Screenshot_20260527-073045_Art Viewer" src="https://github.com/user-attachments/assets/1a41d43c-8ed6-48eb-909e-06aeb1a4c484" />
+<img width="360" height="780" alt="Screenshot_20260527-072958_Art Viewer" src="https://github.com/user-attachments/assets/9ae6f001-3d61-4403-a24e-a32d57a64bb8" />
+<img width="360" height="780" alt="Screenshot_20260527-072949_Art Viewer" src="https://github.com/user-attachments/assets/171a12ce-b0c9-4d03-98d6-4fdd928d8c42" />
+
