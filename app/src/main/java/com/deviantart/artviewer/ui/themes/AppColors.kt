@@ -17,7 +17,7 @@ object AppColors {
     val RedErrorColor = Color(0xFFD32F2F)
 
 
-    val StatusBarColor = Color(0xFFBBDEFB)
+    val StatusBarColor = Color(0xFF64B5F6)
     val NavBarColor = AltBackgroundColor
 
 
