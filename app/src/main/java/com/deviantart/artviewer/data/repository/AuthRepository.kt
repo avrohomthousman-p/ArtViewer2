@@ -11,6 +11,7 @@ import javax.inject.Singleton
 import androidx.core.net.toUri
 import com.deviantart.artviewer.data.remote.TokenResponse
 import com.deviantart.artviewer.data.util.ApiResponse
+import com.deviantart.artviewer.data.util.safeApiCall
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
@@ -90,24 +91,26 @@ class AuthRepository @Inject constructor(
         }
 
 
-        val response = loginApi.generateAccessToken(
-            grantType = "authorization_code",
-            clientId = CLIENT_ID,
-            redirectUri = "artviewer://oauth2redirect",
-            code = authCode,
-            codeVerifier = codeVerifier
-        )
-
-
-        if (!response.isSuccessful){
-            val error = response.errorBody()?.string() ?: "Could not authenticate"
-            Log.e("API failure", error)
-            return ApiResponse.Error(error)
+        val response = safeApiCall<TokenResponse> {
+            loginApi.generateAccessToken(
+                grantType = "authorization_code",
+                clientId = CLIENT_ID,
+                redirectUri = "artviewer://oauth2redirect",
+                code = authCode,
+                codeVerifier = codeVerifier
+            )
         }
 
 
-        val tokenData = response.body() ?: return ApiResponse.Error("No response from DeviantArt")
-        return saveTokenResponse(tokenData)
+        when (response){
+            is ApiResponse.Error -> {
+                Log.e("Login Failure", response.message)
+                return ApiResponse.Error(response.message)
+            }
+            is ApiResponse.Success -> {
+                return saveTokenResponse(response.data)
+            }
+        }
     }
 
 
@@ -118,9 +121,11 @@ class AuthRepository @Inject constructor(
      */
     private suspend fun saveTokenResponse(tokenData: TokenResponse) : ApiResponse<String> {
         if (tokenData.status != "success"){
+            Log.e("Login Failure", "received status ${tokenData.status}")
             return ApiResponse.Error("Login failure: " + (tokenData.errorDescription ?: ""))
         }
         if (tokenData.accessToken.isNullOrEmpty()) {
+            Log.e("Login Failure", "No access token received")
             return ApiResponse.Error("Login failure: did not receive an access token from DeviantArt")
         }
 
@@ -144,45 +149,60 @@ class AuthRepository @Inject constructor(
      */
     suspend fun refreshAccessToken(): ApiResponse<String> {
         if (!isRefreshPossible()) {
+            Log.e("Login Failure", "Refresh not possible. User must login")
             return ApiResponse.Error("Cannot refresh access token. Please login again.")
         }
 
 
-
-        val refreshToken = dataStore.loadRefreshToken()!!
-        val response = loginApi.refreshAccessToken(
-            grantType = "refresh_token",
-            clientId = CLIENT_ID,
-            refreshToken = refreshToken,
-        )
-
-
-
-        val responseData = response.body()
-        val dataIsValid = (
-                responseData != null &&
-                responseData.status == "success" &&
-                !responseData.accessToken.isNullOrEmpty()
-        )
-
-
-        if (response.isSuccessful && dataIsValid){
-            tokenManager.saveAccessToken(responseData.accessToken)
-
-            val newRefreshToken = responseData.refreshToken
-            if (newRefreshToken != null){
-                saveNewRefreshToken(newRefreshToken)
-            }
-
-            return ApiResponse.Success(responseData.accessToken)
-        }
-        else {
-            dataStore.clearRefreshToken()
-            dataStore.clearRefreshTokenExpiration()
-            return ApiResponse.Error(
-                message = "Could not refresh access token. Please login again."
+        val response = safeApiCall<TokenResponse> {
+            val refreshToken = dataStore.loadRefreshToken()!!
+            loginApi.refreshAccessToken(
+                grantType = "refresh_token",
+                clientId = CLIENT_ID,
+                refreshToken = refreshToken,
             )
         }
+
+
+
+        when (response) {
+            is ApiResponse.Error -> {
+                onRefreshFailed()
+                Log.e("Login Failure", response.message)
+                return response
+            }
+            is ApiResponse.Success<TokenResponse> -> {
+                val tokenData = response.data
+
+
+                if (tokenData.status != "success") {
+                    onRefreshFailed()
+                    Log.e("Login failure", "received status ${tokenData.status}")
+                    return ApiResponse.Error("Login failure: did not receive a success status from DeviantArt")
+                }
+                if (tokenData.accessToken.isNullOrEmpty()){
+                    onRefreshFailed()
+                    Log.e("Login failure", "No access token received")
+                    return ApiResponse.Error("Login failure: did not receive an access token from DeviantArt")
+                }
+
+
+
+                tokenManager.saveAccessToken(tokenData.accessToken)
+                tokenData.refreshToken?.let { saveNewRefreshToken(it) }
+                return ApiResponse.Success(tokenData.accessToken)
+            }
+        }
+    }
+
+
+
+    /**
+     * Clears the refresh token and its expiration date if we were not able to refresh it.
+     */
+    private suspend fun onRefreshFailed(){
+        dataStore.clearRefreshToken()
+        dataStore.clearRefreshTokenExpiration()
     }
 
 
@@ -217,7 +237,9 @@ class AuthRepository @Inject constructor(
     suspend fun logout() {
         val refreshToken = dataStore.loadRefreshToken()
         if (!refreshToken.isNullOrEmpty()){
-            loginApi.logout(inAppOnly = true, token = refreshToken)
+            safeApiCall<Unit> {
+                loginApi.logout(inAppOnly = true, token = refreshToken)
+            }
         }
 
         tokenManager.clearAccessToken()

@@ -34,7 +34,7 @@ interface LoginApi {
     suspend fun logout(
         @Field("revoke_refresh_only") inAppOnly: Boolean,
         @Field("token") token: String
-    )
+    ) : Response<Unit>
 
 
     @FormUrlEncoded

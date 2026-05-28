@@ -4,8 +4,10 @@ import android.util.Log
 import com.deviantart.artviewer.common.StorageLocation
 import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
+import com.deviantart.artviewer.data.remote.DeviantArtFolderResponse
 import com.deviantart.artviewer.data.remote.FolderApi
 import com.deviantart.artviewer.data.util.ApiResponse
+import com.deviantart.artviewer.data.util.safeApiCall
 import com.deviantart.artviewer.data.util.toFolder
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,29 +29,38 @@ class FolderRepository @Inject constructor(
         offset: Int = 0
     ): ApiResponse<List<Folder>> {
 
-        val response = folderApi.fetchFolders(
-            location = location.asUrlPath(),
-            ownerUsername = ownerUsername,
-            calculateSize = true,
-            filterEmptyFolders = true,
-            offset = offset
-        )
-
-
-        if (!response.isSuccessful || response.body()?.folderList.isNullOrEmpty()){
-            val error = response.errorBody()?.string() ?: "Could not fetch folders"
-            Log.e("API failure", error)
-            return ApiResponse.Error(error)
+        val response = safeApiCall<DeviantArtFolderResponse> {
+            folderApi.fetchFolders(
+                location = location.asUrlPath(),
+                ownerUsername = ownerUsername,
+                calculateSize = true,
+                filterEmptyFolders = true,
+                offset = offset
+            )
         }
 
 
-        val resultAsFolders = response.body()!!
-            .folderList.map { deviantArtFolder ->
-                deviantArtFolder.toFolder(ownerUsername, location)
+        when (response){
+            is ApiResponse.Error -> {
+                Log.e("API failure", response.message)
+                return response
             }
+            is ApiResponse.Success -> {
+                if (response.data.folderList.isEmpty()) {
+                    Log.e("API failure", "No folders found")
+                    return ApiResponse.Error("No folders found")
+                }
 
 
-        return ApiResponse.Success(resultAsFolders)
+                val resultAsFolders = response.data
+                    .folderList.map { deviantArtFolder ->
+                        deviantArtFolder.toFolder(ownerUsername, location)
+                    }
+
+
+                return ApiResponse.Success(resultAsFolders)
+            }
+        }
     }
 
 
@@ -67,43 +78,54 @@ class FolderRepository @Inject constructor(
         location: StorageLocation,
         shouldRandomize: Boolean
     ): ApiResponse<Unit> {
-        val response = folderApi.fetchFolders(
-            location = location.asUrlPath(),
-            ownerUsername = ownerUsername,
-            calculateSize = true,
-            filterEmptyFolders = true,
-            offset = 0
-        )
 
-
-        if (!response.isSuccessful || response.body()?.folderList.isNullOrEmpty()){
-            val error = response.errorBody()?.string() ?: "Could not fetch folders"
-            Log.e("API failure", error)
-            return ApiResponse.Error(error)
+        val response = safeApiCall<DeviantArtFolderResponse> {
+            folderApi.fetchFolders(
+                location = location.asUrlPath(),
+                ownerUsername = ownerUsername,
+                calculateSize = true,
+                filterEmptyFolders = true,
+                offset = 0
+            )
         }
 
 
-        val responseData = response.body()?.folderList ?: return ApiResponse.Error("Could not fetch folders")
 
-        val totalImages = responseData.sumOf { deviantArtFolder -> deviantArtFolder.totalImages }
-        val thumbnail = responseData.firstOrNull()?.getThumbnailUrl()
-        val displayName = "${ownerUsername}\'s ${location.asUiFriendlyLabel()}"
-
-
-        val folder = Folder(
-            localId = null,
-            remoteId = Folder.ID_IF_FULL_COLLECTION,
-            ownerUsername = ownerUsername,
-            storedIn = location,
-            displayName = displayName,
-            shouldRandomize = shouldRandomize,
-            thumbnailUrl = thumbnail,
-            totalImages = totalImages
-        )
+        when (response) {
+            is ApiResponse.Error -> {
+                Log.e("API failure", response.message)
+                return response
+            }
+            is ApiResponse.Success -> {
+                if (response.data.folderList.isEmpty()){
+                    Log.e("API failure", "No art found")
+                    return ApiResponse.Error("No art found")
+                }
 
 
-        db.insertOrReplace(folder)
 
-        return ApiResponse.Success(Unit)
+                val responseData = response.data.folderList
+                val totalImages = responseData.sumOf { deviantArtFolder -> deviantArtFolder.totalImages }
+                val thumbnail = responseData.firstOrNull()?.getThumbnailUrl()
+                val displayName = "${ownerUsername}\'s ${location.asUiFriendlyLabel()}"
+
+
+                val folder = Folder(
+                    localId = null,
+                    remoteId = Folder.ID_IF_FULL_COLLECTION,
+                    ownerUsername = ownerUsername,
+                    storedIn = location,
+                    displayName = displayName,
+                    shouldRandomize = shouldRandomize,
+                    thumbnailUrl = thumbnail,
+                    totalImages = totalImages
+                )
+
+
+                db.insertOrReplace(folder)
+
+                return ApiResponse.Success(Unit)
+            }
+        }
     }
 }

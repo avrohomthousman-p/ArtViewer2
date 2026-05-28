@@ -40,6 +40,7 @@ class DisplayArtActivity : BaseActivity() {
 
 
 
+        //TODO: this should not run on a rotation
         viewModel.loadFolderContent(folderId)
 
 

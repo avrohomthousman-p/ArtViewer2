@@ -5,10 +5,12 @@ import com.deviantart.artviewer.data.local.room.Folder
 import com.deviantart.artviewer.data.local.room.FolderDao
 import com.deviantart.artviewer.data.remote.DeviantArtMediaItem
 import com.deviantart.artviewer.data.remote.MediaApi
+import com.deviantart.artviewer.data.util.ApiResponse
 import com.deviantart.artviewer.data.util.ArtQuery
 import com.deviantart.artviewer.data.util.ArtQueryPlanner
 import com.deviantart.artviewer.data.util.AtomicNullableMin
 import com.deviantart.artviewer.data.util.MediaAccumulator
+import com.deviantart.artviewer.data.util.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -45,12 +47,7 @@ class ArtRepository @Inject constructor(
         coroutineScope {
             queries.forEach { query ->
                 launch(Dispatchers.IO) {
-                    try {
-                        runQuery(query, folder, accumulator, earliestInvalidIndex)
-                    }
-                    catch (e: Exception) {
-                        Log.e("Query failure", e.message, e)
-                    }
+                    runQuery(query, folder, accumulator, earliestInvalidIndex)
                 }
             }
         }
@@ -104,38 +101,43 @@ class ArtRepository @Inject constructor(
             if (folder.remoteId == Folder.ID_IF_FULL_COLLECTION) "all"
             else folder.remoteId
 
-        val response = mediaApi.fetchMedia(
-            location = folder.storedIn.asUrlPath(),
-            remoteId = remoteIdForUrl,
-            ownerUsername = folder.ownerUsername,
-            offset = queryData.offset,
-            limit = queryData.limit
-        )
 
-
-        val responseData = response.body()?.media
-
-        //Error checking
-        if (!response.isSuccessful){
-            Log.e("Art Fetching Failure", response.message())
-            return
-        }
-        else if (responseData.isNullOrEmpty()){
-            Log.e("Art Fetching Failure", "Got no data in a query")
-            return
+        val response = safeApiCall {
+            mediaApi.fetchMedia(
+                location = folder.storedIn.asUrlPath(),
+                remoteId = remoteIdForUrl,
+                ownerUsername = folder.ownerUsername,
+                offset = queryData.offset,
+                limit = queryData.limit
+            )
         }
 
 
+        when (response){
+            is ApiResponse.Error -> {
+                Log.e("Art Fetching Failure", response.message)
+                return
+            }
+            is ApiResponse.Success -> {
+                val responseData = response.data.media
 
-        val invalidIndex = gatherQueryResults(
-            responseData = responseData,
-            queryData = queryData,
-            folder = folder,
-            accumulator = accumulator
-        )
+                if (responseData.isEmpty()){
+                    Log.e("Art Fetching Failure", "Got no data in a query")
+                    return
+                }
 
 
-        earliestInvalidIndex.updateMin(invalidIndex)
+                val invalidIndex = gatherQueryResults(
+                    responseData = responseData,
+                    queryData = queryData,
+                    folder = folder,
+                    accumulator = accumulator
+                )
+
+
+                earliestInvalidIndex.updateMin(invalidIndex)
+            }
+        }
     }
 
 
