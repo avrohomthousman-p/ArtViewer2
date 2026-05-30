@@ -36,6 +36,13 @@ class DisplayArtViewModel @Inject constructor(
 
 
     fun loadFolderContent(folderId: Int){
+        //Make sure we don't reload on rotations.
+        val state = _uiState.value
+        if (state is UiState.Success && state.data.isNotEmpty()) {
+            return
+        }
+
+
         viewModelScope.launch(Dispatchers.IO) {
             if(tokenManager.isTokenExpired()){
                 _navigation.send(NavDestination.ToLoginActivity)
