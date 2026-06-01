@@ -27,7 +27,7 @@ class AuthRepository @Inject constructor(
     private val tokenManager: TokenManager
 ) {
 
-    private val CLIENT_ID = "48967"
+    private val CLIENT_ID = "68491"
 
 
 
