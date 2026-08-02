@@ -15,6 +15,7 @@
     <string name="confirm">Confirm</string>
     <string name="gallery">Gallery</string>
     <string name="collection">Collection</string>
+    <string name="or">Or</string>
     <string name="should_randomize_text">Show images in a RANDOM order</string>
     <string name="should_not_randomize_text">Show images in the CORRECT order</string>
     <string name="home_icon_content_description">Home button</string>
@@ -22,10 +23,15 @@
 
 
     <!-- Login Activity -->
-    <string name="login_btn_text">Login to DeviantArt</string>
-    <string name="login_banner_reauthenticate_message">We need you to log in. Please click the button below.</string>
+    <string name="login_btn_text">DeviantArt Login</string>
+    <string name="guest_mode_btn_text">Enter as Guest</string>
+    <string name="login_banner_reauthenticate_message">Please pick a login option below.</string>
     <string name="login_banner_refreshing_message">Please wait while we log you in…</string>
     <string name="login_banner_refresh_failed_message">Something went wrong. Please try to log in again.</string>
+    <string name="login_as_guest_warning">
+        While logged in as guest you may experience connection issues. For long term use, it\'s
+        best to make a DeviantArt account and log in with that.
+    </string>
 
     <string name="login_welcome_message">Welcome Back!</string>
 

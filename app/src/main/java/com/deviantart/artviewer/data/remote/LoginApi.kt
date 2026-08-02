@@ -3,6 +3,7 @@ package com.deviantart.artviewer.data.remote
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 
@@ -37,6 +38,9 @@ interface LoginApi {
     ) : Response<Unit>
 
 
+    /**
+     * Refresh access token
+     */
     @FormUrlEncoded
     @POST("oauth2/token")
     suspend fun refreshAccessToken(
@@ -44,4 +48,11 @@ interface LoginApi {
         @Field("client_id") clientId: String,
         @Field("refresh_token") refreshToken: String
     ): Response<TokenResponse>
+
+
+    /**
+     * Fetch an access token from a cloudflare worker - no account needed.
+     */
+    @GET("https://deviantart-app-tools.avrohomthousman.workers.dev/guestLogin")
+    suspend fun loginAsGuest(): Response<TokenResponse>
 }

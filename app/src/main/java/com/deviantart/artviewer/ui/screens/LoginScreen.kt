@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -63,7 +66,8 @@ fun LoginScreen(viewModel: LoginViewModel) {
 
     LoginScreenContent(
         loginState = viewModel.loginState,
-        performLogin = { viewModel.triggerLoginStart() }
+        performLogin = { viewModel.triggerLoginStart() },
+        performGuestLogin = { viewModel.triggerGuestLogin() }
     )
 }
 
@@ -74,7 +78,8 @@ fun LoginScreen(viewModel: LoginViewModel) {
 @Composable
 private fun LoginScreenContent(
     loginState: LoginState,
-    performLogin: () -> Unit
+    performLogin: () -> Unit,
+    performGuestLogin: () -> Unit
 ){
     val bannerText = when (loginState) {
         LoginState.LoggedOut -> stringResource(R.string.login_banner_reauthenticate_message)
@@ -101,7 +106,7 @@ private fun LoginScreenContent(
             .background(AppColors.White)
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
-        val (toolbar, title, statusContent) = createRefs()
+        val (toolbar, title, statusContent, bottomText) = createRefs()
 
         Toolbar(
             Modifier.constrainAs(toolbar) {
@@ -123,10 +128,19 @@ private fun LoginScreenContent(
         CenterContent(
             loginState = loginState,
             performLogin = performLogin,
+            performGuestLogin = performGuestLogin,
             statusText = statusText,
             statusTextColor = statusTextColor,
             modifier = Modifier.constrainAs(statusContent) {
                 top.linkTo(toolbar.bottom)
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
+
+        BottomText(
+            modifier = Modifier.constrainAs(bottomText){
                 bottom.linkTo(parent.bottom)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
@@ -170,15 +184,16 @@ private fun Title(text: String, modifier: Modifier){
 private fun CenterContent(
     loginState: LoginState,
     performLogin: () -> Unit,
+    performGuestLogin: () -> Unit,
     statusText: String?,
     statusTextColor: Color,
     modifier: Modifier
 ) {
     if (loginState == LoginState.LoggedOut) {
-        StandardButton(
+        LoginButtons(
             modifier = modifier,
-            text = stringResource(R.string.login_btn_text),
-            onClick = { performLogin() }
+            performLogin = performLogin,
+            performGuestLogin = performGuestLogin,
         )
     }
     else if(!statusText.isNullOrBlank()) {
@@ -193,12 +208,62 @@ private fun CenterContent(
 
 
 
+@Composable
+private fun LoginButtons(
+    modifier: Modifier,
+    performLogin: () -> Unit,
+    performGuestLogin: () -> Unit
+){
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        StandardButton(
+            modifier = Modifier,
+            text = stringResource(R.string.login_btn_text),
+            onClick = { performLogin() }
+        )
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        Text(
+            modifier = modifier,
+            text = stringResource(R.string.or),
+            fontSize = 18.sp
+        )
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        StandardButton(
+            modifier = Modifier,
+            text = stringResource(R.string.guest_mode_btn_text),
+            onClick = { performGuestLogin() }
+        )
+    }
+}
+
+
+
+@Composable
+private fun BottomText(modifier: Modifier){
+    Text(
+        modifier = modifier.then(Modifier.padding(bottom = 12.dp)),
+        text = stringResource(R.string.login_as_guest_warning),
+        color = AppColors.MutedTextColor,
+        fontSize = 12.sp,
+        textAlign = TextAlign.Center
+    )
+}
+
+
+
 @Preview(showBackground = true)
 @Composable
 private fun LoggedOutPreview() {
     LoginScreenContent(
         loginState = LoginState.LoggedOut,
-        performLogin = {}
+        performLogin = {},
+        performGuestLogin = {}
     )
 }
 
@@ -207,7 +272,8 @@ private fun LoggedOutPreview() {
 private fun LoggingInPreview() {
     LoginScreenContent(
         loginState = LoginState.LoginInProgress,
-        performLogin = {}
+        performLogin = {},
+        performGuestLogin = {}
     )
 }
 
@@ -216,7 +282,8 @@ private fun LoggingInPreview() {
 private fun LoginFailedPreview() {
     LoginScreenContent(
         loginState = LoginState.LoginFailure,
-        performLogin = {}
+        performLogin = {},
+        performGuestLogin = {}
     )
 }
 
@@ -225,6 +292,7 @@ private fun LoginFailedPreview() {
 private fun LoginSuccessPreview() {
     LoginScreenContent(
         loginState = LoginState.LoginSuccess,
-        performLogin = {}
+        performLogin = {},
+        performGuestLogin = {}
     )
 }

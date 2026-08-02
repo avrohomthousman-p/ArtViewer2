@@ -116,6 +116,31 @@ class AuthRepository @Inject constructor(
 
 
     /**
+     * Gets an access token from a cloudflare worker so the user can access DeviantArt
+     * media without needing to log in.
+     *
+     * Note: this method does not provide a refresh token.
+     */
+    suspend fun loginAsGuest(): ApiResponse<String> {
+        val response = safeApiCall<TokenResponse>{
+            loginApi.loginAsGuest()
+        }
+
+
+        when (response){
+            is ApiResponse.Error -> {
+                Log.e("Guest Login Failure", response.message)
+                return ApiResponse.Error(response.message)
+            }
+            is ApiResponse.Success -> {
+                return saveTokenResponse(response.data)
+            }
+        }
+    }
+
+
+
+    /**
      * Error checking and save data from the response after exchanging the auth token for the
      * accessCode.
      */
