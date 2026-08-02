@@ -88,8 +88,10 @@ class LoginViewModel @Inject constructor(
         }
 
         if (response is ApiResponse.Error) {
-            loginState = LoginState.LoginFailure
             Log.e("LoginError", response.message)
+            loginState = LoginState.LoginFailure
+            delay(2500)
+            loginState = LoginState.LoggedOut
             return
         }
         else {
@@ -143,6 +145,38 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val uri = authRepo.buildAuthorizationUrl()
             _navigation.send(NavDestination.ToWebLogin(uri))
+        }
+    }
+
+
+
+    /**
+     * Initiate a login as guest
+     */
+    fun triggerGuestLogin() {
+        viewModelScope.launch(Dispatchers.IO) {
+            loginState = LoginState.LoginInProgress
+
+            val response = MiscUtils.runWithMinimumDuration(2500){
+                authRepo.loginAsGuest()
+            }
+
+
+            when(response){
+                is ApiResponse.Error -> {
+                    Log.e("Guest Login Failure", "Could not login as guest")
+                    loginState = LoginState.LoginFailure
+                    delay(2500)
+                    loginState = LoginState.LoggedOut
+                }
+                is ApiResponse.Success<*> -> {
+                    loginState = LoginState.LoginSuccess
+                    MiscUtils.runWithMinimumDuration(2500) {
+                        initializeDB.join()
+                    }
+                    _navigation.send(NavDestination.ToMainActivity)
+                }
+            }
         }
     }
 }

@@ -66,14 +66,17 @@ object AppModule {
                 level = HttpLoggingInterceptor.Level.BODY
             })
             .addInterceptor { chain ->
-                val newRequest = chain.request().newBuilder()
+                val request = chain.request()
+                val newRequest = request.newBuilder()
                     .apply {
-                        if (!tokenManager.isTokenExpired()) {
-                            val accessToken = tokenManager.getAccessToken()
-                            this.header("Authorization", "Bearer $accessToken")
-                        }
-                        else {
-                            Log.e("OkHttp", "No access token found")
+                        if (request.url.host == "www.deviantart.com"){
+                            if (!tokenManager.isTokenExpired()) {
+                                val accessToken = tokenManager.getAccessToken()
+                                this.header("Authorization", "Bearer $accessToken")
+                            }
+                            else {
+                                Log.e("OkHttp", "No access token found")
+                            }
                         }
                     }
                     .build()
