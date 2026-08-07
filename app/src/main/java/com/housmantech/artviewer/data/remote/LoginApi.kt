@@ -1,0 +1,58 @@
+package com.housmantech.artviewer.data.remote
+
+import retrofit2.Response
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
+import retrofit2.http.POST
+
+
+/**
+ * Class with methods for running API calls related to DeviantArt authentication.
+ */
+interface LoginApi {
+
+
+    /**
+     * Exchange the authorization code for an access token.
+     */
+    @FormUrlEncoded
+    @POST("oauth2/token")
+    suspend fun generateAccessToken(
+        @Field("grant_type") grantType: String,
+        @Field("client_id") clientId: String,
+        @Field("redirect_uri") redirectUri: String,
+        @Field("code") code: String,
+        @Field("code_verifier") codeVerifier: String
+    ): Response<TokenResponse>
+
+
+    /**
+     * Logout of DeviantArt
+     */
+    @FormUrlEncoded
+    @POST("oauth2/revoke")
+    suspend fun logout(
+        @Field("revoke_refresh_only") inAppOnly: Boolean,
+        @Field("token") token: String
+    ) : Response<Unit>
+
+
+    /**
+     * Refresh access token
+     */
+    @FormUrlEncoded
+    @POST("oauth2/token")
+    suspend fun refreshAccessToken(
+        @Field("grant_type") grantType: String = "refresh_token",
+        @Field("client_id") clientId: String,
+        @Field("refresh_token") refreshToken: String
+    ): Response<TokenResponse>
+
+
+    /**
+     * Fetch an access token from a cloudflare worker - no account needed.
+     */
+    @GET("https://deviantart-app-tools.avrohomthousman.workers.dev/guestLogin")
+    suspend fun loginAsGuest(): Response<TokenResponse>
+}
