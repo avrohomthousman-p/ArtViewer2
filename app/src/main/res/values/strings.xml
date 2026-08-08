@@ -25,7 +25,7 @@
     <!-- Login Activity -->
     <string name="login_btn_text">DeviantArt Login</string>
     <string name="guest_mode_btn_text">Enter as Guest</string>
-    <string name="login_banner_reauthenticate_message">Please pick a login option below.</string>
+    <string name="login_banner_reauthenticate_message">Please pick a login option below:</string>
     <string name="login_banner_refreshing_message">Please wait while we log you in…</string>
     <string name="login_banner_refresh_failed_message">Something went wrong. Please try to log in again.</string>
     <string name="login_as_guest_warning">

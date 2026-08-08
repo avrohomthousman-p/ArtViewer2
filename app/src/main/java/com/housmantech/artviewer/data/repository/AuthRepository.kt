@@ -1,6 +1,8 @@
 package com.housmantech.artviewer.data.repository
 
+import android.content.Context
 import android.net.Uri
+import android.util.Base64
 import android.util.Log
 import com.housmantech.artviewer.data.local.datastore.AuthenticationDataStore
 import com.housmantech.artviewer.data.remote.LoginApi
@@ -9,9 +11,15 @@ import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.net.toUri
+import com.google.android.play.core.integrity.IntegrityManagerFactory
+import com.google.android.play.core.integrity.IntegrityTokenRequest
+import com.housmantech.artviewer.data.remote.GuestLoginRequest
 import com.housmantech.artviewer.data.remote.TokenResponse
 import com.housmantech.artviewer.data.util.ApiResponse
 import com.housmantech.artviewer.data.util.safeApiCall
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.tasks.await
+import java.security.SecureRandom
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
@@ -22,6 +30,7 @@ import java.time.ZonedDateTime
  */
 @Singleton
 class AuthRepository @Inject constructor(
+    @param:ApplicationContext private val context: Context,
     private val loginApi: LoginApi,
     private val dataStore: AuthenticationDataStore,
     private val tokenManager: TokenManager
@@ -123,7 +132,10 @@ class AuthRepository @Inject constructor(
      */
     suspend fun loginAsGuest(): ApiResponse<String> {
         val response = safeApiCall<TokenResponse>{
-            loginApi.loginAsGuest()
+            val nonce = generateNonce()
+            val attestationToken = getAttestationToken(nonce)
+            val requestBody = GuestLoginRequest(attestationToken, nonce)
+            loginApi.loginAsGuest(requestBody)
         }
 
 
@@ -136,6 +148,14 @@ class AuthRepository @Inject constructor(
                 return saveTokenResponse(response.data)
             }
         }
+    }
+
+
+
+    private fun generateNonce(): String {
+        val bytes = ByteArray(32)
+        SecureRandom().nextBytes(bytes)
+        return Base64.encodeToString(bytes, Base64.URL_SAFE or Base64.NO_WRAP)
     }
 
 
@@ -251,6 +271,24 @@ class AuthRepository @Inject constructor(
 
             dataStore.saveRefreshTokenExpiration(expirationDate)
         }
+    }
+
+
+
+    /**
+     * Get a token from the Integrity API that cloudflare will use to ensure it's this
+     * app asking for a DeviantArt access token. Only needed for guest login.
+     */
+    private suspend fun getAttestationToken(nonce: String): String {
+        val integrityManager = IntegrityManagerFactory.create(context)
+
+        val request = IntegrityTokenRequest.builder()
+            .setNonce(nonce)
+            .build()
+
+        val response = integrityManager.requestIntegrityToken(request).await()
+
+        return response.token()
     }
 
 
