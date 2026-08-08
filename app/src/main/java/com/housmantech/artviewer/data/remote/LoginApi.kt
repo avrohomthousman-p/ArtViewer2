@@ -1,6 +1,7 @@
 package com.housmantech.artviewer.data.remote
 
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -53,6 +54,8 @@ interface LoginApi {
     /**
      * Fetch an access token from a cloudflare worker - no account needed.
      */
-    @GET("https://deviantart-app-tools.avrohomthousman.workers.dev/guestLogin")
-    suspend fun loginAsGuest(): Response<TokenResponse>
+    @POST("https://deviantart-app-tools.avrohomthousman.workers.dev/guestLogin")
+    suspend fun loginAsGuest(
+        @Body body: GuestLoginRequest
+    ): Response<TokenResponse>
 }

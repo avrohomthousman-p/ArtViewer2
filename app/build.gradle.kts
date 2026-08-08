@@ -23,8 +23,8 @@ android {
         applicationId = "com.housmantech.artviewer"
         minSdk = 24
         targetSdk = 36
-        versionCode = 13
-        versionName = "1.2.10"
+        versionCode = 14
+        versionName = "1.2.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -98,6 +98,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.integrity)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 }
