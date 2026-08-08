@@ -3,6 +3,7 @@ package com.housmantech.artviewer.ui.screens
 import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -42,9 +43,11 @@ import com.housmantech.artviewer.ui.activities.FolderSearchResultsActivity
 import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.MainActivity
 import com.housmantech.artviewer.ui.components.FolderTypePicker
+import com.housmantech.artviewer.ui.components.InfoDialog
 import com.housmantech.artviewer.ui.components.LabeledCheckbox
 import com.housmantech.artviewer.ui.components.StandardButton
 import com.housmantech.artviewer.ui.components.Toolbar
+import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
 
 
@@ -118,7 +121,15 @@ fun FolderSearchScreenContent(
     var saveFullGallery by remember { mutableStateOf(false) }
     var radioSelection by remember { mutableStateOf(StorageLocation.GALLERY) }
     var shouldRandomize by remember { mutableStateOf(true) }
-    
+    var showInfoPopup by remember { mutableStateOf(false) }
+
+
+
+    if (showInfoPopup){
+        InfoDialog(
+            dismissDialog = { showInfoPopup = false }
+        )
+    }
 
 
     Column(
@@ -229,6 +240,18 @@ fun FolderSearchScreenContent(
             }
         )
         Spacer(modifier = Modifier.height(20.dp))
+
+        Text(
+            modifier = Modifier.clickable(
+                indication = null,
+                interactionSource = null,
+                onClick = { showInfoPopup = true }
+            ),
+            text = stringResource(R.string.folder_search_help_text),
+            color = AppColors.LinkColor,
+            fontSize = 16.sp
+        )
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
