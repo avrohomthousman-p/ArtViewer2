@@ -2,10 +2,12 @@ package com.housmantech.artviewer.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.housmantech.artviewer.ui.screens.LoginScreen
 import com.housmantech.artviewer.ui.screens.LoginViewModel
+import com.housmantech.artviewer.BuildConfig
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -19,6 +21,8 @@ class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.e("App Start", "app version: ${BuildConfig.VERSION_NAME}")
 
         val intent = intent
         val authCode =

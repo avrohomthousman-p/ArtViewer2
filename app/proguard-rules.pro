@@ -5,12 +5,40 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+
+
+# Keep generic type signatures (Retrofit needs these)
+-keepattributes Signature
+-keepattributes *Annotation*
+
+# Keep only the generated serializers
+-keep class **$$serializer { *; }
+
+# Keep members annotated with @Serializable
+-keepclassmembers class ** {
+    @kotlinx.serialization.Serializable *;
+}
+
+# Keep API models
+-keep class com.housmantech.artviewer.data.remote.** { *; }
+
+# Keep Retrofit interfaces
+-keep interface com.housmantech.artviewer.data.remote.** { *; }
+
+# Keep Jake Wharton’s converter
+-keep class com.jakewharton.retrofit.** { *; }
+
+# Keep generic signature of Call, Response
+# (R8 full mode strips signatures from non-kept items)
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+
+# Suspend functions wrap return types in Continuation<T>
+# R8 full mode strips the generic parameter unless kept
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
+
+
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
