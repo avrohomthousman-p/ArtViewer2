@@ -41,6 +41,7 @@ import com.housmantech.artviewer.ui.components.DeleteFolderDialog
 import com.housmantech.artviewer.ui.components.EditOrCreateFolderDialog
 import com.housmantech.artviewer.ui.components.FolderInteraction
 import com.housmantech.artviewer.ui.components.NewFolderPrompt
+import com.housmantech.artviewer.ui.components.SettingsDialog
 import com.housmantech.artviewer.ui.components.SingleFolderDisplay
 import com.housmantech.artviewer.ui.components.Toolbar
 import com.housmantech.artviewer.ui.themes.AppColors
@@ -84,11 +85,17 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
     val state = viewModel.uiState.collectAsState()
     var folderBeingEdited by remember { mutableStateOf<Int?>(null) }
     var folderBeingDeleted by remember { mutableStateOf<Int?>(null) }
+    var showSettings by remember { mutableStateOf(false) }
 
 
 
     // Toolbar buttons
     val toolbarButtons = listOf(
+        ToolbarButtonData(
+            icon = R.drawable.ic_settings,
+            contentDescription = stringResource(R.string.settings_btn_content_description),
+            onClick = { showSettings = true }
+        ),
         ToolbarButtonData(
             icon = R.drawable.ic_logout,
             contentDescription = stringResource(R.string.logout_btn_content_desc),
@@ -139,6 +146,17 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
             onSave = {
                 viewModel.deleteFolder(index)
                 folderBeingDeleted = null
+            }
+        )
+    }
+
+
+    if (showSettings) {
+        SettingsDialog(
+            onDismiss = { showSettings = false },
+            onSave = {
+                /* save changes here */
+                showSettings = false
             }
         )
     }
