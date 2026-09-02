@@ -44,6 +44,7 @@ import com.housmantech.artviewer.data.remote.DeviantArtMediaItem
 import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.MainActivity
 import com.housmantech.artviewer.ui.components.Toolbar
+import com.housmantech.artviewer.ui.util.LazyMediaItem
 import com.housmantech.artviewer.ui.util.NavDestination
 import com.housmantech.artviewer.ui.util.ToolbarButtonData
 import com.housmantech.artviewer.ui.util.UiState
@@ -81,11 +82,11 @@ fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
         Toolbar(folderName)
 
 
-        val exactState: UiState<List<DeviantArtMediaItem>> = state.value//needed to satisfy compiler type concerns
+        val exactState: UiState<LinkedList> = state.value//needed to satisfy compiler type concerns
         when(exactState){
             UiState.Loading -> LoadingDisplay()
             is UiState.Error -> ErrorDisplay(exactState.message)
-            is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(exactState.data)
+            is UiState.Success<List<LazyMediaItem>> -> ArtDisplay(viewModel, exactState.data)
         }
     }
 }
@@ -168,7 +169,9 @@ private fun ErrorDisplay(errorMessage: String? = null){
  * them, and they snap into place (like YouTube sorts or TikTok).
  */
 @Composable
-private fun ArtDisplay(artList: List<DeviantArtMediaItem>) {
+private fun ArtDisplay(viewModel: DisplayArtViewModel, artList: List<LazyMediaItem>) {
+    //TODO: need to handle possibility of an empty folder
+
     val pagerState = rememberPagerState(pageCount = { artList.size })
 
     VerticalPager(
@@ -176,19 +179,29 @@ private fun ArtDisplay(artList: List<DeviantArtMediaItem>) {
         modifier = Modifier.fillMaxSize()
     ) { page ->
 
+        val item = artList[page]
         val isCurrentPage = pagerState.currentPage == page
-        val artItem = artList[page]
 
-
-        val videoUrl = artItem.getVideoUrl()
-        val imageUrl = artItem.getImageUrl()
-
-
-        if (!videoUrl.isNullOrEmpty()){
-            VideoPlayer(title = artItem.title, url = videoUrl, play = isCurrentPage)
+        LaunchedEffect(page) {
+            viewModel.ensureLoaded(page)//TODO do stuff on page scroll
         }
-        else if(!imageUrl.isNullOrEmpty()) {
-            ImageDisplay(title = artItem.title, url = imageUrl, showSpinner = isCurrentPage)
+
+
+        when (item){
+            is LazyMediaItem.Loaded -> {
+                val videoUrl = item.media.getVideoUrl()
+                val imageUrl = item.media.getImageUrl()
+
+                if (!videoUrl.isNullOrEmpty()) {
+                    VideoPlayer(title = item.media.title, url = videoUrl, play = isCurrentPage)
+                }
+                else if (!imageUrl.isNullOrEmpty()) {
+                    ImageDisplay(title = item.media.title, url = imageUrl, showSpinner = isCurrentPage)
+                }
+            }
+            is LazyMediaItem.Pending -> {
+                CircularProgressIndicator()
+            }
         }
     }
 }
