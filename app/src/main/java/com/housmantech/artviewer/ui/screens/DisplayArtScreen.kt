@@ -22,7 +22,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -40,10 +42,11 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.decode.GifDecoder
 import com.housmantech.artviewer.R
-import com.housmantech.artviewer.data.remote.DeviantArtMediaItem
 import com.housmantech.artviewer.ui.activities.LoginActivity
-import com.housmantech.artviewer.ui.activities.MainActivity
 import com.housmantech.artviewer.ui.components.Toolbar
+import com.housmantech.artviewer.ui.util.LazyMediaItem
+import com.housmantech.artviewer.ui.util.LinkedList
+import com.housmantech.artviewer.ui.util.LinkedListGeneric
 import com.housmantech.artviewer.ui.util.NavDestination
 import com.housmantech.artviewer.ui.util.ToolbarButtonData
 import com.housmantech.artviewer.ui.util.UiState
@@ -81,11 +84,11 @@ fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
         Toolbar(folderName)
 
 
-        val exactState: UiState<List<DeviantArtMediaItem>> = state.value//needed to satisfy compiler type concerns
+        val exactState: UiState<LinkedList> = state.value//needed to satisfy compiler type concerns
         when(exactState){
             UiState.Loading -> LoadingDisplay()
             is UiState.Error -> ErrorDisplay(exactState.message)
-            is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(exactState.data)
+            is UiState.Success<LinkedList> -> ArtDisplay(viewModel, exactState.data)
         }
     }
 }
@@ -168,8 +171,28 @@ private fun ErrorDisplay(errorMessage: String? = null){
  * them, and they snap into place (like YouTube sorts or TikTok).
  */
 @Composable
-private fun ArtDisplay(artList: List<DeviantArtMediaItem>) {
-    val pagerState = rememberPagerState(pageCount = { artList.size })
+private fun ArtDisplay(viewModel: DisplayArtViewModel, artList: LinkedList) {
+    if (artList.size() == 0) {
+        //TODO: need to a text composable here
+        return
+    }
+
+
+    val item by viewModel.currentMediaItem.collectAsState()
+    val pagerState = rememberPagerState(pageCount = { artList.size() })
+
+
+    LaunchedEffect(pagerState) {
+        var lastPage = pagerState.currentPage
+
+        snapshotFlow { pagerState.currentPage }
+            .collect { newPage ->
+                val forward = newPage > lastPage
+                viewModel.onScroll(forward)
+                lastPage = newPage
+            }
+    }
+
 
     VerticalPager(
         state = pagerState,
@@ -177,18 +200,23 @@ private fun ArtDisplay(artList: List<DeviantArtMediaItem>) {
     ) { page ->
 
         val isCurrentPage = pagerState.currentPage == page
-        val artItem = artList[page]
 
 
-        val videoUrl = artItem.getVideoUrl()
-        val imageUrl = artItem.getImageUrl()
+        when (item){
+            is LazyMediaItem.Loaded -> {
+                val videoUrl = item.media.getVideoUrl()
+                val imageUrl = item.media.getImageUrl()
 
-
-        if (!videoUrl.isNullOrEmpty()){
-            VideoPlayer(title = artItem.title, url = videoUrl, play = isCurrentPage)
-        }
-        else if(!imageUrl.isNullOrEmpty()) {
-            ImageDisplay(title = artItem.title, url = imageUrl, showSpinner = isCurrentPage)
+                if (!videoUrl.isNullOrEmpty()) {
+                    VideoPlayer(title = item.media.title, url = videoUrl, play = isCurrentPage)
+                }
+                else if (!imageUrl.isNullOrEmpty()) {
+                    ImageDisplay(title = item.media.title, url = imageUrl, showSpinner = isCurrentPage)
+                }
+            }
+            else -> {
+                CircularProgressIndicator()
+            }
         }
     }
 }

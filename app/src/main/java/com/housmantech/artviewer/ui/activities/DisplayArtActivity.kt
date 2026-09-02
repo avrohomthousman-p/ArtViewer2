@@ -40,7 +40,11 @@ class DisplayArtActivity : BaseActivity() {
 
 
 
-        viewModel.loadFolderContent(folderId)
+        //If it's not a restart due to a rotation
+        if (savedInstanceState == null) {
+            viewModel.loadFolderContent(folderId)
+        }
+
 
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
