@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,13 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxDefaults
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -29,20 +30,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.housmantech.artviewer.R
 import com.housmantech.artviewer.ui.themes.AppColors
-
 
 
 /**
@@ -111,14 +106,28 @@ fun SingleFolderDisplay(
 
 
 
-                Text(
-                    text = buildFolderDisplayName(folderName, imageCount),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp)
+                ) {
+                    Text(
+                        text = folderName,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    if (imageCount != null){
+                        Text(
+                            text = stringResource(R.string.image_count, imageCount),
+                            fontSize = 12.sp,
+                            color = AppColors.MutedTextColor
+                        )
+                    }
+                }
+
 
 
                 ActionButtons(
@@ -129,60 +138,6 @@ fun SingleFolderDisplay(
             }
         }
     )
-}
-
-
-
-
-/**
- * Builds the text to display on the folder, which follows one of these formats:
- *
- * if a non-null image count is provided:
- *      folderName   ([imageCount] images)
- *
- * if imageCount is null:
- *      folderName
- */
-@Composable
-private fun buildFolderDisplayName(
-    folderName: String,
-    imageCount: Int?
-): AnnotatedString {
-
-    return buildAnnotatedString {
-
-        // Folder name
-        withStyle(
-            style = SpanStyle(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-        ) {
-            append(folderName)
-        }
-
-
-
-        // If no image count, stop here
-        if (imageCount == null) return@buildAnnotatedString
-
-
-
-        append("   ")
-
-
-
-        // Image count
-        withStyle(
-            style = SpanStyle(
-                fontSize = 12.sp,
-                color = AppColors.MutedTextColor,
-                baselineShift = BaselineShift(0.2f)
-            )
-        ) {
-            append("($imageCount images)")
-        }
-    }
 }
 
 

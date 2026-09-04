@@ -247,7 +247,7 @@ private fun LoginButtons(
 @Composable
 private fun BottomText(modifier: Modifier){
     Text(
-        modifier = modifier.then(Modifier.padding(bottom = 12.dp)),
+        modifier = modifier.then(Modifier.padding(bottom = 12.dp, start = 8.dp, end = 8.dp)),
         text = stringResource(R.string.login_as_guest_warning),
         color = AppColors.MutedTextColor,
         fontSize = 12.sp,
