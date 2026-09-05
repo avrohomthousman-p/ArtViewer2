@@ -61,13 +61,13 @@
     <string name="dialog_delete_folder_warning">This action cannot be undone</string>
 
 
-    <!-- Settings Dialog -->
+    <!-- Settings Activity -->
     <string name="settings_title">Settings</string>
-    <string name="settings_save_button_text">Save Changes</string>
-    <string name="settings_content_section_title">Content</string>
-    <string name="settings_legal_section_title">Legal</string>
-    <string name="settings_mature_content_prompt">Mature content: </string>
-    <string name="settings_privacy_policy_prompt">Click here for the Privacy Policy</string>
+    <string name="settings_mature_content_allowed">Mature content is allowed</string>
+    <string name="settings_mature_content_blocked">Mature content is blocked</string>
+    <string name="visible_icon_content_desc">visible icon</string>
+    <string name="hidden_icon_content_desc">hidden icon</string>
+    <string name="settings_privacy_policy_text">App Privacy Policy</string>
 
 
     <!-- Display Art Activity -->

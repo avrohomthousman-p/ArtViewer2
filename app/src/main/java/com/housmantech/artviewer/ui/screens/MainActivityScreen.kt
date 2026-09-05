@@ -37,11 +37,11 @@ import com.housmantech.artviewer.data.local.room.Folder
 import com.housmantech.artviewer.ui.activities.DisplayArtActivity
 import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.FolderSearchActivity
+import com.housmantech.artviewer.ui.activities.SettingsActivity
 import com.housmantech.artviewer.ui.components.DeleteFolderDialog
 import com.housmantech.artviewer.ui.components.EditOrCreateFolderDialog
 import com.housmantech.artviewer.ui.components.FolderInteraction
 import com.housmantech.artviewer.ui.components.NewFolderPrompt
-import com.housmantech.artviewer.ui.components.SettingsDialog
 import com.housmantech.artviewer.ui.components.SingleFolderDisplay
 import com.housmantech.artviewer.ui.components.Toolbar
 import com.housmantech.artviewer.ui.themes.AppColors
@@ -85,7 +85,6 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
     val state = viewModel.uiState.collectAsState()
     var folderBeingEdited by remember { mutableStateOf<Int?>(null) }
     var folderBeingDeleted by remember { mutableStateOf<Int?>(null) }
-    var showSettings by remember { mutableStateOf(false) }
 
 
 
@@ -94,7 +93,10 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
         ToolbarButtonData(
             icon = R.drawable.ic_settings,
             contentDescription = stringResource(R.string.settings_btn_content_description),
-            onClick = { showSettings = true }
+            onClick = {
+                val intent = Intent(context, SettingsActivity::class.java)
+                context.startActivity(intent)
+            }
         ),
         ToolbarButtonData(
             icon = R.drawable.ic_logout,
@@ -146,17 +148,6 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
             onSave = {
                 viewModel.deleteFolder(index)
                 folderBeingDeleted = null
-            }
-        )
-    }
-
-
-    if (showSettings) {
-        SettingsDialog(
-            onDismiss = { showSettings = false },
-            onSave = {
-                /* save changes here */
-                showSettings = false
             }
         )
     }

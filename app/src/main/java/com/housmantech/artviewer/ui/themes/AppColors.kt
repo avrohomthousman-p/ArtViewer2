@@ -11,7 +11,7 @@ object AppColors {
     val AltButtonColor = Color(0xFF398DFA)
     val AltBackgroundColor = Color(0xFFF2F2F2)
     val MutedTextColor = Color(0xFF999999)
-    val SectionHeaderColor = Color(0xFF6A5F5B)//Color(0xFF555555)
+    val GreyBorderColor = Color.LightGray
 
 
     val GreenSuccessColor = Color(0xFF00C853)

@@ -45,6 +45,12 @@
 
 
         <activity
+            android:name=".ui.activities.SettingsActivity"
+            android:exported="false">
+        </activity>
+
+
+        <activity
             android:name=".ui.activities.DisplayArtActivity"
             android:exported="false">
         </activity>
