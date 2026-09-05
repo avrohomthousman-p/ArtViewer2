@@ -2,6 +2,7 @@ package com.housmantech.artviewer.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -96,7 +97,9 @@ fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
  */
 @Composable
 private fun Toolbar(folderName: String){
-    val context = LocalContext.current
+    val activity = LocalActivity.current
+
+
 
     Toolbar(
         includeBackButton = true,
@@ -106,9 +109,7 @@ private fun Toolbar(folderName: String){
                 icon = R.drawable.ic_home,
                 contentDescription = stringResource(R.string.home_icon_content_description),
                 onClick = {
-                    val intent = Intent(context, MainActivity::class.java)
-                    context.startActivity(intent)
-                    (context as? Activity)?.finish()
+                    activity?.finish()
                 }
             )
         )

@@ -32,6 +32,9 @@ enum class LoginState {
 }
 
 
+const val LOGIN_DELAY = 2000L
+
+
 /**
  * View model for the login screen
  */
@@ -83,20 +86,20 @@ class LoginViewModel @Inject constructor(
     private suspend fun completeLogin(authCode: String){
         loginState = LoginState.LoginInProgress
 
-        val response = MiscUtils.runWithMinimumDuration(2500) {
+        val response = MiscUtils.runWithMinimumDuration(LOGIN_DELAY) {
             authRepo.exchangeAuthCodeForAccessToken(authCode)
         }
 
         if (response is ApiResponse.Error) {
             Log.e("LoginError", response.message)
             loginState = LoginState.LoginFailure
-            delay(2500)
+            delay(LOGIN_DELAY)
             loginState = LoginState.LoggedOut
             return
         }
         else {
             loginState = LoginState.LoginSuccess
-            MiscUtils.runWithMinimumDuration(2500) {
+            MiscUtils.runWithMinimumDuration(LOGIN_DELAY) {
                 this.initializeDB.join()
             }
             _navigation.send(NavDestination.ToMainActivity)
@@ -122,13 +125,13 @@ class LoginViewModel @Inject constructor(
             is ApiResponse.Error -> {
                 Log.e("LoginError", response.message)
                 loginState = LoginState.LoginFailure
-                delay(2500)
+                delay(LOGIN_DELAY)
                 loginState = LoginState.LoggedOut
                 return
             }
             is ApiResponse.Success<*> -> {
                 loginState = LoginState.LoginSuccess
-                MiscUtils.runWithMinimumDuration(2500) {
+                MiscUtils.runWithMinimumDuration(LOGIN_DELAY) {
                     this.initializeDB.join()
                 }
                 _navigation.send(NavDestination.ToMainActivity)
