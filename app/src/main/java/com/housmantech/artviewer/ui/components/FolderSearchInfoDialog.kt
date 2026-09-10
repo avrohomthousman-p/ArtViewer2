@@ -43,11 +43,11 @@ fun FolderSearchInfoDialog(dismissDialog: () -> Unit) {
             tonalElevation = 6.dp
         ) {
             Column(
-                Modifier.padding(16.dp),
+                Modifier.padding(22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.dialog_info_title),
+                    text = stringResource(R.string.dialog_search_info_title),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -56,12 +56,12 @@ fun FolderSearchInfoDialog(dismissDialog: () -> Unit) {
 
                 MainInfoText()
 
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(40.dp))
 
                 StandardButton(
                     modifier = Modifier,
                     onClick = { dismissDialog() },
-                    text = stringResource(R.string.dialog_info_button_text)
+                    text = stringResource(R.string.got_it)
                 )
             }
         }
@@ -74,8 +74,8 @@ fun FolderSearchInfoDialog(dismissDialog: () -> Unit) {
 private fun MainInfoText() {
     val context = LocalContext.current
 
-    val fullText = stringResource(R.string.dialog_info_text)
-    val clickableText = stringResource(R.string.dialog_info_clickable_text)
+    val fullText = stringResource(R.string.dialog_search_info_text)
+    val clickableText = stringResource(R.string.dialog_search_info_clickable_text)
 
 
     val annotatedText = buildAnnotatedString {
