@@ -23,6 +23,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -85,7 +86,12 @@ fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
         when(exactState){
             UiState.Loading -> LoadingDisplay()
             is UiState.Error -> ErrorDisplay(exactState.message)
-            is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(exactState.data)
+            is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
+                artList = exactState.data,
+                onScroll = { page, isForward ->
+                    viewModel.onScroll(page, isForward)
+                }
+            )
         }
     }
 }
@@ -168,13 +174,36 @@ private fun ErrorDisplay(errorMessage: String? = null){
  * them, and they snap into place (like YouTube sorts or TikTok).
  */
 @Composable
-private fun ArtDisplay(artList: List<DeviantArtMediaItem>) {
+private fun ArtDisplay(
+    artList: List<DeviantArtMediaItem>,
+    onScroll: (Int, Boolean) -> Unit
+) {
+    if (artList.isEmpty()) {
+        ErrorDisplay(errorMessage = stringResource(R.string.media_folder_empty_message))
+        return
+    }
+
+
     val pagerState = rememberPagerState(pageCount = { artList.size })
+
+
+    LaunchedEffect(pagerState) {
+        var lastPage = pagerState.currentPage
+
+        snapshotFlow { pagerState.currentPage }
+            .collect { newPage ->
+                val isForward = newPage > lastPage
+                onScroll(newPage, isForward)
+                lastPage = newPage
+            }
+    }
+
 
     VerticalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize()
     ) { page ->
+
 
         val isCurrentPage = pagerState.currentPage == page
         val artItem = artList[page]

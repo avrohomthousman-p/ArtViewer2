@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.housmantech.artviewer.ui.screens.DisplayArtScreen
 import com.housmantech.artviewer.ui.screens.DisplayArtViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -62,7 +63,7 @@ class DisplayArtActivity : BaseActivity() {
             Toast.LENGTH_LONG
         ).show()
 
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.Main) {
             delay(2000)
             finish()
         }
