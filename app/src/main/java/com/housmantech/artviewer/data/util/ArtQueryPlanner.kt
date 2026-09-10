@@ -10,7 +10,7 @@ import com.housmantech.artviewer.data.local.room.Folder
  * from the appropriate folder.
  */
 object ArtQueryPlanner {
-    const val MAX_ITEMS_SHOWN = 250
+    const val MAX_ITEMS_SHOWN = 96
     private const val MAX_ITEMS_PER_QUERY = 24
 
 

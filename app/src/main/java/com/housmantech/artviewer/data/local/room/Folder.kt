@@ -43,4 +43,12 @@ data class Folder constructor (
     companion object {
         const val ID_IF_FULL_COLLECTION = "__ALL__"
     }
+
+
+    /**
+     * Gets the folder ID as DeviantArt expects to see it in the url's for the API requests
+     */
+    fun folderIdForApi(): String {
+        return if (remoteId == ID_IF_FULL_COLLECTION) "all" else remoteId
+    }
 }
