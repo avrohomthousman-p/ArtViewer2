@@ -43,7 +43,7 @@ import com.housmantech.artviewer.ui.activities.FolderSearchResultsActivity
 import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.MainActivity
 import com.housmantech.artviewer.ui.components.FolderTypePicker
-import com.housmantech.artviewer.ui.components.InfoDialog
+import com.housmantech.artviewer.ui.components.FolderSearchInfoDialog
 import com.housmantech.artviewer.ui.components.LabeledCheckbox
 import com.housmantech.artviewer.ui.components.StandardButton
 import com.housmantech.artviewer.ui.components.Toolbar
@@ -126,7 +126,7 @@ fun FolderSearchScreenContent(
 
 
     if (showInfoPopup){
-        InfoDialog(
+        FolderSearchInfoDialog(
             dismissDialog = { showInfoPopup = false }
         )
     }

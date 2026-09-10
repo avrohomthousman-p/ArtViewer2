@@ -1,15 +1,12 @@
 package com.housmantech.artviewer.ui.components
 
 import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,11 +21,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -38,10 +33,10 @@ import com.housmantech.artviewer.ui.themes.AppColors
 
 
 /**
- * Dialog that shows some information.
+ * Dialog that shows some instructions on how to get data needed for a folder search.
  */
 @Composable
-fun InfoDialog(dismissDialog: () -> Unit) {
+fun FolderSearchInfoDialog(dismissDialog: () -> Unit) {
     Dialog(onDismissRequest = { dismissDialog() }) {
         Surface(
             shape = RoundedCornerShape(12.dp),
