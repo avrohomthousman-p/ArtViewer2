@@ -91,6 +91,7 @@
     <!-- Display Art Activity -->
     <string name="media_loading_message">Loading your art…</string>
     <string name="media_default_error_msg">We are experiencing technical difficulties.</string>
+    <string name="media_folder_empty_message">We could not find any art in this folder.</string>
 
 
     <!-- Folder Search Activity -->
