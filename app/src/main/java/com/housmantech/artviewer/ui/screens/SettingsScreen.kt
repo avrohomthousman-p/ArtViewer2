@@ -2,6 +2,7 @@ package com.housmantech.artviewer.ui.screens
 
 import android.content.Intent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -29,8 +31,10 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import com.housmantech.artviewer.BuildConfig
 import com.housmantech.artviewer.R
 import com.housmantech.artviewer.ui.components.Toolbar
+import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.topAndBottomBorder
 
 
@@ -60,7 +64,9 @@ private fun SettingsScreenContent() {
 
 
         MatureContentSetting()
+        AboutAppSetting()
         PrivacyPolicySetting()
+        AppVersionSetting()
     }
 }
 
@@ -94,14 +100,37 @@ private fun MatureContentSetting() {
         iconId = iconId,
         contentDesc = stringResource(contentDescriptionId),
         text = stringResource(textId),
+        onClick = {
+            //TODO: update settings
+            matureContentAllowed = !matureContentAllowed
+        },
         extraContent = {
             Switch(
                 checked = matureContentAllowed,
-                onCheckedChange = {
-                    //TODO: update settings
-                    matureContentAllowed = !matureContentAllowed
-                },
+                onCheckedChange = null,
                 enabled = true, //TODO: not if logged in as guest
+            )
+        }
+    )
+}
+
+
+
+@Composable
+private fun AboutAppSetting() {
+    SettingsItem(
+        iconId = R.drawable.ic_help,
+        contentDesc = "Help icon",
+        text = stringResource(R.string.settings_about_app),
+        onClick = {
+            //TODO: open a modal
+        },
+        extraContent = {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_right),
+                contentDescription = "Arrow right",
+                modifier = Modifier.scale(1.2F),
+                tint = AppColors.LinkColor
             )
         }
     )
@@ -117,17 +146,34 @@ private fun PrivacyPolicySetting() {
         iconId = R.drawable.ic_privacy_policy,
         contentDesc = "Privacy Policy icon",
         text = stringResource(R.string.settings_privacy_policy_text),
+        onClick = {
+            val url = "https://deviantart-app-tools.avrohomthousman.workers.dev/privacyPolicy"
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+            context.startActivity(intent)
+        },
         extraContent = {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_open_in_browser),
                 contentDescription = "Privacy Policy icon",
-                modifier = Modifier.clickable(
-                    onClick = {
-                        val url = "https://deviantart-app-tools.avrohomthousman.workers.dev/privacyPolicy"
-                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-                        context.startActivity(intent)
-                    }
-                )
+                tint = AppColors.LinkColor
+            )
+        }
+    )
+}
+
+
+
+@Composable
+private fun AppVersionSetting(){
+    SettingsItem(
+        iconId = R.drawable.ic_info,
+        contentDesc = "App version icon",
+        text = stringResource(R.string.settings_app_version),
+        onClick = null,
+        extraContent = {
+            Text(
+                text = BuildConfig.VERSION_NAME,
+                fontSize = 18.sp
             )
         }
     )
@@ -143,13 +189,20 @@ private fun SettingsItem(
     iconId: Int,
     contentDesc: String,
     text: String,
+    onClick: (() -> Unit)?,
     extraContent: @Composable () -> Unit
 ){
     Row(
         modifier = Modifier
             .height(70.dp)
             .topAndBottomBorder()
-            .padding(12.dp),
+            .padding(12.dp)
+            .clickable(
+                enabled = onClick != null,
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = { onClick?.invoke() }
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

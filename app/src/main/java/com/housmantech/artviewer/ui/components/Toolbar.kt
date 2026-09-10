@@ -77,7 +77,7 @@ fun Toolbar(
 
             otherButtons.forEach {
                 ToolbarButton(it)
-                Spacer(modifier = Modifier.width(14.dp))
+                Spacer(modifier = Modifier.width(18.dp))
             }
         }
     }

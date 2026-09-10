@@ -76,6 +76,8 @@
     <string name="visible_icon_content_desc">visible icon</string>
     <string name="hidden_icon_content_desc">hidden icon</string>
     <string name="settings_privacy_policy_text">App Privacy Policy</string>
+    <string name="settings_app_version">App Version</string>
+    <string name="settings_about_app">About App</string>
 
 
     <!-- Display Art Activity -->
