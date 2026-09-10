@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.housmantech.artviewer.BuildConfig
 import com.housmantech.artviewer.R
+import com.housmantech.artviewer.ui.components.AppInfoDialog
 import com.housmantech.artviewer.ui.components.Toolbar
 import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.topAndBottomBorder
@@ -50,6 +51,8 @@ fun SettingsScreen() {
 
 @Composable
 private fun SettingsScreenContent() {
+    var showAppInfoPopup by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -64,9 +67,16 @@ private fun SettingsScreenContent() {
 
 
         MatureContentSetting()
-        AboutAppSetting()
+        AboutAppSetting(showDialog = { showAppInfoPopup = true })
         PrivacyPolicySetting()
         AppVersionSetting()
+    }
+
+
+    if (showAppInfoPopup) {
+        AppInfoDialog(
+            dismissDialog = { showAppInfoPopup = false }
+        )
     }
 }
 
@@ -117,13 +127,13 @@ private fun MatureContentSetting() {
 
 
 @Composable
-private fun AboutAppSetting() {
+private fun AboutAppSetting(showDialog: () -> Unit) {
     SettingsItem(
         iconId = R.drawable.ic_help,
         contentDesc = "Help icon",
         text = stringResource(R.string.settings_about_app),
         onClick = {
-            //TODO: open a modal
+            showDialog()
         },
         extraContent = {
             Icon(

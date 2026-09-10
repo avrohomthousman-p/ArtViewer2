@@ -67,6 +67,14 @@
         want is in the artist\'s Gallery or Collection.
     </string>
     <string name="dialog_search_info_clickable_text">DeviantArt website</string>
+    <string name="dialog_app_info_title">About This App</string>
+    <string name="dialog_app_info_problem_statement">
+        If you’ve ever browsed an artist’s gallery on DeviantArt, you’ve probably noticed that the
+        artwork always appears in the same order. That means you keep seeing the first hundred
+        pieces over and over, while the rest of the gallery stays hidden unless you scroll for a
+        long time.\n\nThis app fixes that by shuffling. Save your favorite artists’ galleries and
+        view their work in a randomized order, so every piece gets a chance to be seen.
+    </string>
 
 
     <!-- Settings Activity -->
