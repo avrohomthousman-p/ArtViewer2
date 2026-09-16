@@ -1,5 +1,6 @@
 package com.housmantech.artviewer.ui.activities
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
@@ -46,8 +47,14 @@ class DisplayArtActivity : BaseActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
         setContent {
-            DisplayArtScreen(viewModel, folderName)
+            DisplayArtScreen(
+                viewModel = viewModel,
+                isLandscape = isLandscape,
+                folderName = folderName
+            )
         }
     }
 

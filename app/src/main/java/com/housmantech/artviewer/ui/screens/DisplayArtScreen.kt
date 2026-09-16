@@ -2,7 +2,10 @@ package com.housmantech.artviewer.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.LocalActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,11 +24,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,21 +48,50 @@ import coil.decode.GifDecoder
 import com.housmantech.artviewer.R
 import com.housmantech.artviewer.data.remote.DeviantArtMediaItem
 import com.housmantech.artviewer.ui.activities.LoginActivity
-import com.housmantech.artviewer.ui.activities.MainActivity
 import com.housmantech.artviewer.ui.components.Toolbar
+import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
+import com.housmantech.artviewer.ui.util.OrientationLayout
 import com.housmantech.artviewer.ui.util.ToolbarButtonData
 import com.housmantech.artviewer.ui.util.UiState
-
 
 
 /**
  * Screen used for the DisplayArtActivity.
  */
 @Composable
-fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
-    val state = viewModel.uiState.collectAsState()
+fun DisplayArtScreen(
+    viewModel: DisplayArtViewModel,
+    isLandscape: Boolean,
+    folderName: String
+) {
+    val activity = LocalActivity.current as? ComponentActivity
     val context = LocalContext.current
+    val state = viewModel.uiState.collectAsState()
+    val isFullscreenMode = isLandscape && state.value is UiState.Success
+
+
+    val statusBarColor =
+        if (isFullscreenMode)
+            AppColors.NavBarColor
+        else
+            AppColors.StatusBarColor
+
+
+    SideEffect {
+        if (isFullscreenMode) {
+            activity?.enableEdgeToEdge(
+                statusBarStyle = SystemBarStyle.light(
+                    scrim = statusBarColor.toArgb(),
+                    darkScrim = statusBarColor.toArgb()
+                ),
+                navigationBarStyle = SystemBarStyle.light(
+                    scrim = AppColors.NavBarColor.toArgb(),
+                    darkScrim = AppColors.NavBarColor.toArgb()
+                )
+            )
+        }
+    }
 
 
     LaunchedEffect(Unit){
@@ -79,7 +113,10 @@ fun DisplayArtScreen(viewModel: DisplayArtViewModel, folderName: String) {
         modifier = Modifier.fillMaxSize()
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
-        Toolbar(folderName)
+        if (!isFullscreenMode) {
+            Toolbar(folderName)
+        }
+
 
 
         val exactState: UiState<List<DeviantArtMediaItem>> = state.value//needed to satisfy compiler type concerns
@@ -106,7 +143,6 @@ private fun Toolbar(folderName: String){
     val activity = LocalActivity.current
 
 
-
     Toolbar(
         includeBackButton = true,
         title = folderName,
@@ -127,7 +163,7 @@ private fun Toolbar(folderName: String){
 @Composable
 private fun LoadingDisplay(){
     Box(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -155,7 +191,7 @@ private fun ErrorDisplay(errorMessage: String? = null){
 
 
     Box(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         contentAlignment = Alignment.TopCenter
     ) {
         Text(
@@ -214,10 +250,10 @@ private fun ArtDisplay(
 
 
         if (!videoUrl.isNullOrEmpty()){
-            VideoPlayer(title = artItem.title, url = videoUrl, play = isCurrentPage)
+            VideoPlayerContainer(title = artItem.title, url = videoUrl, play = isCurrentPage)
         }
         else if(!imageUrl.isNullOrEmpty()) {
-            ImageDisplay(title = artItem.title, url = imageUrl, showSpinner = isCurrentPage)
+            ImageDisplayContainer(title = artItem.title, url = imageUrl, showSpinner = isCurrentPage)
         }
     }
 }
@@ -225,7 +261,7 @@ private fun ArtDisplay(
 
 
 @Composable
-private fun VideoPlayer(title: String, url: String, play: Boolean) {
+private fun VideoPlayerContainer(title: String, url: String, play: Boolean) {
     val context = LocalContext.current
 
 
@@ -248,73 +284,108 @@ private fun VideoPlayer(title: String, url: String, play: Boolean) {
     }
 
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = title,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-            fontSize = 22.sp,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.SemiBold
-        )
+    OrientationLayout(
+        portrait = {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = title,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                    fontSize = 22.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.SemiBold
+                )
 
-        AndroidView(
-            factory = {
-                PlayerView(context).apply {
-                    player = exoPlayer
-                    useController = true
-                }
-            },
-            modifier = Modifier.fillMaxSize()
-        )
-    }
+                Spacer(modifier = Modifier.height(10.dp))
+
+                VideoPlayer(exoPlayer)
+            }
+        },
+        landscape = {
+            VideoPlayer(exoPlayer)
+        }
+    )
+}
+
+
+
+/**
+ * Displays the actual video with no containers or anything
+ */
+@Composable
+private fun VideoPlayer(exoPlayer: ExoPlayer) {
+    val context = LocalContext.current
+
+    AndroidView(
+        factory = {
+            PlayerView(context).apply {
+                player = exoPlayer
+                useController = true
+            }
+        },
+        modifier = Modifier.fillMaxSize()
+    )
 }
 
 
 
 @Composable
-private fun ImageDisplay(title: String, url: String, showSpinner: Boolean){
+private fun ImageDisplayContainer(title: String, url: String, showSpinner: Boolean){
     val imageLoader = rememberGifImageLoader()
     val painter = rememberAsyncImagePainter(
         model = url,
         imageLoader = imageLoader
     )
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = title,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-            fontSize = 22.sp,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.SemiBold
+    OrientationLayout(
+        portrait = {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = title,
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                    fontSize = 22.sp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.SemiBold
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                ImageDisplay(painter, showSpinner)
+            }
+        },
+        landscape = {
+            ImageDisplay(painter, showSpinner)
+        }
+    )
+}
+
+
+
+@Composable
+private fun ImageDisplay(painter: AsyncImagePainter, showSpinner: Boolean) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painter,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            if (showSpinner && painter.state is AsyncImagePainter.State.Loading) {
-                CircularProgressIndicator()
-            }
+        if (showSpinner && painter.state is AsyncImagePainter.State.Loading) {
+            CircularProgressIndicator()
         }
     }
 }
