@@ -2,6 +2,7 @@ package com.housmantech.artviewer.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.LocalActivity
@@ -103,16 +104,16 @@ fun DisplayArtScreen(
     }
 
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         viewModel.navigation.collect { destination ->
-            when(destination){
+            when (destination) {
                 NavDestination.ToLoginActivity -> {
                     val intent = Intent(context, LoginActivity::class.java)
                     context.startActivity(intent)
                     (context as? Activity)?.finish()
                 }
 
-                else -> { }
+                else -> {}
             }
         }
     }
@@ -127,9 +128,9 @@ fun DisplayArtScreen(
         }
 
 
-
-        val exactState: UiState<List<DeviantArtMediaItem>> = state.value//needed to satisfy compiler type concerns
-        when(exactState){
+        val exactState: UiState<List<DeviantArtMediaItem>> =
+            state.value//needed to satisfy compiler type concerns
+        when (exactState) {
             UiState.Loading -> LoadingDisplay(matureContentAllowed)
             is UiState.Error -> ErrorDisplay(exactState.message)
             is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
@@ -138,6 +139,17 @@ fun DisplayArtScreen(
                     viewModel.onScroll(page, isForward)
                 }
             )
+        }
+
+
+        //Show a toast message if the user is at the end of the art list but more data is loading.
+        //Without this the user will think it's actually the end of the list.
+        val showLoadingToast by viewModel.showLoadingToast.collectAsState()
+        LaunchedEffect(showLoadingToast) {
+            if (showLoadingToast) {
+                Toast.makeText(context, "Loading more media…", Toast.LENGTH_LONG).show()
+                viewModel.clearLoadingToastFlag()
+            }
         }
     }
 }

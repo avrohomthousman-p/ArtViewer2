@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,6 +46,15 @@ class DisplayArtViewModel @Inject constructor(
 
     private val _matureContentAllowed = MutableStateFlow(false)
     val matureContentAllowed: StateFlow<Boolean> = _matureContentAllowed
+
+
+    /**
+     * Flag indicating that the UI should show a toast when the user reaches the
+     * temporary end of the loaded media. This lets the user know that more items
+     * are still loading and will appear if they wait briefly and swipe again.
+     */
+    private val _showLoadingToast = MutableStateFlow(false)
+    val showLoadingToast = _showLoadingToast.asStateFlow()
 
 
     private lateinit var folder: Folder
@@ -118,6 +128,12 @@ class DisplayArtViewModel @Inject constructor(
         val distanceFromEndOfList = mediaList.data.size - page
         val imagesNeeded = batchTracker.getEndOfListThreshold() - distanceFromEndOfList
         if (imagesNeeded > 0) {
+
+            val isAtTemporaryEnd = (page == mediaList.data.size - 1) && this.batchTracker.hasMoreData()
+            if (isAtTemporaryEnd) {
+                _showLoadingToast.value = true
+            }
+
             viewModelScope.launch(Dispatchers.IO) {
                 if (isRunningBatch) return@launch
                 isRunningBatch = true
@@ -158,5 +174,14 @@ class DisplayArtViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+
+
+    /**
+     * Clears the flag used to tell the front end to show a toast that more media is loading
+     */
+    fun clearLoadingToastFlag() {
+        _showLoadingToast.value = false
     }
 }
