@@ -8,8 +8,8 @@ import com.housmantech.artviewer.data.local.room.Folder
 import com.housmantech.artviewer.data.local.room.FolderDao
 import com.housmantech.artviewer.data.remote.DeviantArtMediaItem
 import com.housmantech.artviewer.data.repository.ArtRepository
+import com.housmantech.artviewer.data.repository.SettingsRepository
 import com.housmantech.artviewer.data.repository.TokenManager
-import com.housmantech.artviewer.ui.util.BatchConfig
 import com.housmantech.artviewer.ui.util.BatchTracker
 import com.housmantech.artviewer.ui.util.BatchTrackerFactory
 import com.housmantech.artviewer.ui.util.NavDestination
@@ -30,7 +30,8 @@ import javax.inject.Inject
 class DisplayArtViewModel @Inject constructor(
     private val db: FolderDao,
     private val artRepo: ArtRepository,
-    private val tokenManager: TokenManager
+    private val tokenManager: TokenManager,
+    private val settingsRepo: SettingsRepository,
 ) : ViewModel() {
 
 
@@ -42,10 +43,21 @@ class DisplayArtViewModel @Inject constructor(
     val navigation = _navigation.receiveAsFlow()
 
 
+    private val _matureContentAllowed = MutableStateFlow(false)
+    val matureContentAllowed: StateFlow<Boolean> = _matureContentAllowed
+
+
     private lateinit var folder: Folder
     private lateinit var batchTracker: BatchTracker
     private var isRunningBatch = false
 
+
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            _matureContentAllowed.value = settingsRepo.shouldShowMatureContent()
+        }
+    }
 
 
     fun loadFolderContent(folderId: Int){
@@ -75,7 +87,7 @@ class DisplayArtViewModel @Inject constructor(
 
 
                 isRunningBatch = true
-                runBatchWithRetries()
+                runBatchWithRetries(batchTracker.getBatchSize())
                 isRunningBatch = false
 
 
@@ -104,14 +116,14 @@ class DisplayArtViewModel @Inject constructor(
         val mediaList = _uiState.value as UiState.Success<List<DeviantArtMediaItem>>
 
         val distanceFromEndOfList = mediaList.data.size - page
-        val shouldRunBatch = distanceFromEndOfList <= batchTracker.getEndOfListThreshold()
-        if (shouldRunBatch) {
+        val imagesNeeded = batchTracker.getEndOfListThreshold() - distanceFromEndOfList
+        if (imagesNeeded > 0) {
             viewModelScope.launch(Dispatchers.IO) {
                 if (isRunningBatch) return@launch
                 isRunningBatch = true
 
                 try {
-                    runBatchWithRetries()
+                    runBatchWithRetries(imagesNeeded)
                 } finally {
                     isRunningBatch = false
                 }
@@ -128,16 +140,22 @@ class DisplayArtViewModel @Inject constructor(
      * If the response is empty (because all the incoming data was invalid) it
      * runs another batch, and will keep running batches until we run out of
      * items in the folder or get at least one item.
+     *
+     * @param imagesNeeded - The number images we should fetch from the API (without
+     *      going out of the folder bounds)
      */
-    private suspend fun runBatchWithRetries() {
-        var lastBatchWasEmpty = true
-        while(lastBatchWasEmpty && this.batchTracker.hasMoreData()) {
+    private suspend fun runBatchWithRetries(imagesNeeded: Int) {
+        var imagesFetched = 0
+        while(imagesFetched < imagesNeeded && this.batchTracker.hasMoreData()) {
             val batch = this.batchTracker.planNextBatch()
             val response = artRepo.runBatch(this.folder, batch)
-            lastBatchWasEmpty = response.isEmpty() //TODO: can later upgrade this to check if we got at least X items
 
-            withContext(Dispatchers.Main) {
-                batchTracker.saveResults(response)
+            if (response.isNotEmpty()) {
+                imagesFetched += response.size
+
+                withContext(Dispatchers.Main) {
+                    batchTracker.saveResults(response)
+                }
             }
         }
     }

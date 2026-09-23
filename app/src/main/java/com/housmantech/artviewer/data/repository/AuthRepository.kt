@@ -309,4 +309,17 @@ class AuthRepository @Inject constructor(
         dataStore.clearRefreshToken()
         dataStore.clearRefreshTokenExpiration()
     }
+
+
+
+    /**
+     * Returns true if the user is logged in as guest, and false otherwise.
+     *
+     * Currently, this is implemented by checking of there is a refresh token present.
+     * This works because guest login's never have refresh tokens, and they are only
+     * cleared when you log out, or they expire.
+     */
+    suspend fun isGuestMode(): Boolean {
+        return dataStore.loadRefreshToken() == null
+    }
 }

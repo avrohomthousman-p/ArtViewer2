@@ -28,6 +28,7 @@ const val MAX_CONCURRENT_QUERIES = 4
 @Singleton
 class ArtRepository @Inject constructor(
     private val db: FolderDao,
+    private val settingsRepo: SettingsRepository,
     private val mediaApi: MediaApi
 ) {
 
@@ -50,13 +51,14 @@ class ArtRepository @Inject constructor(
 
 
     private suspend fun fetchConsecutiveMedia(folder: Folder, offset: Int, mediaCount: Int): List<DeviantArtMediaItem> {
+        val allowMatureContent = settingsRepo.shouldShowMatureContent()
         val mediaReceived = arrayOfNulls<DeviantArtMediaItem>(mediaCount)
 
         coroutineScope {
             for (i in 0 until mediaCount step QUERY_PAGE_SIZE){
                 launch(Dispatchers.IO) {
                     semaphore.withPermit {
-                        val data = runQuery(folder = folder, offset = offset + i)
+                        val data = runQuery(folder = folder, offset = offset + i, allowMatureContent = allowMatureContent)
 
                         //Copy the results
                         val numItemsToCopy = minOf(data.size, mediaCount - i)
@@ -94,6 +96,7 @@ class ArtRepository @Inject constructor(
      *             -the item was does not exist (folder was smaller than expected).
      */
     private suspend fun fetchNonConsecutiveMedia(folder: Folder, remoteIndexes: List<Int>): List<DeviantArtMediaItem> {
+        val allowMatureContent = settingsRepo.shouldShowMatureContent()
         val results = arrayOfNulls<DeviantArtMediaItem>(remoteIndexes.size)
 
 
@@ -110,7 +113,7 @@ class ArtRepository @Inject constructor(
                         }
 
                         val (localIndex, remoteIndex) = next
-                        val item = fetchSingleMediaItem(folder, remoteIndex)
+                        val item = fetchSingleMediaItem(folder, remoteIndex, allowMatureContent)
                         results[localIndex] = item
                     }
                 }
@@ -129,14 +132,20 @@ class ArtRepository @Inject constructor(
      * @returns the media item at that index or null if there is no such index or
      * an error occurred.
      */
-    private suspend fun fetchSingleMediaItem(folder: Folder, remoteIndex: Int): DeviantArtMediaItem? {
+    private suspend fun fetchSingleMediaItem(
+        folder: Folder,
+        remoteIndex: Int,
+        allowMatureContent: Boolean
+    ): DeviantArtMediaItem? {
+
         val response = safeApiCall {
             mediaApi.fetchMedia(
                 location = folder.storedIn.asUrlPath(),
                 remoteId = folder.folderIdForApi(),
                 ownerUsername = folder.ownerUsername,
                 offset = remoteIndex,
-                limit = 1
+                limit = 1,
+                matureContent = allowMatureContent
             )
         }
 
@@ -179,14 +188,15 @@ class ArtRepository @Inject constructor(
     }
 
 
-    private suspend fun runQuery(folder: Folder, offset: Int): List<DeviantArtMediaItem> {
+    private suspend fun runQuery(folder: Folder, offset: Int, allowMatureContent: Boolean): List<DeviantArtMediaItem> {
         val response = safeApiCall {
             mediaApi.fetchMedia(
                 location = folder.storedIn.asUrlPath(),
                 remoteId = folder.folderIdForApi(),
                 ownerUsername = folder.ownerUsername,
                 offset = offset,
-                limit = QUERY_PAGE_SIZE
+                limit = QUERY_PAGE_SIZE,
+                matureContent = allowMatureContent
             )
         }
 

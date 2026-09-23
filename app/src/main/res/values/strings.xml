@@ -90,6 +90,12 @@
 
     <!-- Display Art Activity -->
     <string name="media_loading_message">Loading your art…</string>
+    <string name="media_slow_loading_title">Please be patient. The folder seems to be taking long to load.</string>
+    <string name="media_slow_loading_mature_warning">
+        You have mature content blocked. This can cause longer load times for folders that are mostly mature content.
+        Please consider changing this in the app settings or deleting this folder.
+    </string>
+    <string name="media_slow_loading_hyperlink_text">app settings</string>
     <string name="media_default_error_msg">We are experiencing technical difficulties.</string>
     <string name="media_folder_empty_message">We could not find any art in this folder.</string>
 

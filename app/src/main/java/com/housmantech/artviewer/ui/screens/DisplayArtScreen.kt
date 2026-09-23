@@ -26,7 +26,10 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,12 +51,16 @@ import coil.decode.GifDecoder
 import com.housmantech.artviewer.R
 import com.housmantech.artviewer.data.remote.DeviantArtMediaItem
 import com.housmantech.artviewer.ui.activities.LoginActivity
+import com.housmantech.artviewer.ui.activities.SettingsActivity
+import com.housmantech.artviewer.ui.components.ParagraphWithLinks
 import com.housmantech.artviewer.ui.components.Toolbar
 import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
 import com.housmantech.artviewer.ui.util.OrientationLayout
 import com.housmantech.artviewer.ui.util.ToolbarButtonData
 import com.housmantech.artviewer.ui.util.UiState
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 
 /**
@@ -69,6 +76,7 @@ fun DisplayArtScreen(
     val context = LocalContext.current
     val state = viewModel.uiState.collectAsState()
     val isFullscreenMode = isLandscape && state.value is UiState.Success
+    val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
 
 
     val statusBarColor =
@@ -78,6 +86,7 @@ fun DisplayArtScreen(
             AppColors.StatusBarColor
 
 
+    //Ensure the edge to edge is handled correctly in the case of landscape mode and Success state
     SideEffect {
         if (isFullscreenMode) {
             activity?.enableEdgeToEdge(
@@ -121,7 +130,7 @@ fun DisplayArtScreen(
 
         val exactState: UiState<List<DeviantArtMediaItem>> = state.value//needed to satisfy compiler type concerns
         when(exactState){
-            UiState.Loading -> LoadingDisplay()
+            UiState.Loading -> LoadingDisplay(matureContentAllowed)
             is UiState.Error -> ErrorDisplay(exactState.message)
             is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
                 artList = exactState.data,
@@ -161,16 +170,59 @@ private fun Toolbar(folderName: String){
 
 
 @Composable
-private fun LoadingDisplay(){
-    Box(
+private fun LoadingDisplay(matureContentAllowed: Boolean){
+    var isTakingLong by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        delay(5500.milliseconds)
+        isTakingLong = true
+    }
+
+
+    Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
-        contentAlignment = Alignment.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(R.string.media_loading_message),
             fontSize = 26.sp,
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
         )
+
+
+        if (isTakingLong){
+            Spacer(modifier = Modifier.height(40.dp))
+            Text(
+                text = stringResource(R.string.media_slow_loading_title),
+                fontSize = 20.sp
+            )
+
+            if (!matureContentAllowed) {
+                val activity = LocalActivity.current
+                val context = LocalContext.current
+
+                val navigateToSettings: () -> Unit = {
+                    activity?.let {
+                        val intent = Intent(context, SettingsActivity::class.java)
+                        it.startActivity(intent)
+                        it.finish()
+                    }
+                }
+
+
+                val fullText = stringResource(R.string.media_slow_loading_mature_warning)
+                val linkText = stringResource(R.string.media_slow_loading_hyperlink_text)
+
+                Spacer(modifier = Modifier.height(16.dp))
+                ParagraphWithLinks(
+                    fullText = fullText,
+                    links = mapOf(
+                        linkText to navigateToSettings
+                    )
+                )
+            }
+        }
     }
 }
 

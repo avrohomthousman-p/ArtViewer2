@@ -15,6 +15,8 @@ private val Context.appStateDataStore by preferencesDataStore(name = "app_state_
 @Singleton
 class AppStateDataStore(private val context: Context) {
     private val FIRST_LAUNCH_KEY = booleanPreferencesKey("not_first_launch")
+    private val MATURE_CONTENT_PERFERRED_KEY = booleanPreferencesKey("mature_content_allowed")
+
 
 
     suspend fun isFirstLaunch(): Boolean {
@@ -28,5 +30,20 @@ class AppStateDataStore(private val context: Context) {
         context.appStateDataStore.edit { prefs ->
             prefs[FIRST_LAUNCH_KEY] = false
         }
+    }
+
+
+
+    suspend fun setUserPrefersMatureContent(value: Boolean) {
+        context.appStateDataStore.edit { prefs ->
+            prefs[MATURE_CONTENT_PERFERRED_KEY] = value
+        }
+    }
+
+
+
+    suspend fun userPrefersMatureContent(): Boolean {
+        val prefs = context.appStateDataStore.data.first()
+        return prefs[MATURE_CONTENT_PERFERRED_KEY] ?: false
     }
 }

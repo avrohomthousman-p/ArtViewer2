@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,15 +44,18 @@ import com.housmantech.artviewer.ui.util.topAndBottomBorder
  * Screen for thr settings page
  */
 @Composable
-fun SettingsScreen() {
-    SettingsScreenContent()
+fun SettingsScreen(viewModel: SettingsViewModel) {
+    SettingsScreenContent(viewModel)
 }
 
 
 
 @Composable
-private fun SettingsScreenContent() {
+private fun SettingsScreenContent(viewModel: SettingsViewModel) {
     var showAppInfoPopup by remember { mutableStateOf(false) }
+    val guestMode by viewModel.isGuestMode.collectAsState()
+    val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
+
 
     Column(
         modifier = Modifier
@@ -66,7 +70,11 @@ private fun SettingsScreenContent() {
         Spacer(modifier = Modifier.height(20.dp))
 
 
-        MatureContentSetting()
+        MatureContentSetting(
+            enabled = !guestMode,
+            matureContentAllowedSetting = matureContentAllowed,
+            setMatureContent = viewModel::setMatureContent,
+        )
         AboutAppSetting(showDialog = { showAppInfoPopup = true })
         PrivacyPolicySetting()
         AppVersionSetting()
@@ -84,20 +92,26 @@ private fun SettingsScreenContent() {
 
 /**
  * Shows a settings item for toggling mature content
+ *
+ * @param enabled - if true the maturity settings can be changed
  */
 @Composable
-private fun MatureContentSetting() {
-    var matureContentAllowed by remember { mutableStateOf(true) } //TODO: fetch this from shared prefs
+private fun MatureContentSetting(
+    enabled: Boolean,
+    matureContentAllowedSetting: Boolean,
+    setMatureContent: (Boolean) -> Unit
+) {
 
 
     val (iconId, contentDescriptionId, textId) =
-        if (matureContentAllowed) {
+        if (matureContentAllowedSetting) {
             Triple(
                 R.drawable.ic_visibility_on,
                 R.string.visible_icon_content_desc,
                 R.string.settings_mature_content_allowed
             )
-        } else {
+        }
+        else {
             Triple(
                 R.drawable.ic_visibility_off,
                 R.string.hidden_icon_content_desc,
@@ -105,20 +119,19 @@ private fun MatureContentSetting() {
             )
         }
 
+    val toggleMaturity = { setMatureContent(!matureContentAllowedSetting) }
+
 
     SettingsItem(
         iconId = iconId,
         contentDesc = stringResource(contentDescriptionId),
         text = stringResource(textId),
-        onClick = {
-            //TODO: update settings
-            matureContentAllowed = !matureContentAllowed
-        },
+        onClick = if (enabled) toggleMaturity else null,
         extraContent = {
             Switch(
-                checked = matureContentAllowed,
+                checked = matureContentAllowedSetting,
                 onCheckedChange = null,
-                enabled = true, //TODO: not if logged in as guest
+                enabled = enabled,
             )
         }
     )
