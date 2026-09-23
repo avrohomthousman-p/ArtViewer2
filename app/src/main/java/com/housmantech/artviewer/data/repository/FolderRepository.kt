@@ -56,6 +56,7 @@ class FolderRepository @Inject constructor(
                     .folderList.map { deviantArtFolder ->
                         deviantArtFolder.toFolder(ownerUsername, location)
                     }
+                    .filter { it.totalImages > 0 }
 
 
                 return ApiResponse.Success(resultAsFolders)
