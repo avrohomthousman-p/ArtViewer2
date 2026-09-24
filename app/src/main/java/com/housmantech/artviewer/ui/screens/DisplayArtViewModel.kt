@@ -115,6 +115,9 @@ class DisplayArtViewModel @Inject constructor(
                 Log.e("Art Fetching Failure", e.message, e)
                 _uiState.value = UiState.Error("Something went wrong. We could not load your art.")
             }
+            finally {
+                artRepo.updateImageCountForFolder(folder)
+            }
         }
     }
 

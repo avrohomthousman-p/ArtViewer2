@@ -8,6 +8,7 @@ import com.housmantech.artviewer.data.remote.MediaApi
 import com.housmantech.artviewer.data.util.ApiResponse
 import com.housmantech.artviewer.data.util.safeApiCall
 import com.housmantech.artviewer.ui.util.Batch
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -237,10 +238,67 @@ class ArtRepository @Inject constructor(
 
 
 
-    private suspend fun updateImageCountInDB(folder: Folder, imageCount: Int?){
-        if (imageCount != null) {
+    /**
+     * Probes the end of a folder to detect whether its actual size has changed.
+     *
+     * We fetch a single page of media positioned so that, if we have the correct
+     * folder size, half of the items should be inside the folder and half should
+     * go past the end of the folder (and DeviantArt would not provide them).
+     *
+     * QUERY_PAGE_SIZE = 24, so halfPage = 12.
+     *
+     * Example:
+     *   Saved totalImages = 100
+     *   Probe offset = 100 - 12 = 88
+     *
+     *   We expect:
+     *     - Items 88..99 to exist (12 items)
+     *     - Items 100..111 to NOT exist (12 items)
+     *
+     * If the API returns more than 12 items, it means the folder grew.
+     * If it returns fewer than 12 items, it means the folder shrank.
+     *
+     * The number of items past the expected end is:
+     *     returnedCount - halfPage
+     *
+     * And the actual last index is:
+     *     expectedTotalImages + itemsPastEnd
+     */
+    fun updateImageCountForFolder(folder: Folder) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val halfPage = QUERY_PAGE_SIZE / 2
+            val probeOffset = folder.totalImages - halfPage
+
+            val response = safeApiCall {
+                mediaApi.fetchMedia(
+                    location = folder.storedIn.asUrlPath(),
+                    remoteId = folder.folderIdForApi(),
+                    ownerUsername = folder.ownerUsername,
+                    offset = probeOffset,
+                    limit = QUERY_PAGE_SIZE,
+                    matureContent = true
+                )
+            }
+
+
+            if (response is ApiResponse.Success) {
+                val media = response.data.media
+
+                val returnedCount = media.size
+                val itemsPastExpectedEnd = returnedCount - halfPage
+                val actualLastIndex = folder.totalImages + itemsPastExpectedEnd
+
+                updateImageCountInDB(folder, actualLastIndex)
+            }
+        }
+    }
+
+
+
+    private suspend fun updateImageCountInDB(folder: Folder, newImageCount: Int){
+        if (newImageCount != folder.totalImages) {
             coroutineScope {
-                db.insertOrReplace(folder.copy(totalImages = imageCount))
+                db.insertOrReplace(folder.copy(totalImages = newImageCount))
             }
         }
     }
