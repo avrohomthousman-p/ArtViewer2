@@ -40,6 +40,7 @@ import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.topAndBottomBorder
 
 
+
 /**
  * Screen for thr settings page
  */
@@ -188,11 +189,29 @@ private fun PrivacyPolicySetting() {
 
 @Composable
 private fun AppVersionSetting(){
+    val context = LocalContext.current
+    val appId = context.packageName
+
+
     SettingsItem(
         iconId = R.drawable.ic_info,
         contentDesc = "App version icon",
         text = stringResource(R.string.settings_app_version),
-        onClick = null,
+        onClick = {
+            val intent =
+                try {
+                    Intent(Intent.ACTION_VIEW, "market://details?id=$appId".toUri())
+                }
+                catch (_: Exception) {
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        "https://play.google.com/store/apps/details?id=$appId".toUri()
+                    )
+                }
+
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        },
         extraContent = {
             Text(
                 text = BuildConfig.VERSION_NAME,
