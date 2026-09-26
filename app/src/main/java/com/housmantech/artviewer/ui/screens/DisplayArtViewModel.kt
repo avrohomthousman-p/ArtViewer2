@@ -8,6 +8,7 @@ import com.housmantech.artviewer.data.local.room.Folder
 import com.housmantech.artviewer.data.local.room.FolderDao
 import com.housmantech.artviewer.data.remote.DeviantArtMediaItem
 import com.housmantech.artviewer.data.repository.ArtRepository
+import com.housmantech.artviewer.data.repository.SettingsDefaults
 import com.housmantech.artviewer.data.repository.SettingsRepository
 import com.housmantech.artviewer.data.repository.TokenManager
 import com.housmantech.artviewer.ui.util.BatchTracker
@@ -44,8 +45,12 @@ class DisplayArtViewModel @Inject constructor(
     val navigation = _navigation.receiveAsFlow()
 
 
-    private val _matureContentAllowed = MutableStateFlow(false)
+    private val _matureContentAllowed = MutableStateFlow(SettingsDefaults.MATURE_CONTENT_ALLOWED)
     val matureContentAllowed: StateFlow<Boolean> = _matureContentAllowed
+
+
+    private val _showArtTitle = MutableStateFlow(SettingsDefaults.SHOW_ART_TITLES)
+    val showArtTitle: StateFlow<Boolean> = _showArtTitle
 
 
     /**
@@ -66,6 +71,7 @@ class DisplayArtViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             _matureContentAllowed.value = settingsRepo.shouldShowMatureContent()
+            _showArtTitle.value = settingsRepo.shouldShowArtTitle()
         }
     }
 

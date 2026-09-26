@@ -81,6 +81,10 @@
     <string name="settings_title">Settings</string>
     <string name="settings_mature_content_allowed">Mature content is allowed</string>
     <string name="settings_mature_content_blocked">Mature content is blocked</string>
+    <string name="mature_content_content_desc">adult content icon</string>
+    <string name="no_mature_content_content_desc">adult content blocked</string>
+    <string name="settings_show_art_title">Art titles are shown</string>
+    <string name="settings_hide_art_title">Art titles are hidden</string>
     <string name="visible_icon_content_desc">visible icon</string>
     <string name="hidden_icon_content_desc">hidden icon</string>
     <string name="settings_privacy_policy_text">App Privacy Policy</string>

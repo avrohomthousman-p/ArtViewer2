@@ -56,6 +56,7 @@ private fun SettingsScreenContent(viewModel: SettingsViewModel) {
     var showAppInfoPopup by remember { mutableStateOf(false) }
     val guestMode by viewModel.isGuestMode.collectAsState()
     val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
+    val showArtTitle by viewModel.showArtTitle.collectAsState()
 
 
     Column(
@@ -73,8 +74,12 @@ private fun SettingsScreenContent(viewModel: SettingsViewModel) {
 
         MatureContentSetting(
             enabled = !guestMode,
-            matureContentAllowedSetting = matureContentAllowed,
+            matureContentAllowed = matureContentAllowed,
             setMatureContent = viewModel::setMatureContent,
+        )
+        ShowArtTitleSetting(
+            showArtTitle = showArtTitle,
+            setShowTitle = viewModel::setShowArtTitle
         )
         AboutAppSetting(showDialog = { showAppInfoPopup = true })
         PrivacyPolicySetting()
@@ -99,28 +104,28 @@ private fun SettingsScreenContent(viewModel: SettingsViewModel) {
 @Composable
 private fun MatureContentSetting(
     enabled: Boolean,
-    matureContentAllowedSetting: Boolean,
+    matureContentAllowed: Boolean,
     setMatureContent: (Boolean) -> Unit
 ) {
 
 
     val (iconId, contentDescriptionId, textId) =
-        if (matureContentAllowedSetting) {
+        if (matureContentAllowed) {
             Triple(
-                R.drawable.ic_visibility_on,
-                R.string.visible_icon_content_desc,
+                R.drawable.ic_adult_content,
+                R.string.mature_content_content_desc,
                 R.string.settings_mature_content_allowed
             )
         }
         else {
             Triple(
-                R.drawable.ic_visibility_off,
-                R.string.hidden_icon_content_desc,
+                R.drawable.ic_no_adult_content,
+                R.string.no_mature_content_content_desc,
                 R.string.settings_mature_content_blocked
             )
         }
 
-    val toggleMaturity = { setMatureContent(!matureContentAllowedSetting) }
+    val toggleMaturity = { setMatureContent(!matureContentAllowed) }
 
 
     SettingsItem(
@@ -130,9 +135,51 @@ private fun MatureContentSetting(
         onClick = if (enabled) toggleMaturity else null,
         extraContent = {
             Switch(
-                checked = matureContentAllowedSetting,
+                checked = matureContentAllowed,
                 onCheckedChange = null,
                 enabled = enabled,
+            )
+        }
+    )
+}
+
+
+
+/**
+ * Settings item that lets you turn off showing the title of the art item
+ */
+@Composable
+private fun ShowArtTitleSetting(
+    showArtTitle: Boolean,
+    setShowTitle: (Boolean) -> Unit
+) {
+    val (iconId, contentDescriptionId, textId) =
+        if (showArtTitle) {
+            Triple(
+                R.drawable.ic_visibility_on,
+                R.string.visible_icon_content_desc,
+                R.string.settings_show_art_title
+            )
+        }
+        else {
+            Triple(
+                R.drawable.ic_visibility_off,
+                R.string.hidden_icon_content_desc,
+                R.string.settings_hide_art_title
+            )
+        }
+
+
+    SettingsItem(
+        iconId = iconId,
+        contentDesc = stringResource(contentDescriptionId),
+        text = stringResource(textId),
+        onClick = { setShowTitle(!showArtTitle) },
+        extraContent = {
+            Switch(
+                checked = showArtTitle,
+                onCheckedChange = null,
+                enabled = true,
             )
         }
     )

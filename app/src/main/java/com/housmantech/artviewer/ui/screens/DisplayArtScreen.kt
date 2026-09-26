@@ -78,6 +78,7 @@ fun DisplayArtScreen(
     val state = viewModel.uiState.collectAsState()
     val isFullscreenMode = isLandscape && state.value is UiState.Success
     val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
+    val showArtTitles by viewModel.showArtTitle.collectAsState()
 
 
     val statusBarColor =
@@ -135,6 +136,7 @@ fun DisplayArtScreen(
             is UiState.Error -> ErrorDisplay(exactState.message)
             is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
                 artList = exactState.data,
+                showArtTitles = showArtTitles,
                 onScroll = { page, isForward ->
                     viewModel.onScroll(page, isForward)
                 }
@@ -276,6 +278,7 @@ private fun ErrorDisplay(errorMessage: String? = null){
 @Composable
 private fun ArtDisplay(
     artList: List<DeviantArtMediaItem>,
+    showArtTitles: Boolean,
     onScroll: (Int, Boolean) -> Unit
 ) {
     if (artList.isEmpty()) {
@@ -313,11 +316,13 @@ private fun ArtDisplay(
         val imageUrl = artItem.getImageUrl()
 
 
+        val title = if (showArtTitles) artItem.title else null
+
         if (!videoUrl.isNullOrEmpty()){
-            VideoPlayerContainer(title = artItem.title, url = videoUrl, play = isCurrentPage)
+            VideoPlayerContainer(title = title, url = videoUrl, play = isCurrentPage)
         }
         else if(!imageUrl.isNullOrEmpty()) {
-            ImageDisplayContainer(title = artItem.title, url = imageUrl, showSpinner = isCurrentPage)
+            ImageDisplayContainer(title = title, url = imageUrl, showSpinner = isCurrentPage)
         }
     }
 }
@@ -325,7 +330,7 @@ private fun ArtDisplay(
 
 
 @Composable
-private fun VideoPlayerContainer(title: String, url: String, play: Boolean) {
+private fun VideoPlayerContainer(title: String?, url: String, play: Boolean) {
     val context = LocalContext.current
 
 
@@ -357,15 +362,17 @@ private fun VideoPlayerContainer(title: String, url: String, play: Boolean) {
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = title,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-                    fontSize = 22.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold
-                )
+                if (!title.isNullOrEmpty()) {
+                    Text(
+                        text = title,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                        fontSize = 22.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.SemiBold
+                    )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
                 VideoPlayer(exoPlayer)
             }
@@ -399,7 +406,7 @@ private fun VideoPlayer(exoPlayer: ExoPlayer) {
 
 
 @Composable
-private fun ImageDisplayContainer(title: String, url: String, showSpinner: Boolean){
+private fun ImageDisplayContainer(title: String?, url: String, showSpinner: Boolean){
     val imageLoader = rememberGifImageLoader()
     val painter = rememberAsyncImagePainter(
         model = url,
@@ -415,15 +422,17 @@ private fun ImageDisplayContainer(title: String, url: String, showSpinner: Boole
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = title,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-                    fontSize = 22.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold
-                )
+                if (!title.isNullOrEmpty()) {
+                    Text(
+                        text = title,
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                        fontSize = 22.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.SemiBold
+                    )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
 
                 ImageDisplay(painter, showSpinner)
             }

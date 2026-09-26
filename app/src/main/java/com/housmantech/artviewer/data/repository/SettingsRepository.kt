@@ -5,6 +5,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 
+object SettingsDefaults {
+    const val MATURE_CONTENT_ALLOWED = false
+    const val SHOW_ART_TITLES = true
+}
+
+
 
 /**
  * Gets settings related to content display, like maturity allowed/blocked
@@ -55,5 +61,20 @@ class SettingsRepository @Inject constructor(
         }
 
         return userPrefersMatureContent()
+    }
+
+
+
+    /**
+     * Decides if the title of the art should be show above the art or not.
+     */
+    suspend fun shouldShowArtTitle(): Boolean {
+        return appState.userPrefersShowingArtTitle()
+    }
+
+
+
+    suspend fun setShouldShowArtTitle(showTitle: Boolean) {
+        appState.setUserPrefsShowArtTitle(showTitle)
     }
 }
