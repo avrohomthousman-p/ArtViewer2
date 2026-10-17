@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -78,7 +79,7 @@ fun DisplayArtScreen(
     val state = viewModel.uiState.collectAsState()
     val isFullscreenMode = isLandscape && state.value is UiState.Success
     val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
-    val showArtTitles by viewModel.showArtTitle.collectAsState()
+    var showArtTitles by rememberSaveable { mutableStateOf(true) }
 
 
     val statusBarColor =
@@ -125,7 +126,11 @@ fun DisplayArtScreen(
             .padding(WindowInsets.systemBars.asPaddingValues())
     ) {
         if (!isFullscreenMode) {
-            Toolbar(folderName)
+            Toolbar(
+                folderName = folderName,
+                showArtTitles = showArtTitles,
+                toggleShowTitle = { showArtTitles = !showArtTitles }
+                )
         }
 
 
@@ -162,14 +167,30 @@ fun DisplayArtScreen(
  * Version of the toolbar that is specifically set for the DisplayArtScreen.
  */
 @Composable
-private fun Toolbar(folderName: String){
+private fun Toolbar(
+    folderName: String,
+    showArtTitles: Boolean,
+    toggleShowTitle: () -> Unit
+){
     val activity = LocalActivity.current
+
+
+    val showTitleIcon = if (showArtTitles) R.drawable.ic_show_title else R.drawable.ic_hide_title
+    val showTitleContentDesc = stringResource(
+        if (showArtTitles) R.string.media_show_title_content_desc
+        else R.string.media_hide_title_content_desc
+    )
 
 
     Toolbar(
         includeBackButton = true,
         title = folderName,
         otherButtons = listOf(
+            ToolbarButtonData(
+                icon = showTitleIcon,
+                contentDescription = showTitleContentDesc,
+                onClick = toggleShowTitle
+            ),
             ToolbarButtonData(
                 icon = R.drawable.ic_home,
                 contentDescription = stringResource(R.string.home_icon_content_description),

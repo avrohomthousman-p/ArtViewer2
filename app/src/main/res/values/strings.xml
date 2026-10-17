@@ -83,10 +83,6 @@
     <string name="settings_mature_content_blocked">Mature content is blocked</string>
     <string name="mature_content_content_desc">adult content icon</string>
     <string name="no_mature_content_content_desc">adult content blocked</string>
-    <string name="settings_show_art_title">Art titles are shown</string>
-    <string name="settings_hide_art_title">Art titles are hidden</string>
-    <string name="visible_icon_content_desc">visible icon</string>
-    <string name="hidden_icon_content_desc">hidden icon</string>
     <string name="settings_privacy_policy_text">App Privacy Policy</string>
     <string name="settings_app_version">App Version</string>
     <string name="settings_about_app">About App</string>
@@ -102,6 +98,10 @@
     <string name="media_slow_loading_hyperlink_text">app settings</string>
     <string name="media_default_error_msg">We are experiencing technical difficulties.</string>
     <string name="media_folder_empty_message">We could not find any art in this folder.</string>
+    <string name="media_mute_button_content_desc">Mute</string>
+    <string name="media_unmute_button_content_desc">Unmute</string>
+    <string name="media_show_title_content_desc">Show title</string>
+    <string name="media_hide_title_content_desc">Hide title</string>
 
 
     <!-- Folder Search Activity -->

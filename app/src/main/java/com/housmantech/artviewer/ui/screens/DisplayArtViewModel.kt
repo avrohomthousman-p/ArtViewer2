@@ -49,10 +49,6 @@ class DisplayArtViewModel @Inject constructor(
     val matureContentAllowed: StateFlow<Boolean> = _matureContentAllowed
 
 
-    private val _showArtTitle = MutableStateFlow(SettingsDefaults.SHOW_ART_TITLES)
-    val showArtTitle: StateFlow<Boolean> = _showArtTitle
-
-
     /**
      * Flag indicating that the UI should show a toast when the user reaches the
      * temporary end of the loaded media. This lets the user know that more items
@@ -71,7 +67,6 @@ class DisplayArtViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.IO) {
             _matureContentAllowed.value = settingsRepo.shouldShowMatureContent()
-            _showArtTitle.value = settingsRepo.shouldShowArtTitle()
         }
     }
 

@@ -56,7 +56,6 @@ private fun SettingsScreenContent(viewModel: SettingsViewModel) {
     var showAppInfoPopup by remember { mutableStateOf(false) }
     val guestMode by viewModel.isGuestMode.collectAsState()
     val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
-    val showArtTitle by viewModel.showArtTitle.collectAsState()
 
 
     Column(
@@ -76,10 +75,6 @@ private fun SettingsScreenContent(viewModel: SettingsViewModel) {
             enabled = !guestMode,
             matureContentAllowed = matureContentAllowed,
             setMatureContent = viewModel::setMatureContent,
-        )
-        ShowArtTitleSetting(
-            showArtTitle = showArtTitle,
-            setShowTitle = viewModel::setShowArtTitle
         )
         AboutAppSetting(showDialog = { showAppInfoPopup = true })
         PrivacyPolicySetting()
@@ -138,48 +133,6 @@ private fun MatureContentSetting(
                 checked = matureContentAllowed,
                 onCheckedChange = null,
                 enabled = enabled,
-            )
-        }
-    )
-}
-
-
-
-/**
- * Settings item that lets you turn off showing the title of the art item
- */
-@Composable
-private fun ShowArtTitleSetting(
-    showArtTitle: Boolean,
-    setShowTitle: (Boolean) -> Unit
-) {
-    val (iconId, contentDescriptionId, textId) =
-        if (showArtTitle) {
-            Triple(
-                R.drawable.ic_visibility_on,
-                R.string.visible_icon_content_desc,
-                R.string.settings_show_art_title
-            )
-        }
-        else {
-            Triple(
-                R.drawable.ic_visibility_off,
-                R.string.hidden_icon_content_desc,
-                R.string.settings_hide_art_title
-            )
-        }
-
-
-    SettingsItem(
-        iconId = iconId,
-        contentDesc = stringResource(contentDescriptionId),
-        text = stringResource(textId),
-        onClick = { setShowTitle(!showArtTitle) },
-        extraContent = {
-            Switch(
-                checked = showArtTitle,
-                onCheckedChange = null,
-                enabled = true,
             )
         }
     )

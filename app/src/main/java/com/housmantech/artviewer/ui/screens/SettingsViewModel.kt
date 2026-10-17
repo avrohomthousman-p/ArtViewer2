@@ -19,7 +19,6 @@ class SettingsViewModel @Inject constructor(
 
     val isGuestMode = MutableStateFlow(true)
     val matureContentAllowed = MutableStateFlow(SettingsDefaults.MATURE_CONTENT_ALLOWED)
-    val showArtTitle = MutableStateFlow(SettingsDefaults.SHOW_ART_TITLES)
 
 
 
@@ -27,7 +26,6 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             isGuestMode.value = settingsRepo.isGuestMode()
             matureContentAllowed.value = settingsRepo.shouldShowMatureContent()
-            showArtTitle.value = settingsRepo.shouldShowArtTitle()
         }
     }
 
@@ -41,15 +39,6 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             settingsRepo.setUserPrefersMatureContent(allowed)
             matureContentAllowed.value = allowed
-        }
-    }
-
-
-
-    fun setShowArtTitle(showTitle: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            settingsRepo.setShouldShowArtTitle(showTitle)
-            showArtTitle.value = showTitle
         }
     }
 }
