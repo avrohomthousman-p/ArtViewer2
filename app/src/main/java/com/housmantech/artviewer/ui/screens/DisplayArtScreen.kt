@@ -80,6 +80,7 @@ fun DisplayArtScreen(
     val isFullscreenMode = isLandscape && state.value is UiState.Success
     val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
     var showArtTitles by rememberSaveable { mutableStateOf(true) }
+    var muteVideos by remember { mutableStateOf(true) }
 
 
     val statusBarColor =
@@ -129,8 +130,10 @@ fun DisplayArtScreen(
             Toolbar(
                 folderName = folderName,
                 showArtTitles = showArtTitles,
-                toggleShowTitle = { showArtTitles = !showArtTitles }
-                )
+                toggleShowTitle = { showArtTitles = !showArtTitles },
+                videosMuted = muteVideos,
+                toggleMuted = { muteVideos = !muteVideos}
+            )
         }
 
 
@@ -142,6 +145,7 @@ fun DisplayArtScreen(
             is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
                 artList = exactState.data,
                 showArtTitles = showArtTitles,
+                muteVideos = muteVideos,
                 onScroll = { page, isForward ->
                     viewModel.onScroll(page, isForward)
                 }
@@ -170,7 +174,9 @@ fun DisplayArtScreen(
 private fun Toolbar(
     folderName: String,
     showArtTitles: Boolean,
-    toggleShowTitle: () -> Unit
+    toggleShowTitle: () -> Unit,
+    videosMuted: Boolean,
+    toggleMuted: () -> Unit
 ){
     val activity = LocalActivity.current
 
@@ -182,6 +188,14 @@ private fun Toolbar(
     )
 
 
+    val muteIcon = if (videosMuted) R.drawable.ic_mute else R.drawable.ic_unmute
+    val muteContentDesc = stringResource(
+        if (videosMuted) R.string.media_mute_button_content_desc
+        else R.string.media_unmute_button_content_desc
+    )
+
+
+
     Toolbar(
         includeBackButton = true,
         title = folderName,
@@ -190,6 +204,11 @@ private fun Toolbar(
                 icon = showTitleIcon,
                 contentDescription = showTitleContentDesc,
                 onClick = toggleShowTitle
+            ),
+            ToolbarButtonData(
+                icon = muteIcon,
+                contentDescription = muteContentDesc,
+                onClick = toggleMuted
             ),
             ToolbarButtonData(
                 icon = R.drawable.ic_home,
@@ -300,6 +319,7 @@ private fun ErrorDisplay(errorMessage: String? = null){
 private fun ArtDisplay(
     artList: List<DeviantArtMediaItem>,
     showArtTitles: Boolean,
+    muteVideos: Boolean,
     onScroll: (Int, Boolean) -> Unit
 ) {
     if (artList.isEmpty()) {
@@ -340,7 +360,7 @@ private fun ArtDisplay(
         val title = if (showArtTitles) artItem.title else null
 
         if (!videoUrl.isNullOrEmpty()){
-            VideoPlayerContainer(title = title, url = videoUrl, play = isCurrentPage)
+            VideoPlayerContainer(title = title, url = videoUrl, play = isCurrentPage, muteVideos = muteVideos)
         }
         else if(!imageUrl.isNullOrEmpty()) {
             ImageDisplayContainer(title = title, url = imageUrl, showSpinner = isCurrentPage)
@@ -351,7 +371,7 @@ private fun ArtDisplay(
 
 
 @Composable
-private fun VideoPlayerContainer(title: String?, url: String, play: Boolean) {
+private fun VideoPlayerContainer(title: String?, url: String, play: Boolean, muteVideos: Boolean) {
     val context = LocalContext.current
 
 
@@ -366,6 +386,11 @@ private fun VideoPlayerContainer(title: String?, url: String, play: Boolean) {
     LaunchedEffect(play) {
         exoPlayer.playWhenReady = play
     }
+
+    LaunchedEffect(muteVideos) {
+        exoPlayer.volume = if (muteVideos) 0f else 1f
+    }
+
 
     DisposableEffect(Unit) {
         onDispose {
