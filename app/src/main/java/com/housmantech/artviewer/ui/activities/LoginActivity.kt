@@ -3,6 +3,7 @@ package com.housmantech.artviewer.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.housmantech.artviewer.ui.screens.LoginScreen
@@ -16,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
  * or refreshes their login token instead (if possible).
  */
 @AndroidEntryPoint
-class LoginActivity : BaseActivity() {
+class LoginActivity : ComponentActivity() {
     private val viewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

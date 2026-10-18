@@ -19,10 +19,6 @@ object AppColors {
     val LinkColor = Color(0xFF1E88E5)
 
 
-    val StatusBarColor = Color(0xFF64B5F6)
-    val NavBarColor = Color(0xFFB0B0B0)
-
-
     val White = Color.White
     val Black = Color.Black
 }

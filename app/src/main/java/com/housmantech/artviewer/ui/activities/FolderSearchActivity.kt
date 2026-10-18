@@ -1,6 +1,7 @@
 package com.housmantech.artviewer.ui.activities
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.housmantech.artviewer.ui.screens.FolderSearchScreen
@@ -13,7 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
  * Activity for entering search criteria to find new DeviantArt folders.
  */
 @AndroidEntryPoint
-class FolderSearchActivity : BaseActivity() {
+class FolderSearchActivity : ComponentActivity() {
     private val viewModel: FolderSearchViewModel by viewModels()
 
 

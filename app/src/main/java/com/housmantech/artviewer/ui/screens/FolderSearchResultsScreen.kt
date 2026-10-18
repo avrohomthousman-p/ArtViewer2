@@ -2,6 +2,7 @@ package com.housmantech.artviewer.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,6 +36,7 @@ import com.housmantech.artviewer.ui.components.FolderInteraction
 import com.housmantech.artviewer.ui.components.SingleFolderDisplay
 import com.housmantech.artviewer.ui.components.TitleWithBullets
 import com.housmantech.artviewer.ui.components.Toolbar
+import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
 import com.housmantech.artviewer.ui.util.ToolbarButtonData
 import com.housmantech.artviewer.ui.util.UiState
@@ -108,26 +110,26 @@ private fun FolderSearchResultsScreenContent(
     onSwipeFolder: (Int) -> Unit,
     onClickSaveBtn: (Int) -> Unit
 ){
-    BaseScreen() {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.White),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-            SearchResultsScreenToolbar(stringResource(R.string.results_toolbar_title))
-            Spacer(modifier = Modifier.height(30.dp))
+        SearchResultsScreenToolbar(stringResource(R.string.results_toolbar_title))
+        Spacer(modifier = Modifier.height(30.dp))
 
 
-            when(state) {
-                is UiState.Error -> DisplayError(ownerUsername, location)
-                UiState.Loading -> DisplayLoadingMessage()
-                is UiState.Success<List<Folder>> ->
-                    DisplayFoldersList(
-                        folders = state.data,
-                        onClickSaveBtn = onClickSaveBtn,
-                        onSwipeFolder = onSwipeFolder
-                    )
-            }
+        when(state) {
+            is UiState.Error -> DisplayError(ownerUsername, location)
+            UiState.Loading -> DisplayLoadingMessage()
+            is UiState.Success<List<Folder>> ->
+                DisplayFoldersList(
+                    folders = state.data,
+                    onClickSaveBtn = onClickSaveBtn,
+                    onSwipeFolder = onSwipeFolder
+                )
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.housmantech.artviewer.ui.screens
 
 import android.content.Intent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -55,34 +56,34 @@ private fun SettingsScreenContent(viewModel: SettingsViewModel) {
     val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
 
 
-    BaseScreen() {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Toolbar(
-                includeBackButton = true,
-                title = stringResource(R.string.settings_title),
-                otherButtons = listOf()
-            )
-            Spacer(modifier = Modifier.height(20.dp))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.White)
+    ) {
+        Toolbar(
+            includeBackButton = true,
+            title = stringResource(R.string.settings_title),
+            otherButtons = listOf()
+        )
+        Spacer(modifier = Modifier.height(20.dp))
 
 
-            MatureContentSetting(
-                enabled = !guestMode,
-                matureContentAllowed = matureContentAllowed,
-                setMatureContent = viewModel::setMatureContent,
-            )
-            AboutAppSetting(showDialog = { showAppInfoPopup = true })
-            PrivacyPolicySetting()
-            AppVersionSetting()
-        }
+        MatureContentSetting(
+            enabled = !guestMode,
+            matureContentAllowed = matureContentAllowed,
+            setMatureContent = viewModel::setMatureContent,
+        )
+        AboutAppSetting(showDialog = { showAppInfoPopup = true })
+        PrivacyPolicySetting()
+        AppVersionSetting()
+    }
 
 
-        if (showAppInfoPopup) {
-            AppInfoDialog(
-                dismissDialog = { showAppInfoPopup = false }
-            )
-        }
+    if (showAppInfoPopup) {
+        AppInfoDialog(
+            dismissDialog = { showAppInfoPopup = false }
+        )
     }
 }
 

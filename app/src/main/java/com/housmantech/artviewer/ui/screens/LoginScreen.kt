@@ -3,6 +3,7 @@ package com.housmantech.artviewer.ui.screens
 import android.app.Activity
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -97,51 +98,51 @@ private fun LoginScreenContent(
     }
 
 
-    BaseScreen() {
-        ConstraintLayout(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val (toolbar, title, statusContent, bottomText) = createRefs()
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.White)
+    ) {
+        val (toolbar, title, statusContent, bottomText) = createRefs()
 
-            Toolbar(
-                Modifier.constrainAs(toolbar) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-            )
+        Toolbar(
+            Modifier.constrainAs(toolbar) {
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
 
-            Title(
-                text = bannerText,
-                modifier = Modifier.constrainAs(title) {
-                    top.linkTo(toolbar.bottom, margin = 22.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-            )
+        Title(
+            text = bannerText,
+            modifier = Modifier.constrainAs(title) {
+                top.linkTo(toolbar.bottom, margin = 22.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
 
-            CenterContent(
-                loginState = loginState,
-                performLogin = performLogin,
-                performGuestLogin = performGuestLogin,
-                statusText = statusText,
-                statusTextColor = statusTextColor,
-                modifier = Modifier.constrainAs(statusContent) {
-                    top.linkTo(toolbar.bottom)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-            )
+        CenterContent(
+            loginState = loginState,
+            performLogin = performLogin,
+            performGuestLogin = performGuestLogin,
+            statusText = statusText,
+            statusTextColor = statusTextColor,
+            modifier = Modifier.constrainAs(statusContent) {
+                top.linkTo(toolbar.bottom)
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
 
-            BottomText(
-                modifier = Modifier.constrainAs(bottomText){
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-            )
-        }
+        BottomText(
+            modifier = Modifier.constrainAs(bottomText){
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
     }
 }
 

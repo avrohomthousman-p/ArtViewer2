@@ -1,6 +1,7 @@
 package com.housmantech.artviewer.ui.activities
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.housmantech.artviewer.ui.screens.MainActivityScreen
@@ -13,7 +14,7 @@ import kotlin.getValue
  * Main activity - where the saved folders are shown.
  */
 @AndroidEntryPoint
-class MainActivity : BaseActivity() {
+class MainActivity : ComponentActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

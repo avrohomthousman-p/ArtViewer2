@@ -1,6 +1,7 @@
 package com.housmantech.artviewer.ui.activities
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.housmantech.artviewer.ui.screens.SettingsScreen
@@ -10,7 +11,7 @@ import kotlin.getValue
 
 
 @AndroidEntryPoint
-class SettingsActivity : BaseActivity() {
+class SettingsActivity : ComponentActivity() {
     private val viewModel: SettingsViewModel by viewModels()
 
 

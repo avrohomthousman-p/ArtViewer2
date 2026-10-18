@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -177,79 +178,79 @@ private fun PortraitDisplay(
     checkIfLoginExpired: () -> Boolean,
     saveFullCollection: (String, StorageLocation, Boolean) -> Unit
 ) {
-    BaseScreen() {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Toolbar(
-                includeBackButton = true,
-                title = stringResource(R.string.folder_search_toolbar_title),
-                otherButtons = listOf()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.White),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Toolbar(
+            includeBackButton = true,
+            title = stringResource(R.string.folder_search_toolbar_title),
+            otherButtons = listOf()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
 
 
-            ScreenTitle()
-            Spacer(modifier = Modifier.height(40.dp))
+        ScreenTitle()
+        Spacer(modifier = Modifier.height(40.dp))
 
 
-            UsernameInputFeild(
-                usernameInput = usernameInput.value,
-                setUsernameInput = { newValue -> usernameInput.value = newValue},
-                isValidUsername = isValidUsername.value,
-                setIsValidUsername = { newValue -> isValidUsername.value = newValue }
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-
-
-
-            SaveFullGalleryCheckbox(
-                saveFullGallery = saveFullGallery.value,
-                setSaveFullGallery = { newValue -> saveFullGallery.value = newValue}
-            )
-            Spacer(modifier = Modifier.height(30.dp))
+        UsernameInputFeild(
+            usernameInput = usernameInput.value,
+            setUsernameInput = { newValue -> usernameInput.value = newValue},
+            isValidUsername = isValidUsername.value,
+            setIsValidUsername = { newValue -> isValidUsername.value = newValue }
+        )
+        Spacer(modifier = Modifier.height(30.dp))
 
 
 
-            FolderTypePicker(
-                currentlySelected = storageLocation.value,
-                onSelected = { storageLocation.value = it }
-            )
-            Spacer(modifier = Modifier.height(30.dp))
+        SaveFullGalleryCheckbox(
+            saveFullGallery = saveFullGallery.value,
+            setSaveFullGallery = { newValue -> saveFullGallery.value = newValue}
+        )
+        Spacer(modifier = Modifier.height(30.dp))
 
 
 
-            if (saveFullGallery.value){
-                FolderRandomizationSwitch(
-                    shouldRandomize = shouldRandomize.value,
-                    setShouldRandomize = { newValue -> shouldRandomize.value = newValue }
-                )
-            }
+        FolderTypePicker(
+            currentlySelected = storageLocation.value,
+            onSelected = { storageLocation.value = it }
+        )
+        Spacer(modifier = Modifier.height(30.dp))
 
 
 
-            Spacer(modifier = Modifier.weight(1f))
-
-
-
-            SearchButton(
-                usernameInput = usernameInput.value,
-                saveFullGallery = saveFullGallery.value,
-                storageLocation = storageLocation.value,
+        if (saveFullGallery.value){
+            FolderRandomizationSwitch(
                 shouldRandomize = shouldRandomize.value,
-                checkIfLoginExpired = checkIfLoginExpired,
-                setIsValidUsername = { newValue -> isValidUsername.value = newValue },
-                saveFullCollection = saveFullCollection
+                setShouldRandomize = { newValue -> shouldRandomize.value = newValue }
             )
-            Spacer(modifier = Modifier.height(20.dp))
-
-
-            HelpText(
-                showInfoPopup = showInfoPopup
-            )
-            Spacer(modifier = Modifier.height(32.dp))
         }
+
+
+
+        Spacer(modifier = Modifier.weight(1f))
+
+
+
+        SearchButton(
+            usernameInput = usernameInput.value,
+            saveFullGallery = saveFullGallery.value,
+            storageLocation = storageLocation.value,
+            shouldRandomize = shouldRandomize.value,
+            checkIfLoginExpired = checkIfLoginExpired,
+            setIsValidUsername = { newValue -> isValidUsername.value = newValue },
+            saveFullCollection = saveFullCollection
+        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+
+        HelpText(
+            showInfoPopup = showInfoPopup
+        )
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
@@ -269,85 +270,85 @@ private fun LandscapeDisplay(
     checkIfLoginExpired: () -> Boolean,
     saveFullCollection: (String, StorageLocation, Boolean) -> Unit
 ) {
-    BaseScreen() {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Toolbar(
-                includeBackButton = true,
-                title = stringResource(R.string.folder_search_toolbar_title),
-                otherButtons = listOf()
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.White)
+    ) {
+        Toolbar(
+            includeBackButton = true,
+            title = stringResource(R.string.folder_search_toolbar_title),
+            otherButtons = listOf()
+        )
 
 
-            TwoPaneLayout(
-                modifier = Modifier.fillMaxSize(),
-                dividerWidth = 10.dp,
-                dividerColor = AppColors.AltBackgroundColor,
-                leftContent = {
-                    Spacer(modifier = Modifier.height(20.dp))
+        TwoPaneLayout(
+            modifier = Modifier.fillMaxSize(),
+            dividerWidth = 10.dp,
+            dividerColor = AppColors.AltBackgroundColor,
+            leftContent = {
+                Spacer(modifier = Modifier.height(20.dp))
 
 
-                    ScreenTitle()
-                    Spacer(modifier = Modifier.height(30.dp))
+                ScreenTitle()
+                Spacer(modifier = Modifier.height(30.dp))
 
 
-                    UsernameInputFeild(
-                        usernameInput = usernameInput.value,
-                        setUsernameInput = { newValue -> usernameInput.value = newValue },
-                        isValidUsername = isValidUsername.value,
-                        setIsValidUsername = { newValue -> isValidUsername.value = newValue }
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
+                UsernameInputFeild(
+                    usernameInput = usernameInput.value,
+                    setUsernameInput = { newValue -> usernameInput.value = newValue },
+                    isValidUsername = isValidUsername.value,
+                    setIsValidUsername = { newValue -> isValidUsername.value = newValue }
+                )
+                Spacer(modifier = Modifier.height(20.dp))
 
 
-                    FolderTypePicker(
-                        currentlySelected = storageLocation.value,
-                        onSelected = { storageLocation.value = it }
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                },
-                rightContent = {
-                    Spacer(modifier = Modifier.height(16.dp))
+                FolderTypePicker(
+                    currentlySelected = storageLocation.value,
+                    onSelected = { storageLocation.value = it }
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+            },
+            rightContent = {
+                Spacer(modifier = Modifier.height(16.dp))
 
 
-                    SaveFullGalleryCheckbox(
-                        saveFullGallery = saveFullGallery.value,
-                        setSaveFullGallery = { newValue -> saveFullGallery.value = newValue}
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
+                SaveFullGalleryCheckbox(
+                    saveFullGallery = saveFullGallery.value,
+                    setSaveFullGallery = { newValue -> saveFullGallery.value = newValue}
+                )
+                Spacer(modifier = Modifier.height(20.dp))
 
 
-                    if (saveFullGallery.value){
-                        FolderRandomizationSwitch(
-                            shouldRandomize = shouldRandomize.value,
-                            setShouldRandomize = { newValue -> shouldRandomize.value = newValue }
-                        )
-                    }
-
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-
-                    SearchButton(
-                        usernameInput = usernameInput.value,
-                        saveFullGallery = saveFullGallery.value,
-                        storageLocation = storageLocation.value,
+                if (saveFullGallery.value){
+                    FolderRandomizationSwitch(
                         shouldRandomize = shouldRandomize.value,
-                        checkIfLoginExpired = checkIfLoginExpired,
-                        setIsValidUsername = { newValue -> isValidUsername.value = newValue },
-                        saveFullCollection = saveFullCollection
+                        setShouldRandomize = { newValue -> shouldRandomize.value = newValue }
                     )
-                    Spacer(modifier = Modifier.height(20.dp))
-
-
-                    HelpText(
-                        showInfoPopup = showInfoPopup
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
                 }
-            )
-        }
+
+
+                Spacer(modifier = Modifier.weight(1f))
+
+
+                SearchButton(
+                    usernameInput = usernameInput.value,
+                    saveFullGallery = saveFullGallery.value,
+                    storageLocation = storageLocation.value,
+                    shouldRandomize = shouldRandomize.value,
+                    checkIfLoginExpired = checkIfLoginExpired,
+                    setIsValidUsername = { newValue -> isValidUsername.value = newValue },
+                    saveFullCollection = saveFullCollection
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+
+
+                HelpText(
+                    showInfoPopup = showInfoPopup
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+        )
     }
 }
 

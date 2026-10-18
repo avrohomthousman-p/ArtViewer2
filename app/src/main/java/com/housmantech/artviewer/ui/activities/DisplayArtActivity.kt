@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -19,7 +20,7 @@ import kotlinx.coroutines.launch
  * Activity where the user is shown the media contents of a specific folder.
  */
 @AndroidEntryPoint
-class DisplayArtActivity : BaseActivity() {
+class DisplayArtActivity : ComponentActivity() {
     companion object {
         const val FOLDER_ID_KEY = "folderID"
         const val FOLDER_NAME_KEY = "folderName"

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -89,58 +90,46 @@ fun DisplayArtScreen(
     }
 
 
-    // Fullscreen mode has no toolbar (due to the screen not having much vertical space)
-    // so we don't want such a bright blue status bar.
-    val statusBarColor =
-        if (isFullscreenMode)
-            AppColors.AltBackgroundColor
-        else
-            AppColors.StatusBarColor
 
-
-    BaseScreen(
-        statusBarColor = statusBarColor,
-        navBarColor = AppColors.NavBarColor
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.White)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            if (!isFullscreenMode) {
-                Toolbar(
-                    folderName = folderName,
-                    showArtTitles = showArtTitles,
-                    toggleShowTitle = { showArtTitles = !showArtTitles },
-                    videosMuted = muteVideos,
-                    toggleMuted = { muteVideos = !muteVideos}
-                )
-            }
+        if (!isFullscreenMode) {
+            Toolbar(
+                folderName = folderName,
+                showArtTitles = showArtTitles,
+                toggleShowTitle = { showArtTitles = !showArtTitles },
+                videosMuted = muteVideos,
+                toggleMuted = { muteVideos = !muteVideos}
+            )
+        }
 
 
-            val exactState: UiState<List<DeviantArtMediaItem>> =
-                state.value//needed to satisfy compiler type concerns
-            when (exactState) {
-                UiState.Loading -> LoadingDisplay(matureContentAllowed)
-                is UiState.Error -> ErrorDisplay(exactState.message)
-                is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
-                    artList = exactState.data,
-                    showArtTitles = showArtTitles,
-                    muteVideos = muteVideos,
-                    onScroll = { page, isForward ->
-                        viewModel.onScroll(page, isForward)
-                    }
-                )
-            }
-
-
-            //Show a toast message if the user is at the end of the art list but more data is loading.
-            //Without this the user will think it's actually the end of the list.
-            val showLoadingToast by viewModel.showLoadingToast.collectAsState()
-            LaunchedEffect(showLoadingToast) {
-                if (showLoadingToast) {
-                    Toast.makeText(context, "Loading more media…", Toast.LENGTH_LONG).show()
-                    viewModel.clearLoadingToastFlag()
+        val exactState: UiState<List<DeviantArtMediaItem>> =
+            state.value//needed to satisfy compiler type concerns
+        when (exactState) {
+            UiState.Loading -> LoadingDisplay(matureContentAllowed)
+            is UiState.Error -> ErrorDisplay(exactState.message)
+            is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
+                artList = exactState.data,
+                showArtTitles = showArtTitles,
+                muteVideos = muteVideos,
+                onScroll = { page, isForward ->
+                    viewModel.onScroll(page, isForward)
                 }
+            )
+        }
+
+
+        //Show a toast message if the user is at the end of the art list but more data is loading.
+        //Without this the user will think it's actually the end of the list.
+        val showLoadingToast by viewModel.showLoadingToast.collectAsState()
+        LaunchedEffect(showLoadingToast) {
+            if (showLoadingToast) {
+                Toast.makeText(context, "Loading more media…", Toast.LENGTH_LONG).show()
+                viewModel.clearLoadingToastFlag()
             }
         }
     }

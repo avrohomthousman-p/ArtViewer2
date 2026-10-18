@@ -3,6 +3,7 @@ package com.housmantech.artviewer.ui.screens
 import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +40,7 @@ import com.housmantech.artviewer.ui.components.FolderInteraction
 import com.housmantech.artviewer.ui.components.NewFolderPrompt
 import com.housmantech.artviewer.ui.components.SingleFolderDisplay
 import com.housmantech.artviewer.ui.components.Toolbar
+import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
 import com.housmantech.artviewer.ui.util.ToolbarButtonData
 import com.housmantech.artviewer.ui.util.UiState
@@ -157,31 +159,31 @@ private fun MainActivityScreenContent(
     onClickFolderEdit: (Int) -> Unit,
     onClickFolderDelete: (Int) -> Unit
 ) {
-    BaseScreen() {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Toolbar(
-                includeBackButton = false,
-                title = stringResource(R.string.main_title),
-                otherButtons = toolbarButtons
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColors.White),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Toolbar(
+            includeBackButton = false,
+            title = stringResource(R.string.main_title),
+            otherButtons = toolbarButtons
+        )
 
-            Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
 
-            when(state) {
-                is UiState.Error -> ErrorDisplay()
-                UiState.Loading -> LoadingDisplay()
-                is UiState.Success<List<Folder>> ->
-                    FoldersListDisplay(
-                        folders = state.data,
-                        onClickFolder = onClickFolder,
-                        onClickFolderEdit = onClickFolderEdit,
-                        onClickFolderDelete = onClickFolderDelete
-                    )
-            }
+        when(state) {
+            is UiState.Error -> ErrorDisplay()
+            UiState.Loading -> LoadingDisplay()
+            is UiState.Success<List<Folder>> ->
+                FoldersListDisplay(
+                    folders = state.data,
+                    onClickFolder = onClickFolder,
+                    onClickFolderEdit = onClickFolderEdit,
+                    onClickFolderDelete = onClickFolderDelete
+                )
         }
     }
 }
