@@ -1,6 +1,5 @@
 package com.housmantech.artviewer.ui.activities
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -20,8 +19,6 @@ class FolderSearchActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
-
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         setContent {
             FolderSearchScreen(this.viewModel)

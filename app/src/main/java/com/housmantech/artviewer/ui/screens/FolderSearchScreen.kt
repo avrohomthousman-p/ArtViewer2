@@ -2,6 +2,7 @@ package com.housmantech.artviewer.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -17,12 +18,15 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
@@ -44,6 +48,7 @@ import com.housmantech.artviewer.ui.components.FolderTypePicker
 import com.housmantech.artviewer.ui.components.LabeledCheckbox
 import com.housmantech.artviewer.ui.components.StandardButton
 import com.housmantech.artviewer.ui.components.Toolbar
+import com.housmantech.artviewer.ui.components.TwoPaneLayout
 import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
 
@@ -113,12 +118,11 @@ fun FolderSearchScreenContent(
     saveFullCollection: (String, StorageLocation, Boolean) -> Unit,
     checkIfLoginExpired: () -> Boolean
 ) {
-    val context = LocalContext.current
-    var usernameInput by remember { mutableStateOf("") }
-    var isValidUsername by remember { mutableStateOf(true) }
-    var saveFullGallery by remember { mutableStateOf(false) }
-    var radioSelection by remember { mutableStateOf(StorageLocation.GALLERY) }
-    var shouldRandomize by remember { mutableStateOf(true) }
+    val usernameInput = rememberSaveable { mutableStateOf("") }
+    val isValidUsername = rememberSaveable { mutableStateOf(true) }
+    val saveFullGallery = rememberSaveable { mutableStateOf(false) }
+    val storageLocation = rememberSaveable { mutableStateOf(StorageLocation.GALLERY) }
+    val shouldRandomize = rememberSaveable { mutableStateOf(true) }
     var showInfoPopup by remember { mutableStateOf(false) }
 
 
@@ -130,6 +134,49 @@ fun FolderSearchScreenContent(
     }
 
 
+    val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    if (isPortrait) {
+        PortraitDisplay(
+            usernameInput = usernameInput,
+            isValidUsername = isValidUsername,
+            saveFullGallery = saveFullGallery,
+            storageLocation = storageLocation,
+            shouldRandomize = shouldRandomize,
+            showInfoPopup = { showInfoPopup = true },
+            checkIfLoginExpired = checkIfLoginExpired,
+            saveFullCollection = saveFullCollection
+        )
+    }
+    else {
+        LandscapeDisplay(
+            usernameInput = usernameInput,
+            isValidUsername = isValidUsername,
+            saveFullGallery = saveFullGallery,
+            storageLocation = storageLocation,
+            shouldRandomize = shouldRandomize,
+            showInfoPopup = { showInfoPopup = true },
+            checkIfLoginExpired = checkIfLoginExpired,
+            saveFullCollection = saveFullCollection
+        )
+    }
+}
+
+
+
+@Composable
+private fun PortraitDisplay(
+    //User input
+    usernameInput: MutableState<String>,
+    isValidUsername: MutableState<Boolean>,
+    saveFullGallery: MutableState<Boolean>,
+    storageLocation: MutableState<StorageLocation>,
+    shouldRandomize: MutableState<Boolean>,
+
+    //Functions
+    showInfoPopup: () -> Unit,
+    checkIfLoginExpired: () -> Boolean,
+    saveFullCollection: (String, StorageLocation, Boolean) -> Unit
+) {
     BaseScreen() {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -147,36 +194,36 @@ fun FolderSearchScreenContent(
             Spacer(modifier = Modifier.height(40.dp))
 
 
-            UsernameInput(
-                usernameInput = usernameInput,
-                setUsernameInput = { newValue -> usernameInput = newValue},
-                isValidUsername = isValidUsername,
-                setIsValidUsername = { newValue -> isValidUsername = newValue }
+            UsernameInputFeild(
+                usernameInput = usernameInput.value,
+                setUsernameInput = { newValue -> usernameInput.value = newValue},
+                isValidUsername = isValidUsername.value,
+                setIsValidUsername = { newValue -> isValidUsername.value = newValue }
             )
             Spacer(modifier = Modifier.height(30.dp))
 
 
 
             SaveFullGalleryCheckbox(
-                saveFullGallery = saveFullGallery,
-                setSaveFullGallery = { newValue -> saveFullGallery = newValue}
+                saveFullGallery = saveFullGallery.value,
+                setSaveFullGallery = { newValue -> saveFullGallery.value = newValue}
             )
             Spacer(modifier = Modifier.height(30.dp))
 
 
 
             FolderTypePicker(
-                currentlySelected = radioSelection,
-                onSelected = { radioSelection = it }
+                currentlySelected = storageLocation.value,
+                onSelected = { storageLocation.value = it }
             )
             Spacer(modifier = Modifier.height(30.dp))
 
 
 
-            if (saveFullGallery){
+            if (saveFullGallery.value){
                 FolderRandomizationSwitch(
-                    shouldRandomize = shouldRandomize,
-                    setShouldRandomize = { newValue -> shouldRandomize = newValue }
+                    shouldRandomize = shouldRandomize.value,
+                    setShouldRandomize = { newValue -> shouldRandomize.value = newValue }
                 )
             }
 
@@ -187,21 +234,119 @@ fun FolderSearchScreenContent(
 
 
             SearchButton(
-                usernameInput = usernameInput,
-                saveFullGallery = saveFullGallery,
-                storageLocation = radioSelection,
-                shouldRandomize = shouldRandomize,
+                usernameInput = usernameInput.value,
+                saveFullGallery = saveFullGallery.value,
+                storageLocation = storageLocation.value,
+                shouldRandomize = shouldRandomize.value,
                 checkIfLoginExpired = checkIfLoginExpired,
-                setIsValidUsername = { newValue -> isValidUsername = newValue },
+                setIsValidUsername = { newValue -> isValidUsername.value = newValue },
                 saveFullCollection = saveFullCollection
             )
             Spacer(modifier = Modifier.height(20.dp))
 
 
             HelpText(
-                showPopup = { showInfoPopup = true }
+                showInfoPopup = showInfoPopup
             )
             Spacer(modifier = Modifier.height(32.dp))
+        }
+    }
+}
+
+
+
+@Composable
+private fun LandscapeDisplay(
+    //User input
+    usernameInput: MutableState<String>,
+    isValidUsername: MutableState<Boolean>,
+    saveFullGallery: MutableState<Boolean>,
+    storageLocation: MutableState<StorageLocation>,
+    shouldRandomize: MutableState<Boolean>,
+
+    //Functions
+    showInfoPopup: () -> Unit,
+    checkIfLoginExpired: () -> Boolean,
+    saveFullCollection: (String, StorageLocation, Boolean) -> Unit
+) {
+    BaseScreen() {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Toolbar(
+                includeBackButton = true,
+                title = stringResource(R.string.folder_search_toolbar_title),
+                otherButtons = listOf()
+            )
+
+
+            TwoPaneLayout(
+                modifier = Modifier.fillMaxSize(),
+                dividerWidth = 10.dp,
+                dividerColor = AppColors.AltBackgroundColor,
+                leftContent = {
+                    Spacer(modifier = Modifier.height(20.dp))
+
+
+                    ScreenTitle()
+                    Spacer(modifier = Modifier.height(30.dp))
+
+
+                    UsernameInputFeild(
+                        usernameInput = usernameInput.value,
+                        setUsernameInput = { newValue -> usernameInput.value = newValue },
+                        isValidUsername = isValidUsername.value,
+                        setIsValidUsername = { newValue -> isValidUsername.value = newValue }
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+
+                    FolderTypePicker(
+                        currentlySelected = storageLocation.value,
+                        onSelected = { storageLocation.value = it }
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                },
+                rightContent = {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+
+                    SaveFullGalleryCheckbox(
+                        saveFullGallery = saveFullGallery.value,
+                        setSaveFullGallery = { newValue -> saveFullGallery.value = newValue}
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+
+                    if (saveFullGallery.value){
+                        FolderRandomizationSwitch(
+                            shouldRandomize = shouldRandomize.value,
+                            setShouldRandomize = { newValue -> shouldRandomize.value = newValue }
+                        )
+                    }
+
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+
+                    SearchButton(
+                        usernameInput = usernameInput.value,
+                        saveFullGallery = saveFullGallery.value,
+                        storageLocation = storageLocation.value,
+                        shouldRandomize = shouldRandomize.value,
+                        checkIfLoginExpired = checkIfLoginExpired,
+                        setIsValidUsername = { newValue -> isValidUsername.value = newValue },
+                        saveFullCollection = saveFullCollection
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+
+
+                    HelpText(
+                        showInfoPopup = showInfoPopup
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+            )
         }
     }
 }
@@ -225,7 +370,7 @@ private fun ScreenTitle(){
  * Input field for entering the username of the artist whose folders you want to search for.
  */
 @Composable
-private fun UsernameInput(
+private fun UsernameInputFeild(
     usernameInput: String,
     setUsernameInput: (String) -> Unit,
     isValidUsername: Boolean,
@@ -347,13 +492,13 @@ private fun SearchButton(
  */
 @Composable
 private fun HelpText(
-    showPopup: () -> Unit
+    showInfoPopup: () -> Unit
 ) {
     Text(
         modifier = Modifier.clickable(
             indication = null,
             interactionSource = null,
-            onClick = showPopup
+            onClick = showInfoPopup
         ),
         text = stringResource(R.string.folder_search_help_text),
         color = AppColors.LinkColor,
