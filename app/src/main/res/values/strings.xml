@@ -107,7 +107,7 @@
     <!-- Folder Search Activity -->
     <string name="folder_search_toolbar_title">Search For Folders</string>
     <string name="folder_search_prompt">Describe the folder you are looking for:</string>
-    <string name="folder_search_username_prompt">Enter username of owner: </string>
+    <string name="folder_search_username_prompt">Enter username of artist: </string>
     <string name="folder_search_checkbox_label">Save the full Gallery/Collection</string>
     <string name="folder_search_save_full_gallery_button">SAVE AS SINGLE FOLDER</string>
     <string name="folder_search_run_search_button">SEE USER FOLDERS</string>

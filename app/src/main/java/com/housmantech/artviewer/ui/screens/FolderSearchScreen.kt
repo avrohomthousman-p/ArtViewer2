@@ -101,7 +101,7 @@ fun FolderSearchScreen(viewModel: FolderSearchViewModel) {
 
 
 /**
- * Content of the FOlderSearchScreen.
+ * Content of the FolderSearchScreen.
  *
  * @param saveFullCollection - A function that saves the full gallery or collection as a folder, to
  *          be called if the user makes that selection.
@@ -143,37 +143,23 @@ fun FolderSearchScreenContent(
             Spacer(modifier = Modifier.height(16.dp))
 
 
-            Text(
-                text = stringResource(R.string.folder_search_prompt),
-                modifier = Modifier.fillMaxWidth(),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center
-            )
+            ScreenTitle()
             Spacer(modifier = Modifier.height(40.dp))
 
 
-            OutlinedTextField(
-                value = usernameInput,
-                onValueChange = { newValue ->
-                    usernameInput = newValue
-                    isValidUsername = newValue.isNotBlank()
-                },
-                isError = !isValidUsername,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                label = { Text(stringResource(R.string.folder_search_username_prompt)) },
-                singleLine = true
+            UsernameInput(
+                usernameInput = usernameInput,
+                setUsernameInput = { newValue -> usernameInput = newValue},
+                isValidUsername = isValidUsername,
+                setIsValidUsername = { newValue -> isValidUsername = newValue }
             )
             Spacer(modifier = Modifier.height(30.dp))
 
 
 
-            LabeledCheckbox(
-                label = stringResource(R.string.folder_search_checkbox_label),
-                checked = saveFullGallery,
-                onCheckedChange = { saveFullGallery = it }
+            SaveFullGalleryCheckbox(
+                saveFullGallery = saveFullGallery,
+                setSaveFullGallery = { newValue -> saveFullGallery = newValue}
             )
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -188,18 +174,10 @@ fun FolderSearchScreenContent(
 
 
             if (saveFullGallery){
-                val labelId = if (shouldRandomize) R.string.should_randomize_text else R.string.should_not_randomize_text
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(labelId)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Switch(
-                        checked = shouldRandomize,
-                        onCheckedChange = { shouldRandomize = !shouldRandomize }
-                    )
-                }
+                FolderRandomizationSwitch(
+                    shouldRandomize = shouldRandomize,
+                    setShouldRandomize = { newValue -> shouldRandomize = newValue }
+                )
             }
 
 
@@ -208,49 +186,179 @@ fun FolderSearchScreenContent(
 
 
 
-            val btnText =
-                if (saveFullGallery) R.string.folder_search_save_full_gallery_button
-                else R.string.folder_search_run_search_button
-
-            StandardButton(
-                modifier = Modifier,
-                text = stringResource(btnText),
-                onClick = {
-                    if(checkIfLoginExpired()){
-                        return@StandardButton
-                    }
-                    if (usernameInput.isBlank()){
-                        isValidUsername = false
-                        return@StandardButton
-                    }
-
-
-                    if (saveFullGallery){
-                        saveFullCollection(usernameInput, radioSelection, shouldRandomize)
-                    }
-                    else {
-                        val intent = Intent(context, FolderSearchResultsActivity::class.java)
-                        intent.putExtra(FolderSearchResultsActivity.USERNAME_KEY, usernameInput.trim())
-                        intent.putExtra(FolderSearchResultsActivity.LOCATION_KEY, radioSelection.toString())
-                        context.startActivity(intent)
-                    }
-                }
+            SearchButton(
+                usernameInput = usernameInput,
+                saveFullGallery = saveFullGallery,
+                storageLocation = radioSelection,
+                shouldRandomize = shouldRandomize,
+                checkIfLoginExpired = checkIfLoginExpired,
+                setIsValidUsername = { newValue -> isValidUsername = newValue },
+                saveFullCollection = saveFullCollection
             )
             Spacer(modifier = Modifier.height(20.dp))
 
-            Text(
-                modifier = Modifier.clickable(
-                    indication = null,
-                    interactionSource = null,
-                    onClick = { showInfoPopup = true }
-                ),
-                text = stringResource(R.string.folder_search_help_text),
-                color = AppColors.LinkColor,
-                fontSize = 16.sp
+
+            HelpText(
+                showPopup = { showInfoPopup = true }
             )
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
+}
+
+
+
+@Composable
+private fun ScreenTitle(){
+    Text(
+        text = stringResource(R.string.folder_search_prompt),
+        modifier = Modifier.fillMaxWidth(),
+        fontSize = 24.sp,
+        fontWeight = FontWeight.SemiBold,
+        textAlign = TextAlign.Center
+    )
+}
+
+
+
+/**
+ * Input field for entering the username of the artist whose folders you want to search for.
+ */
+@Composable
+private fun UsernameInput(
+    usernameInput: String,
+    setUsernameInput: (String) -> Unit,
+    isValidUsername: Boolean,
+    setIsValidUsername: (Boolean) -> Unit
+) {
+    OutlinedTextField(
+        value = usernameInput,
+        onValueChange = { newValue ->
+            setUsernameInput(newValue)
+            setIsValidUsername(newValue.isNotBlank())
+        },
+        isError = !isValidUsername,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        label = { Text(stringResource(R.string.folder_search_username_prompt)) },
+        singleLine = true
+    )
+}
+
+
+
+/**
+ * Displays a checkbox that lets the user select if they want to save the full gallery/collection,
+ * or want to see individual folders they can save separately.
+ */
+@Composable
+private fun SaveFullGalleryCheckbox(
+    saveFullGallery: Boolean,
+    setSaveFullGallery: (Boolean) -> Unit
+) {
+    LabeledCheckbox(
+        label = stringResource(R.string.folder_search_checkbox_label),
+        checked = saveFullGallery,
+        onCheckedChange = setSaveFullGallery
+    )
+}
+
+
+
+/**
+ * Displays a switch that can be used to toggle the folder randomization setting
+ */
+@Composable
+private fun FolderRandomizationSwitch(
+    shouldRandomize: Boolean,
+    setShouldRandomize: (Boolean) -> Unit
+) {
+    val labelId = if (shouldRandomize) R.string.should_randomize_text else R.string.should_not_randomize_text
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            text = stringResource(labelId)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Switch(
+            checked = shouldRandomize,
+            onCheckedChange = setShouldRandomize
+        )
+    }
+}
+
+
+
+/**
+ * Shows the button that submits the form and does the folder search (or gallery save if that is
+ * what the user selected).
+ */
+@Composable
+private fun SearchButton(
+    //User input
+    usernameInput: String,
+    saveFullGallery: Boolean,
+    storageLocation: StorageLocation,
+    shouldRandomize: Boolean,
+
+    //Functions
+    checkIfLoginExpired: () -> Boolean,
+    setIsValidUsername: (Boolean) -> Unit,
+    saveFullCollection: (String, StorageLocation, Boolean) -> Unit
+) {
+    val context = LocalContext.current
+
+    val btnText =
+        if (saveFullGallery) R.string.folder_search_save_full_gallery_button
+        else R.string.folder_search_run_search_button
+
+
+    StandardButton(
+        modifier = Modifier,
+        text = stringResource(btnText),
+        onClick = {
+            if(checkIfLoginExpired()){
+                return@StandardButton
+            }
+            if (usernameInput.isBlank()){
+                setIsValidUsername(false)
+                return@StandardButton
+            }
+
+
+            if (saveFullGallery){
+                saveFullCollection(usernameInput, storageLocation, shouldRandomize)
+            }
+            else {
+                val intent = Intent(context, FolderSearchResultsActivity::class.java)
+                intent.putExtra(FolderSearchResultsActivity.USERNAME_KEY, usernameInput.trim())
+                intent.putExtra(FolderSearchResultsActivity.LOCATION_KEY, storageLocation.toString())
+                context.startActivity(intent)
+            }
+        }
+    )
+}
+
+
+
+/**
+ * Displays help text the user can click on to get information about the folder search.
+ */
+@Composable
+private fun HelpText(
+    showPopup: () -> Unit
+) {
+    Text(
+        modifier = Modifier.clickable(
+            indication = null,
+            interactionSource = null,
+            onClick = showPopup
+        ),
+        text = stringResource(R.string.folder_search_help_text),
+        color = AppColors.LinkColor,
+        fontSize = 16.sp
+    )
 }
 
 
