@@ -6,12 +6,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
@@ -58,34 +55,34 @@ private fun SettingsScreenContent(viewModel: SettingsViewModel) {
     val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(WindowInsets.systemBars.asPaddingValues())
-    ) {
-        Toolbar(
-            includeBackButton = true,
-            title = stringResource(R.string.settings_title),
-            otherButtons = listOf()
-        )
-        Spacer(modifier = Modifier.height(20.dp))
+    BaseScreen() {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Toolbar(
+                includeBackButton = true,
+                title = stringResource(R.string.settings_title),
+                otherButtons = listOf()
+            )
+            Spacer(modifier = Modifier.height(20.dp))
 
 
-        MatureContentSetting(
-            enabled = !guestMode,
-            matureContentAllowed = matureContentAllowed,
-            setMatureContent = viewModel::setMatureContent,
-        )
-        AboutAppSetting(showDialog = { showAppInfoPopup = true })
-        PrivacyPolicySetting()
-        AppVersionSetting()
-    }
+            MatureContentSetting(
+                enabled = !guestMode,
+                matureContentAllowed = matureContentAllowed,
+                setMatureContent = viewModel::setMatureContent,
+            )
+            AboutAppSetting(showDialog = { showAppInfoPopup = true })
+            PrivacyPolicySetting()
+            AppVersionSetting()
+        }
 
 
-    if (showAppInfoPopup) {
-        AppInfoDialog(
-            dismissDialog = { showAppInfoPopup = false }
-        )
+        if (showAppInfoPopup) {
+            AppInfoDialog(
+                dismissDialog = { showAppInfoPopup = false }
+            )
+        }
     }
 }
 

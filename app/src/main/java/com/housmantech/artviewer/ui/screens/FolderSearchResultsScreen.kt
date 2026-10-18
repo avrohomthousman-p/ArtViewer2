@@ -5,12 +5,8 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -112,26 +108,26 @@ private fun FolderSearchResultsScreenContent(
     onSwipeFolder: (Int) -> Unit,
     onClickSaveBtn: (Int) -> Unit
 ){
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(WindowInsets.systemBars.asPaddingValues()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    BaseScreen() {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-        SearchResultsScreenToolbar(stringResource(R.string.results_toolbar_title))
-        Spacer(modifier = Modifier.height(30.dp))
+            SearchResultsScreenToolbar(stringResource(R.string.results_toolbar_title))
+            Spacer(modifier = Modifier.height(30.dp))
 
 
-        when(state) {
-            is UiState.Error -> DisplayError(ownerUsername, location)
-            UiState.Loading -> DisplayLoadingMessage()
-            is UiState.Success<List<Folder>> ->
-                DisplayFoldersList(
-                    folders = state.data,
-                    onClickSaveBtn = onClickSaveBtn,
-                    onSwipeFolder = onSwipeFolder
-                )
+            when(state) {
+                is UiState.Error -> DisplayError(ownerUsername, location)
+                UiState.Loading -> DisplayLoadingMessage()
+                is UiState.Success<List<Folder>> ->
+                    DisplayFoldersList(
+                        folders = state.data,
+                        onClickSaveBtn = onClickSaveBtn,
+                        onSwipeFolder = onSwipeFolder
+                    )
+            }
         }
     }
 }

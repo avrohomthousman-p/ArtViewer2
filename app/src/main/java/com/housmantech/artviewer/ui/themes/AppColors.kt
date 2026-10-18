@@ -20,7 +20,7 @@ object AppColors {
 
 
     val StatusBarColor = Color(0xFF64B5F6)
-    val NavBarColor = AltBackgroundColor
+    val NavBarColor = Color(0xFFB0B0B0)
 
 
     val White = Color.White

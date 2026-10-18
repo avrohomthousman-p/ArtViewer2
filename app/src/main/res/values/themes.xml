@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ArtViewer" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- System bars are transparent and the color is managed in compose (BaseActivity) -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+
+    </style>
+</resources>

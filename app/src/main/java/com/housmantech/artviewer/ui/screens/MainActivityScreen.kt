@@ -3,16 +3,11 @@ package com.housmantech.artviewer.ui.screens
 import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -35,8 +30,8 @@ import com.housmantech.artviewer.R
 import com.housmantech.artviewer.common.StorageLocation
 import com.housmantech.artviewer.data.local.room.Folder
 import com.housmantech.artviewer.ui.activities.DisplayArtActivity
-import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.FolderSearchActivity
+import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.SettingsActivity
 import com.housmantech.artviewer.ui.components.DeleteFolderDialog
 import com.housmantech.artviewer.ui.components.EditOrCreateFolderDialog
@@ -44,7 +39,6 @@ import com.housmantech.artviewer.ui.components.FolderInteraction
 import com.housmantech.artviewer.ui.components.NewFolderPrompt
 import com.housmantech.artviewer.ui.components.SingleFolderDisplay
 import com.housmantech.artviewer.ui.components.Toolbar
-import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
 import com.housmantech.artviewer.ui.util.ToolbarButtonData
 import com.housmantech.artviewer.ui.util.UiState
@@ -154,6 +148,7 @@ fun MainActivityScreen(viewModel: MainActivityViewModel) {
 }
 
 
+
 @Composable
 private fun MainActivityScreenContent(
     state: UiState<List<Folder>>,
@@ -162,34 +157,35 @@ private fun MainActivityScreenContent(
     onClickFolderEdit: (Int) -> Unit,
     onClickFolderDelete: (Int) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(WindowInsets.systemBars.asPaddingValues()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Toolbar(
-            includeBackButton = false,
-            title = stringResource(R.string.main_title),
-            otherButtons = toolbarButtons
-        )
+    BaseScreen() {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Toolbar(
+                includeBackButton = false,
+                title = stringResource(R.string.main_title),
+                otherButtons = toolbarButtons
+            )
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
 
-        when(state) {
-            is UiState.Error -> ErrorDisplay()
-            UiState.Loading -> LoadingDisplay()
-            is UiState.Success<List<Folder>> ->
-                FoldersListDisplay(
-                    folders = state.data,
-                    onClickFolder = onClickFolder,
-                    onClickFolderEdit = onClickFolderEdit,
-                    onClickFolderDelete = onClickFolderDelete
-                )
+            when(state) {
+                is UiState.Error -> ErrorDisplay()
+                UiState.Loading -> LoadingDisplay()
+                is UiState.Success<List<Folder>> ->
+                    FoldersListDisplay(
+                        folders = state.data,
+                        onClickFolder = onClickFolder,
+                        onClickFolderEdit = onClickFolderEdit,
+                        onClickFolderDelete = onClickFolderDelete
+                    )
+            }
         }
     }
 }
+
 
 
 /**
@@ -230,7 +226,6 @@ private fun FoldersListDisplay(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppColors.White)
             .verticalScroll(scrollState)
     ) {
         folders.forEachIndexed { index, folder ->

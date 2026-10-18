@@ -3,21 +3,15 @@ package com.housmantech.artviewer.ui.screens
 import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.LocalActivity
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
@@ -25,7 +19,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -74,37 +66,12 @@ fun DisplayArtScreen(
     isLandscape: Boolean,
     folderName: String
 ) {
-    val activity = LocalActivity.current as? ComponentActivity
     val context = LocalContext.current
     val state = viewModel.uiState.collectAsState()
     val isFullscreenMode = isLandscape && state.value is UiState.Success
     val matureContentAllowed by viewModel.matureContentAllowed.collectAsState()
     var showArtTitles by rememberSaveable { mutableStateOf(true) }
     var muteVideos by remember { mutableStateOf(true) }
-
-
-    val statusBarColor =
-        if (isFullscreenMode)
-            AppColors.NavBarColor
-        else
-            AppColors.StatusBarColor
-
-
-    //Ensure the edge to edge is handled correctly in the case of landscape mode and Success state
-    SideEffect {
-        if (isFullscreenMode) {
-            activity?.enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.light(
-                    scrim = statusBarColor.toArgb(),
-                    darkScrim = statusBarColor.toArgb()
-                ),
-                navigationBarStyle = SystemBarStyle.light(
-                    scrim = AppColors.NavBarColor.toArgb(),
-                    darkScrim = AppColors.NavBarColor.toArgb()
-                )
-            )
-        }
-    }
 
 
     LaunchedEffect(Unit) {
@@ -122,44 +89,58 @@ fun DisplayArtScreen(
     }
 
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-            .padding(WindowInsets.systemBars.asPaddingValues())
+    // Fullscreen mode has no toolbar (due to the screen not having much vertical space)
+    // so we don't want such a bright blue status bar.
+    val statusBarColor =
+        if (isFullscreenMode)
+            AppColors.AltBackgroundColor
+        else
+            AppColors.StatusBarColor
+
+
+    BaseScreen(
+        statusBarColor = statusBarColor,
+        navBarColor = AppColors.NavBarColor
     ) {
-        if (!isFullscreenMode) {
-            Toolbar(
-                folderName = folderName,
-                showArtTitles = showArtTitles,
-                toggleShowTitle = { showArtTitles = !showArtTitles },
-                videosMuted = muteVideos,
-                toggleMuted = { muteVideos = !muteVideos}
-            )
-        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            if (!isFullscreenMode) {
+                Toolbar(
+                    folderName = folderName,
+                    showArtTitles = showArtTitles,
+                    toggleShowTitle = { showArtTitles = !showArtTitles },
+                    videosMuted = muteVideos,
+                    toggleMuted = { muteVideos = !muteVideos}
+                )
+            }
 
 
-        val exactState: UiState<List<DeviantArtMediaItem>> =
-            state.value//needed to satisfy compiler type concerns
-        when (exactState) {
-            UiState.Loading -> LoadingDisplay(matureContentAllowed)
-            is UiState.Error -> ErrorDisplay(exactState.message)
-            is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
-                artList = exactState.data,
-                showArtTitles = showArtTitles,
-                muteVideos = muteVideos,
-                onScroll = { page, isForward ->
-                    viewModel.onScroll(page, isForward)
+            val exactState: UiState<List<DeviantArtMediaItem>> =
+                state.value//needed to satisfy compiler type concerns
+            when (exactState) {
+                UiState.Loading -> LoadingDisplay(matureContentAllowed)
+                is UiState.Error -> ErrorDisplay(exactState.message)
+                is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
+                    artList = exactState.data,
+                    showArtTitles = showArtTitles,
+                    muteVideos = muteVideos,
+                    onScroll = { page, isForward ->
+                        viewModel.onScroll(page, isForward)
+                    }
+                )
+            }
+
+
+            //Show a toast message if the user is at the end of the art list but more data is loading.
+            //Without this the user will think it's actually the end of the list.
+            val showLoadingToast by viewModel.showLoadingToast.collectAsState()
+            LaunchedEffect(showLoadingToast) {
+                if (showLoadingToast) {
+                    Toast.makeText(context, "Loading more media…", Toast.LENGTH_LONG).show()
+                    viewModel.clearLoadingToastFlag()
                 }
-            )
-        }
-
-
-        //Show a toast message if the user is at the end of the art list but more data is loading.
-        //Without this the user will think it's actually the end of the list.
-        val showLoadingToast by viewModel.showLoadingToast.collectAsState()
-        LaunchedEffect(showLoadingToast) {
-            if (showLoadingToast) {
-                Toast.makeText(context, "Loading more media…", Toast.LENGTH_LONG).show()
-                viewModel.clearLoadingToastFlag()
             }
         }
     }

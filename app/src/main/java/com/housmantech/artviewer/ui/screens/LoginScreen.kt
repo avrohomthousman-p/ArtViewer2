@@ -3,17 +3,13 @@ package com.housmantech.artviewer.ui.screens
 import android.app.Activity
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +30,7 @@ import com.housmantech.artviewer.ui.components.TOOLBAR_HEIGHT
 import com.housmantech.artviewer.ui.components.Toolbar
 import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
+
 
 
 /**
@@ -100,52 +97,51 @@ private fun LoginScreenContent(
     }
 
 
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppColors.White)
-            .padding(WindowInsets.systemBars.asPaddingValues())
-    ) {
-        val (toolbar, title, statusContent, bottomText) = createRefs()
+    BaseScreen() {
+        ConstraintLayout(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val (toolbar, title, statusContent, bottomText) = createRefs()
 
-        Toolbar(
-            Modifier.constrainAs(toolbar) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-        )
+            Toolbar(
+                Modifier.constrainAs(toolbar) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
 
-        Title(
-            text = bannerText,
-            modifier = Modifier.constrainAs(title) {
-                top.linkTo(toolbar.bottom, margin = 22.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-        )
+            Title(
+                text = bannerText,
+                modifier = Modifier.constrainAs(title) {
+                    top.linkTo(toolbar.bottom, margin = 22.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
 
-        CenterContent(
-            loginState = loginState,
-            performLogin = performLogin,
-            performGuestLogin = performGuestLogin,
-            statusText = statusText,
-            statusTextColor = statusTextColor,
-            modifier = Modifier.constrainAs(statusContent) {
-                top.linkTo(toolbar.bottom)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-        )
+            CenterContent(
+                loginState = loginState,
+                performLogin = performLogin,
+                performGuestLogin = performGuestLogin,
+                statusText = statusText,
+                statusTextColor = statusTextColor,
+                modifier = Modifier.constrainAs(statusContent) {
+                    top.linkTo(toolbar.bottom)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
 
-        BottomText(
-            modifier = Modifier.constrainAs(bottomText){
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-        )
+            BottomText(
+                modifier = Modifier.constrainAs(bottomText){
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+            )
+        }
     }
 }
 

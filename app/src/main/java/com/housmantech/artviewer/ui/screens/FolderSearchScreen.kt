@@ -7,13 +7,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
@@ -42,13 +39,14 @@ import com.housmantech.artviewer.common.StorageLocation
 import com.housmantech.artviewer.ui.activities.FolderSearchResultsActivity
 import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.MainActivity
-import com.housmantech.artviewer.ui.components.FolderTypePicker
 import com.housmantech.artviewer.ui.components.FolderSearchInfoDialog
+import com.housmantech.artviewer.ui.components.FolderTypePicker
 import com.housmantech.artviewer.ui.components.LabeledCheckbox
 import com.housmantech.artviewer.ui.components.StandardButton
 import com.housmantech.artviewer.ui.components.Toolbar
 import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
+
 
 
 /**
@@ -132,126 +130,126 @@ fun FolderSearchScreenContent(
     }
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(WindowInsets.systemBars.asPaddingValues()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Toolbar(
-            includeBackButton = true,
-            title = stringResource(R.string.folder_search_toolbar_title),
-            otherButtons = listOf()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+    BaseScreen() {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Toolbar(
+                includeBackButton = true,
+                title = stringResource(R.string.folder_search_toolbar_title),
+                otherButtons = listOf()
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
 
-        Text(
-            text = stringResource(R.string.folder_search_prompt),
-            modifier = Modifier.fillMaxWidth(),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(40.dp))
+            Text(
+                text = stringResource(R.string.folder_search_prompt),
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(40.dp))
 
 
-        OutlinedTextField(
-            value = usernameInput,
-            onValueChange = { newValue ->
-                usernameInput = newValue
-                isValidUsername = newValue.isNotBlank()
-            },
-            isError = !isValidUsername,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            label = { Text(stringResource(R.string.folder_search_username_prompt)) },
-            singleLine = true
-        )
-        Spacer(modifier = Modifier.height(30.dp))
-
-
-
-        LabeledCheckbox(
-            label = stringResource(R.string.folder_search_checkbox_label),
-            checked = saveFullGallery,
-            onCheckedChange = { saveFullGallery = it }
-        )
-        Spacer(modifier = Modifier.height(30.dp))
+            OutlinedTextField(
+                value = usernameInput,
+                onValueChange = { newValue ->
+                    usernameInput = newValue
+                    isValidUsername = newValue.isNotBlank()
+                },
+                isError = !isValidUsername,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                label = { Text(stringResource(R.string.folder_search_username_prompt)) },
+                singleLine = true
+            )
+            Spacer(modifier = Modifier.height(30.dp))
 
 
 
-        FolderTypePicker(
-            currentlySelected = radioSelection,
-            onSelected = { radioSelection = it }
-        )
-        Spacer(modifier = Modifier.height(30.dp))
+            LabeledCheckbox(
+                label = stringResource(R.string.folder_search_checkbox_label),
+                checked = saveFullGallery,
+                onCheckedChange = { saveFullGallery = it }
+            )
+            Spacer(modifier = Modifier.height(30.dp))
 
 
 
-        if (saveFullGallery){
-            val labelId = if (shouldRandomize) R.string.should_randomize_text else R.string.should_not_randomize_text
+            FolderTypePicker(
+                currentlySelected = radioSelection,
+                onSelected = { radioSelection = it }
+            )
+            Spacer(modifier = Modifier.height(30.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(labelId)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Switch(
-                    checked = shouldRandomize,
-                    onCheckedChange = { shouldRandomize = !shouldRandomize }
-                )
+
+
+            if (saveFullGallery){
+                val labelId = if (shouldRandomize) R.string.should_randomize_text else R.string.should_not_randomize_text
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(labelId)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Switch(
+                        checked = shouldRandomize,
+                        onCheckedChange = { shouldRandomize = !shouldRandomize }
+                    )
+                }
             }
+
+
+
+            Spacer(modifier = Modifier.weight(1f))
+
+
+
+            val btnText =
+                if (saveFullGallery) R.string.folder_search_save_full_gallery_button
+                else R.string.folder_search_run_search_button
+
+            StandardButton(
+                modifier = Modifier,
+                text = stringResource(btnText),
+                onClick = {
+                    if(checkIfLoginExpired()){
+                        return@StandardButton
+                    }
+                    if (usernameInput.isBlank()){
+                        isValidUsername = false
+                        return@StandardButton
+                    }
+
+
+                    if (saveFullGallery){
+                        saveFullCollection(usernameInput, radioSelection, shouldRandomize)
+                    }
+                    else {
+                        val intent = Intent(context, FolderSearchResultsActivity::class.java)
+                        intent.putExtra(FolderSearchResultsActivity.USERNAME_KEY, usernameInput.trim())
+                        intent.putExtra(FolderSearchResultsActivity.LOCATION_KEY, radioSelection.toString())
+                        context.startActivity(intent)
+                    }
+                }
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = null,
+                    onClick = { showInfoPopup = true }
+                ),
+                text = stringResource(R.string.folder_search_help_text),
+                color = AppColors.LinkColor,
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(32.dp))
         }
-
-
-
-        Spacer(modifier = Modifier.weight(1f))
-
-
-
-        val btnText =
-            if (saveFullGallery) R.string.folder_search_save_full_gallery_button
-            else R.string.folder_search_run_search_button
-
-        StandardButton(
-            modifier = Modifier,
-            text = stringResource(btnText),
-            onClick = {
-                if(checkIfLoginExpired()){
-                    return@StandardButton
-                }
-                if (usernameInput.isBlank()){
-                    isValidUsername = false
-                    return@StandardButton
-                }
-
-
-                if (saveFullGallery){
-                    saveFullCollection(usernameInput, radioSelection, shouldRandomize)
-                }
-                else {
-                    val intent = Intent(context, FolderSearchResultsActivity::class.java)
-                    intent.putExtra(FolderSearchResultsActivity.USERNAME_KEY, usernameInput.trim())
-                    intent.putExtra(FolderSearchResultsActivity.LOCATION_KEY, radioSelection.toString())
-                    context.startActivity(intent)
-                }
-            }
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            modifier = Modifier.clickable(
-                indication = null,
-                interactionSource = null,
-                onClick = { showInfoPopup = true }
-            ),
-            text = stringResource(R.string.folder_search_help_text),
-            color = AppColors.LinkColor,
-            fontSize = 16.sp
-        )
-        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
