@@ -48,7 +48,6 @@ import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.SettingsActivity
 import com.housmantech.artviewer.ui.components.ParagraphWithLinks
 import com.housmantech.artviewer.ui.components.Toolbar
-import com.housmantech.artviewer.ui.themes.AppColors
 import com.housmantech.artviewer.ui.util.NavDestination
 import com.housmantech.artviewer.ui.util.OrientationLayout
 import com.housmantech.artviewer.ui.util.ToolbarButtonData
@@ -89,19 +88,7 @@ fun DisplayArtScreen(
     }
 
 
-    // Fullscreen mode has no toolbar (due to the screen not having much vertical space)
-    // so we don't want such a bright blue status bar.
-    val statusBarColor =
-        if (isFullscreenMode)
-            AppColors.AltBackgroundColor
-        else
-            AppColors.StatusBarColor
-
-
-    BaseScreen(
-        statusBarColor = statusBarColor,
-        navBarColor = AppColors.NavBarColor
-    ) {
+    BaseScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
