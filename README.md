@@ -12,6 +12,10 @@ have saved a folder, you can access it anytime.
 
 
 
+# Download
+The app is available for free on the app store <a href="https://play.google.com/store/apps/details?id=com.housmantech.artviewer&pcampaignid=web_share">here</a> (Sorry - Android only)
+
+
 # DeviantArt Connection
 This app has you authenticate viathe DeviantArt Oauth2 login portal. Users will need a DeviantArt account to use the app.
 
@@ -20,9 +24,8 @@ This app has you authenticate viathe DeviantArt Oauth2 login portal. Users will 
 
 
 # Screenshots
-<img width="360" height="780" alt="Screenshot_20260527-072945_Art Viewer" src="https://github.com/user-attachments/assets/0f511227-d803-407f-a1c0-cee85cc890b4" />
-<img width="360" height="780" alt="Screenshot_20260527-072934_Art Viewer" src="https://github.com/user-attachments/assets/f88da3df-6697-4f84-9f85-bc20074e1561" />
-<img width="360" height="780" alt="Screenshot_20260527-073045_Art Viewer" src="https://github.com/user-attachments/assets/1a41d43c-8ed6-48eb-909e-06aeb1a4c484" />
-<img width="360" height="780" alt="Screenshot_20260527-072958_Art Viewer" src="https://github.com/user-attachments/assets/9ae6f001-3d61-4403-a24e-a32d57a64bb8" />
-<img width="360" height="780" alt="Screenshot_20260527-072949_Art Viewer" src="https://github.com/user-attachments/assets/171a12ce-b0c9-4d03-98d6-4fdd928d8c42" />
-
+<img width="360" height="780" alt="Screenshot_20261026-171257_Art Viewer" src="https://github.com/user-attachments/assets/7d9eae6f-0ca0-498d-b16a-70d05a68c961" />
+<img width="360" height="780" alt="Screenshot_20261026-171214_Art Viewer" src="https://github.com/user-attachments/assets/ee8fa5f5-4487-4618-a7fe-c06f4645afbf" />
+<img width="360" height="780" alt="Screenshot_20261026-171607_Art Viewer" src="https://github.com/user-attachments/assets/5f6834bc-8163-40e6-8043-cccaebbd4d03" />
+<img width="360" height="780" alt="Screenshot_20261026-171241_Art Viewer" src="https://github.com/user-attachments/assets/948a92d9-3762-4a61-9300-c4468e6dfb81" />
+<img width="360" height="780" alt="Screenshot_20261026-171223_Art Viewer" src="https://github.com/user-attachments/assets/fb8472ec-e846-4a9a-bce7-dfa6ecfe2806" />
