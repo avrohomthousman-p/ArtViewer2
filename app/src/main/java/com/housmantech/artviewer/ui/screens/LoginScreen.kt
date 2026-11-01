@@ -2,20 +2,24 @@ package com.housmantech.artviewer.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -210,6 +214,33 @@ private fun LoginButtons(
     performLogin: () -> Unit,
     performGuestLogin: () -> Unit
 ){
+
+    val configuration = LocalConfiguration.current
+
+    if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        LoginButtonsPortrait(
+            modifier = modifier,
+            performLogin = performLogin,
+            performGuestLogin = performGuestLogin
+        )
+    }
+    else {
+        LoginButtonsLandscape(
+            modifier = modifier,
+            performLogin = performLogin,
+            performGuestLogin = performGuestLogin
+        )
+    }
+}
+
+
+
+@Composable
+private fun LoginButtonsPortrait(
+    modifier: Modifier,
+    performLogin: () -> Unit,
+    performGuestLogin: () -> Unit
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -223,12 +254,46 @@ private fun LoginButtons(
         Spacer(modifier = Modifier.height(18.dp))
 
         Text(
-            modifier = modifier,
             text = stringResource(R.string.or),
             fontSize = 18.sp
         )
 
         Spacer(modifier = Modifier.height(18.dp))
+
+        StandardButton(
+            modifier = Modifier,
+            text = stringResource(R.string.guest_mode_btn_text),
+            onClick = { performGuestLogin() }
+        )
+    }
+}
+
+
+
+@Composable
+private fun LoginButtonsLandscape(
+    modifier: Modifier,
+    performLogin: () -> Unit,
+    performGuestLogin: () -> Unit
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StandardButton(
+            modifier = Modifier,
+            text = stringResource(R.string.login_btn_text),
+            onClick = { performLogin() }
+        )
+
+        Spacer(modifier = Modifier.width(20.dp))
+
+        Text(
+            text = stringResource(R.string.or),
+            fontSize = 18.sp
+        )
+
+        Spacer(modifier = Modifier.width(20.dp))
 
         StandardButton(
             modifier = Modifier,
