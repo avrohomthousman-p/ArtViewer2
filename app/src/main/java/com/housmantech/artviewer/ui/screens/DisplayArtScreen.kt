@@ -2,6 +2,7 @@ package com.housmantech.artviewer.ui.screens
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.Image
@@ -28,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +49,7 @@ import com.housmantech.artviewer.data.remote.DeviantArtMediaItem
 import com.housmantech.artviewer.ui.activities.LoginActivity
 import com.housmantech.artviewer.ui.activities.SettingsActivity
 import com.housmantech.artviewer.ui.components.ParagraphWithLinks
+import com.housmantech.artviewer.ui.components.TitleWithBullets
 import com.housmantech.artviewer.ui.components.Toolbar
 import com.housmantech.artviewer.ui.util.NavDestination
 import com.housmantech.artviewer.ui.util.OrientationLayout
@@ -108,11 +111,12 @@ fun DisplayArtScreen(
                 state.value//needed to satisfy compiler type concerns
             when (exactState) {
                 UiState.Loading -> LoadingDisplay(matureContentAllowed)
-                is UiState.Error -> ErrorDisplay(exactState.message)
+                is UiState.Error -> ErrorDisplay(matureContentAllowed, exactState.message)
                 is UiState.Success<List<DeviantArtMediaItem>> -> ArtDisplay(
                     artList = exactState.data,
                     showArtTitles = showArtTitles,
                     muteVideos = muteVideos,
+                    matureContentAllowed = matureContentAllowed,
                     onScroll = { page, isForward ->
                         viewModel.onScroll(page, isForward)
                     }
@@ -256,7 +260,9 @@ private fun LoadingDisplay(matureContentAllowed: Boolean){
  * Uses a default error message if none is provided.
  */
 @Composable
-private fun ErrorDisplay(errorMessage: String? = null){
+private fun ErrorDisplay(matureContentAllowed: Boolean, errorMessage: String? = null){
+    val configuration = LocalConfiguration.current
+
     val actualMessage =
         if (!errorMessage.isNullOrEmpty())
             errorMessage
@@ -264,9 +270,9 @@ private fun ErrorDisplay(errorMessage: String? = null){
             stringResource(R.string.media_default_error_msg)
 
 
-    Box(
+    Column(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
-        contentAlignment = Alignment.TopCenter
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = actualMessage,
@@ -274,7 +280,36 @@ private fun ErrorDisplay(errorMessage: String? = null){
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
         )
+
+
+        if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Spacer(modifier = Modifier.height(40.dp))
+            ErrorScreenAdditionalHelp(matureContentAllowed)
+        }
     }
+}
+
+
+
+/**
+ * Displays suggestions of possible reasons the folder could not be loaded.
+ */
+@Composable
+private fun ErrorScreenAdditionalHelp(matureContentAllowed: Boolean) {
+    val bulletPoints = mutableListOf<String>(
+        stringResource(R.string.media_help_with_errors_internet),
+        stringResource(R.string.media_help_with_errors_folder_exists)
+    )
+
+    if (!matureContentAllowed) {
+        bulletPoints.add(stringResource(R.string.media_help_with_errors_maturity))
+    }
+
+
+    TitleWithBullets(
+        title = stringResource(R.string.media_help_with_errors_title),
+        bulletPoints = bulletPoints
+    )
 }
 
 
@@ -288,10 +323,14 @@ private fun ArtDisplay(
     artList: List<DeviantArtMediaItem>,
     showArtTitles: Boolean,
     muteVideos: Boolean,
+    matureContentAllowed: Boolean,
     onScroll: (Int, Boolean) -> Unit
 ) {
     if (artList.isEmpty()) {
-        ErrorDisplay(errorMessage = stringResource(R.string.media_folder_empty_message))
+        ErrorDisplay(
+            matureContentAllowed = matureContentAllowed,
+            errorMessage = stringResource(R.string.media_folder_empty_message)
+        )
         return
     }
 

@@ -92,12 +92,21 @@
     <string name="media_loading_message">Loading your art…</string>
     <string name="media_slow_loading_title">Please be patient. The folder seems to be taking long to load.</string>
     <string name="media_slow_loading_mature_warning">
-        You have mature content blocked. This can cause longer load times for folders that are mostly mature content.
+        You have mature content blocked. This can cause longer load times for folders that have a lot of mature content.
         Please consider changing this in the app settings or deleting this folder.
     </string>
     <string name="media_slow_loading_hyperlink_text">app settings</string>
     <string name="media_default_error_msg">We are experiencing technical difficulties.</string>
     <string name="media_folder_empty_message">We could not find any art in this folder.</string>
+    <string name="media_help_with_errors_title">Possible causes</string>
+    <string name="media_help_with_errors_internet">Check that your internet connection is stable.</string>
+    <string name="media_help_with_errors_folder_exists">
+        Check that this folder still exists (and was not deleted by the artist).
+    </string>
+    <string name="media_help_with_errors_maturity">
+        Mature content is currently blocked. If this folder contains mature artwork, it will not be displayed.
+        You can change this in the App Settings.
+    </string>
     <string name="media_mute_button_content_desc">Mute</string>
     <string name="media_unmute_button_content_desc">Unmute</string>
     <string name="media_show_title_content_desc">Show title</string>

@@ -104,7 +104,7 @@ class DisplayArtViewModel @Inject constructor(
 
                 if (artData.isEmpty()){
                     Log.e("Art Fetching Failure", "Got no data in view model")
-                    _uiState.value = UiState.Error("Something went wrong. We could not load your art.")
+                    _uiState.value = UiState.Error("Something went wrong. We could not find any art in this folder.")
                     return@launch
                 }
 
