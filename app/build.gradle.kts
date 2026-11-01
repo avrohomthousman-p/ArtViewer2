@@ -5,26 +5,22 @@ import java.io.File
 plugins {
     alias(libs.plugins.android.application)
     id("org.jetbrains.kotlin.plugin.compose")
-    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
+    id("com.google.devtools.ksp") version "2.3.2"
     id("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.21"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.4.21"
     id("de.undercouch.download") version "5.7.0"
 }
 
 android {
     namespace = "com.housmantech.artviewer"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.housmantech.artviewer"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 24
-        versionName = "1.4.2"
+        targetSdk = 37
+        versionCode = 25
+        versionName = "1.4.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
